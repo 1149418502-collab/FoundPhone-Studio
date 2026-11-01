@@ -27,6 +27,19 @@ jobs:
       - run: npm run story:test
       - run: npm run build
       - run: mkdir -p dist/maque && cp -R maque/. dist/maque/
+      - name: Set Maque page title
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path("dist/maque/index.html")
+          html = p.read_text(encoding="utf-8")
+          title = "<title>非常规galgame/试玩版</title>"
+          html, count = re.subn(r"(?is)<title\b[^>]*>.*?</title>", lambda _: title, html, count=1)
+          if not count:
+              html = re.sub(r"(?i)<head\b[^>]*>", lambda m: m.group(0) + title, html, count=1)
+          p.write_text(html, encoding="utf-8")
+          PY
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
