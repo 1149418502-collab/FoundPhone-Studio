@@ -26,6 +26,7 @@ jobs:
       - run: npm run story:validate
       - run: npm run story:test
       - run: npm run build
+      - run: mkdir -p dist/maque && cp -R maque/. dist/maque/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
