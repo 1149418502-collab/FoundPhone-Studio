@@ -61,6 +61,14 @@ async function advance(page: Page, count: number) {
     await page.locator("#chatarea").click({ position: { x: 8, y: 8 } });
 }
 
+async function finishGiftConversation(page: Page) {
+  const count = await page.evaluate(
+    "ordinaryGiftDialogue[pendingOrdinaryGiftName].length",
+  );
+  expect(count).toBeGreaterThanOrEqual(7);
+  await advance(page, count);
+}
+
 test("chat portraits decode and match the embedded header portrait", async ({
   page,
 }) => {
@@ -95,8 +103,16 @@ for (const [name, line] of gifts) {
     await chat(page);
     await send(page, name);
     await expect(page.locator("#chatGiftButton")).toBeDisabled();
-    await advance(page, 3);
+    await finishGiftConversation(page);
     await expect(page.locator("#chatarea")).toContainText(line);
+    if (name === "签名足球")
+      await expect(page.locator("#chatarea")).toContainText(
+        "我会把奖杯送给你的",
+      );
+    if (name === "双层芝士汉堡")
+      await expect(page.locator("#chatarea")).toContainText(
+        "今天要和我一起吃汉堡吗",
+      );
     await expect(page.locator("#chatarea .system-bubble")).toHaveText(
       "赠送给 郑成灿 · " + name,
     );
@@ -124,7 +140,7 @@ test("one gift at a time; rapid second gift cannot interrupt or gain extra affec
   await send(page, "红玫瑰");
   await page.evaluate("sendGiftInChat('签名足球');openGiftPicker()");
   await expect(page.locator("#giftPicker")).not.toHaveClass(/show/);
-  await advance(page, 3);
+  await finishGiftConversation(page);
   expect(
     await page.evaluate(() =>
       JSON.parse(localStorage.getItem("maque_owned_gifts")!),
@@ -132,7 +148,7 @@ test("one gift at a time; rapid second gift cannot interrupt or gain extra affec
   ).toEqual(["签名足球"]);
   await expect(page.locator("#chatarea")).not.toContainText("最喜欢的运动");
   await send(page, "签名足球");
-  await advance(page, 3);
+  await finishGiftConversation(page);
   const score = await page.evaluate(() =>
     Number(localStorage.getItem("maque_affection")),
   );
@@ -169,7 +185,7 @@ test("crossing 80% unlocks immediately, clamps at 100%, and restores after reloa
   await chat(page);
   await page.evaluate("Math.random=()=>0");
   await send(page, "红玫瑰");
-  await advance(page, 3);
+  await finishGiftConversation(page);
   await expect(page.locator("#affectionValue")).toHaveText("♥ 80%");
   await expect(page.locator("#pureLoveBuy")).toBeEnabled();
   await page.reload();
@@ -196,7 +212,7 @@ test("special gift needs two warnings, cancellation resets confirmation, and bot
   await page.evaluate("view('home')");
   await chat(page);
   await send(page, special);
-  await advance(page, 4);
+  await advance(page, await page.evaluate("specialGiftDialogue.length"));
   await page
     .getByRole("button", { name: "哈哈哈，我是开玩笑的", exact: true })
     .click();
@@ -219,3 +235,152 @@ test("special gift needs two warnings, cancellation resets confirmation, and bot
   expect(score).toBeGreaterThanOrEqual(83);
   expect(score).toBeLessThanOrEqual(85);
 });
+
+test("dating unlocks at 5%, keeps the current chat and focus, and uses 1.5 second notices", async ({
+  page,
+}) => {
+  await page.clock.install();
+  await page.clock.pauseAt(new Date(Date.now() + 1000));
+  await open(page, 4, ["红玫瑰"]);
+  await expect(page.locator("#dateApp")).toBeHidden();
+  await chat(page);
+  await page.evaluate("Math.random=()=>0");
+  await send(page, "红玫瑰");
+  await finishGiftConversation(page);
+  await expect(page.locator("#kakao")).toHaveClass(/active/);
+  expect(
+    await page.locator("#dateApp").evaluate((el) => (el as HTMLElement).hidden),
+  ).toBe(false);
+  await expect(page.locator("#featureNotice")).toContainText("约会");
+  await expect(page.locator("#featureNotice")).toHaveCSS(
+    "pointer-events",
+    "none",
+  );
+  await page.locator("#chatGiftButton").focus();
+  await page.clock.fastForward(1499);
+  await expect(page.locator("#featureNotice")).toBeVisible();
+  await page.clock.fastForward(1);
+  await expect(page.locator("#featureNotice")).toBeHidden();
+  await page.evaluate("giftUnlockPushed=false;pushGiftUnlock()");
+  await expect(page.locator("#featureNotice")).toContainText("礼赠");
+  await expect(page.locator("#chatGiftButton")).toBeFocused();
+  await page.clock.fastForward(1500);
+  await expect(page.locator("#featureNotice")).toBeHidden();
+  await page.reload();
+  await page.evaluate("view('home')");
+  await expect(page.locator("#featureNotice")).toBeHidden();
+  await page.getByRole("button", { name: /约会/ }).click();
+  await expect(page.locator(".date-quote")).toHaveText(
+    "나랑 조금 더 가까워지고 싶어요?",
+  );
+});
+
+test("dating threshold guards direct access and four mobile scene cards have introductions", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await open(page, 4);
+  await page.evaluate("openApp('dates')");
+  await expect(page.locator("#modalbody")).toContainText("5%");
+  await page.locator("#modal button").click();
+  await page.evaluate("affection=5;syncDateUnlock()");
+  await page.getByRole("button", { name: /约会/ }).click();
+  await page.getByRole("button", { name: "挑选约会场景" }).click();
+  await expect(page.locator(".date-scene")).toHaveCount(4);
+  await expect(page.locator(".scene-name-escape")).toHaveText("大 逃 殺");
+  const spacing = await page
+    .locator(".scene-name-escape")
+    .evaluate((el) => parseFloat(getComputedStyle(el).letterSpacing));
+  expect(spacing).toBeGreaterThan(5);
+  for (const name of ["大逃殺", "足球校园", "一日爱豆"]) {
+    await page
+      .getByRole("button", { name: "选择约会场景：" + name, exact: true })
+      .click();
+    await expect(page.locator(".date-detail-copy")).not.toBeEmpty();
+    await expect(
+      page.getByRole("button", { name: "等待下一次邀请" }),
+    ).toBeDisabled();
+    await page
+      .getByRole("button", { name: "返回约会场景", exact: true })
+      .click();
+  }
+  expect(
+    await page
+      .locator("#dates")
+      .evaluate((el) => el.scrollWidth <= el.clientWidth),
+  ).toBe(true);
+  await page
+    .locator("#dates")
+    .screenshot({ path: "outputs/maque/dating-scenes.png" });
+  expect(
+    await page.evaluate(() => localStorage.getItem("maque_date_posts")),
+  ).toBeNull();
+});
+
+for (const choice of [
+  "我会在这里，最大声地为你加油。",
+  "慢慢呼吸，你现在的样子已经很帅气了。",
+]) {
+  test(
+    "baseball date, Instagram memory, saved likes and one-time reward: " +
+      choice,
+    async ({ page }) => {
+      const errors: string[] = [];
+      page.on("pageerror", (e) => errors.push(e.message));
+      await open(page, 5);
+      async function enter() {
+        await page.evaluate("openApp('dates')");
+        await page.getByRole("button", { name: "挑选约会场景" }).click();
+        await page
+          .getByRole("button", { name: "选择约会场景：棒球场", exact: true })
+          .click();
+        await expect(page.locator(".date-detail-copy")).toContainText(
+          "LG Twins",
+        );
+        await page.locator("#dateDetail .date-primary").click();
+        await page.locator("#dateDetail .date-primary").click();
+        await page.locator("#dateDetail .date-primary").click();
+        await page.getByRole("button", { name: new RegExp(choice) }).click();
+        for (let i = 0; i < 4; i++)
+          await page.locator("#dateDetail .date-primary").click();
+      }
+      await enter();
+      const score = await page.evaluate(() =>
+        Number(localStorage.getItem("maque_affection")),
+      );
+      expect(score).toBeGreaterThanOrEqual(8);
+      expect(score).toBeLessThanOrEqual(10);
+      await page
+        .getByRole("button", { name: /去看看成灿的 Instagram/ })
+        .click();
+      await expect(page.locator(".ins-post")).toHaveCount(1);
+      await expect(page.locator(".ins-caption")).toContainText(
+        "和银硕一起到了棒球场",
+      );
+      await page
+        .getByRole("button", { name: "喜欢这条动态", exact: true })
+        .click();
+      await expect(
+        page.getByRole("button", { name: "喜欢这条动态", exact: true }),
+      ).toHaveAttribute("aria-pressed", "true");
+      await page
+        .locator("#instagram")
+        .screenshot({ path: "outputs/maque/baseball-instagram.png" });
+      await page.reload();
+      await page.evaluate("openApp('instagram')");
+      await expect(page.locator(".ins-post")).toHaveCount(1);
+      await expect(
+        page.getByRole("button", { name: "喜欢这条动态", exact: true }),
+      ).toHaveAttribute("aria-pressed", "true");
+      await enter();
+      expect(
+        await page.evaluate(() =>
+          Number(localStorage.getItem("maque_affection")),
+        ),
+      ).toBe(score);
+      await page.evaluate("openApp('instagram')");
+      await expect(page.locator(".ins-post")).toHaveCount(1);
+      expect(errors).toEqual([]);
+    },
+  );
+}
