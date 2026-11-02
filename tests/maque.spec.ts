@@ -464,7 +464,6 @@ test("chosen photo has one second of preparation and becomes the saved Instagram
   );
   await expect(page.locator(".ins-caption")).not.toContainText("和银硕一起");
   await page.reload();
-  await page.evaluate("albumReady");
   await page.evaluate("openApp('instagram')");
   await expect(page.locator(".ins-post-image")).toHaveAttribute(
     "src",

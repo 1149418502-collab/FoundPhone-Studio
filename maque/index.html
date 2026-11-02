@@ -1490,6 +1490,7 @@ function usePhotoForDate(){
  setTimeout(()=>{if(token!==datePhotoToken)return;track.hidden=true;document.getElementById('dateUploadTitle').textContent='合影已准备好';document.getElementById('dateUploadDescription').textContent='银硕，这一张，就作为我们约会的开始吧。';document.getElementById('dateUploadContinue').hidden=false},1000);
 }
 
+albumReady.then(()=>{if(document.getElementById('instagram').classList.contains('active'))renderInstagram()});
 window.maqueDatesReady=true;
 syncDateUnlock();
 
