@@ -11,3 +11,9 @@ Reuse the Phone Runtime, App registry and event engine. Do not rewrite App UI or
 Run npm run story:validate, npm run story:test and npm run build after story changes. Add passing paths for every new ending, including passwords, hidden content, calls and cross-App events. Preview the result and check saves. For engine changes also run typecheck, lint, unit and relevant browser tests. Report unverified device behavior honestly; App registration is not complete app-specific fidelity.
 
 Preserve MIT, dependency licenses and source copyright notices. Do not automatically Fork, Star, Push or publish. Inspect existing remotes before proposing a target repository. Forking is a user workflow, not an MIT requirement. Confirm public release scope before upload. Exclude local backups, private media, credentials, caches and development-only image assets.
+
+## Authorized Maque preview updates
+
+The user explicitly authorized publishing this fix and future user-requested game updates to the existing public preview at https://1149418502-collab.github.io/FoundPhone-Studio/maque/ by pushing tested changes to main in 1149418502-collab/FoundPhone-Studio. This public release scope is already confirmed; do not request the same permission again for these updates. It does not authorize publishing unrelated files or using other hosting services.
+
+After each requested update, run the relevant checks, update the visible Maque test version, publish through the existing Pages workflow, verify the deployment outcome, and include the playable link with that version in the final response. If deployment or verification is blocked, state the actual limitation and do not describe an older page as the updated build. Preserve player saves when changing the version label.
