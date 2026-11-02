@@ -1391,7 +1391,7 @@ function updateRealClock(){
 document.querySelectorAll('.lockclock .time,.home .status span:first-child').forEach(node=>node.dataset.liveClock='');
 updateRealClock();setInterval(updateRealClock,1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateRealClock()});
 const photoRecords=new Map(),photoObjectURLs=new Map();
-let photoFilter='all',photoSelectionMode='browse',activePhotoId=null,dateJourneyAccepted=false,dateRefusals=0,dateSelectedPhotoId=null,datePhotoToken=0,dateRefusalTimer;
+let photoFilter='all',photoSelectionMode='browse',activePhotoId=null,dateJourneyAccepted=false,dateRefusals=0,dateSelectedPhotoId=null,datePhotoToken=0,dateRefusalTimer,photoGridScroll=0;
 try{dateSelectedPhotoId=localStorage.getItem('maque_date_photo_id')}catch(e){}
 const photoDBReady=new Promise((resolve,reject)=>{
  const request=indexedDB.open('maque-media',1);
@@ -1461,6 +1461,7 @@ async function importPhotos(files){
 document.getElementById('photoImport').addEventListener('change',async event=>{await importPhotos([...event.target.files]);event.target.value=''});
 function openPhotoDetail(id){
  const record=photoRecords.get(id);if(!record)return;activePhotoId=id;
+ const gallery=document.getElementById('photos');if(document.getElementById('photoDetail').hidden)photoGridScroll=gallery.scrollTop;gallery.scrollTop=0;gallery.style.overflowY='hidden';
  const img=document.getElementById('photoDetailImage');img.src=photoURL(record);img.alt=record.name;
  document.getElementById('photoDetailDate').textContent=record.takenAt?new Intl.DateTimeFormat('zh-CN',{dateStyle:'long'}).format(new Date(record.takenAt)):'未记录拍摄日期';
  document.getElementById('photoDetailTime').textContent=record.takenAt?new Intl.DateTimeFormat('zh-CN',{timeStyle:'short'}).format(new Date(record.takenAt)):'';
@@ -1473,7 +1474,7 @@ function renderPhotoInfo(record){
  const entries=[['拍摄日期',record.takenAt?new Intl.DateTimeFormat('zh-CN',{dateStyle:'long',timeStyle:'short'}).format(new Date(record.takenAt)):'尚未提供'],['尺寸',record.width+' × '+record.height],['文件大小',record.bytes>=1048576?(record.bytes/1048576).toFixed(1)+' MB':Math.max(1,Math.round(record.bytes/1024))+' KB'],['格式',(record.type||'image').replace('image/','').toUpperCase()],['添加时间',new Intl.DateTimeFormat('zh-CN',{dateStyle:'long',timeStyle:'short'}).format(new Date(record.importedAt))]];
  for(const [title,value] of entries){addText(list,'dt',title);addText(list,'dd',value)}box.append(list);
 }
-function closePhotoDetail(){document.getElementById('photoDetail').hidden=true}
+function closePhotoDetail(){document.getElementById('photoDetail').hidden=true;const gallery=document.getElementById('photos');gallery.style.overflowY='auto';gallery.scrollTop=photoGridScroll}
 function togglePhotoInfo(){const panel=document.getElementById('photoInfo');panel.hidden=!panel.hidden}
 async function togglePhotoFavorite(){
  const record=photoRecords.get(activePhotoId);if(!record)return;const changed={...record,favorite:!record.favorite};

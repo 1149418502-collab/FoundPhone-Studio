@@ -615,3 +615,29 @@ test("football script gifts after the question, sends the memory, and rewards on
     await page.evaluate(() => Number(localStorage.getItem("maque_affection"))),
   ).toBe(3);
 });
+
+test("a photo near the bottom of a long album opens fully on screen and returns to its place", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await open(page);
+  await page.evaluate("openApp('photos')");
+  await page
+    .locator("#photoImport")
+    .setInputFiles(
+      Array.from({ length: 18 }, (_, i) => ({
+        ...albumFile,
+        name: `memory-${i}.jpg`,
+      })),
+    );
+  await expect(page.locator(".photo-tile")).toHaveCount(18);
+  await page.locator(".photo-tile").last().click();
+  const image = (await page.locator("#photoDetail").boundingBox())!,
+    phone = (await page.locator("#photos").boundingBox())!;
+  expect(Math.abs(image.y - phone.y)).toBeLessThan(1);
+  await expect(page.getByRole("button", { name: /所有照片/ })).toBeVisible();
+  await page.getByRole("button", { name: /所有照片/ }).click();
+  expect(
+    await page.locator("#photos").evaluate((el) => el.scrollTop),
+  ).toBeGreaterThan(0);
+});
