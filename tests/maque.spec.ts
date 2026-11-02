@@ -36,6 +36,20 @@ async function open(page: Page, affection = 0, owned: string[] = []) {
   await page.route("**/maque/", (route) =>
     route.fulfill({ contentType: "text/html", body: html }),
   );
+  await page.route("**/maque/assets/*", (route) => {
+    const name = new URL(route.request().url()).pathname.split("/").pop()!;
+    if (
+      ![
+        "sungchan-instagram-avatar.jpg",
+        "sungchan-football-childhood.jpg",
+      ].includes(name)
+    )
+      return route.abort();
+    return route.fulfill({
+      contentType: "image/jpeg",
+      body: readFileSync("maque/assets/" + name),
+    });
+  });
   await page.route("https://images.unsplash.com/**", (route) => route.abort());
   await page.goto("/maque/");
   // Begin from a returning player's unlocked phone; interact with real controls below.
@@ -603,6 +617,17 @@ test("football script gifts after the question, sends the memory, and rewards on
   );
   await advance(page, 1);
   await expect(page.locator(".photo-message")).toHaveCount(1);
+  await expect(page.locator(".photo-message > img")).toHaveAttribute(
+    "src",
+    "./assets/sungchan-football-childhood.jpg",
+  );
+  await expect
+    .poll(() =>
+      page
+        .locator(".photo-message > img")
+        .evaluate((image: HTMLImageElement) => image.naturalWidth),
+    )
+    .toBe(1024);
   await advance(page, 12);
   expect(
     await page.evaluate(() => Number(localStorage.getItem("maque_affection"))),
@@ -622,14 +647,12 @@ test("a photo near the bottom of a long album opens fully on screen and returns 
   await page.setViewportSize({ width: 320, height: 640 });
   await open(page);
   await page.evaluate("openApp('photos')");
-  await page
-    .locator("#photoImport")
-    .setInputFiles(
-      Array.from({ length: 18 }, (_, i) => ({
-        ...albumFile,
-        name: `memory-${i}.jpg`,
-      })),
-    );
+  await page.locator("#photoImport").setInputFiles(
+    Array.from({ length: 18 }, (_, i) => ({
+      ...albumFile,
+      name: `memory-${i}.jpg`,
+    })),
+  );
   await expect(page.locator(".photo-tile")).toHaveCount(18);
   await page.locator(".photo-tile").last().click();
   const image = (await page.locator("#photoDetail").boundingBox())!,
@@ -640,4 +663,33 @@ test("a photo near the bottom of a long album opens fully on screen and returns 
   expect(
     await page.locator("#photos").evaluate((el) => el.scrollTop),
   ).toBeGreaterThan(0);
+});
+
+test("provided image 2 is the decoded IG story and post portrait", async ({
+  page,
+}) => {
+  await open(page, 5);
+  await page.evaluate("openedDates.add('baseball');openApp('instagram')");
+  const story = page.locator("#insStoryAvatar");
+  await expect(story).toHaveAttribute("src", /sungchan-instagram-avatar\.jpg$/);
+  await expect
+    .poll(() =>
+      story.evaluate(
+        (img: HTMLImageElement) =>
+          img.complete &&
+          img.naturalWidth === 1280 &&
+          img.naturalHeight === 1280,
+      ),
+    )
+    .toBe(true);
+  await expect(page.locator(".ins-post-header img")).toHaveAttribute(
+    "src",
+    (await story.getAttribute("src")) as string,
+  );
+  await expect(page.locator(".ins-ring").first()).toBeVisible();
+  await expect(page.locator(".memory-photo-placeholder")).toHaveCount(0);
+  await expect(page.locator("#featureNotice")).toBeHidden({ timeout: 5000 });
+  await page
+    .locator("#instagram")
+    .screenshot({ path: "outputs/maque/provided-instagram-avatar.png" });
 });

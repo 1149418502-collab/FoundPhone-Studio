@@ -36,14 +36,15 @@ from the general FoundPhone runtime and `stories/template/story.json`.
 - Gift cards and the gift picker use product photos first and locally drawn
   product illustrations when those cannot load; they no longer use emoji art.
 
-### Media still awaiting original files
+## Preview 2026.11.02.4
 
-`mediaAssets.instagramAvatar.src` is the slot for reference image 2, and
-`mediaAssets.footballMemory.src` is the slot for reference image 1. Both are
-currently empty because the chat references have no downloadable file paths.
-Do not claim either supplied photograph has been installed. The IG portrait
-temporarily retains the existing portrait; the football message uses a clearly
-illustrated memory card. Story portrait alignment is fixed independently.
+The author supplied the original files in `图片素材.zip`. Image 2 is now bundled
+at `maque/assets/sungchan-instagram-avatar.jpg` and used for Instagram's story
+portrait and post portrait. Image 1 is bundled at
+`maque/assets/sungchan-football-childhood.jpg` and appears at the authored
+childhood-memory point in the football conversation. Original bytes and
+watermarks are retained. Source records are in `maque/assets/media-sources.json`.
+These two references are no longer pending. Existing saves are unchanged.
 
 Gift-photo URLs point to Unsplash (`https://unsplash.com/license`). The cloud
 proxy denied the image host with HTTP 403, so these remote photographs and their
@@ -58,10 +59,10 @@ and license records.
 `dateScenes` contains a `photos` array for each scene. The scene background uses
 the first entry (`{src, alt}`); Instagram prefers the player's selected photo.
 Before a player selects a photo, legacy posts can use the scene art.
-The current release uses
-drawn backgrounds and a baseball ticket illustration; the inline chat images
-were visible as references but were not available as downloadable workspace
-files. No substitute photographs or generated likenesses were imported.
+The scene backgrounds still use drawings and legacy baseball posts can use
+a ticket illustration. Baseball-event and other scene-background photographs
+remain pending; the ZIP provided only the football memory and IG portrait.
+No generated likenesses were imported.
 
 The author identified the baseball background as Sungchan and Eunseok appearing
 at an LG Twins first-pitch event. An independent news source, exact event date,

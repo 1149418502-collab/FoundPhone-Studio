@@ -1,0 +1,23 @@
+{
+  "source": "Author-uploaded 图片素材.zip",
+  "images": [
+    {
+      "file": "sungchan-football-childhood.jpg",
+      "reference": "图片1.JPG",
+      "dimensions": [
+        1024,
+        750
+      ],
+      "sha256": "18799af55d7a011a70f5fa1bea5a61a8afdea245d3a5ee410af245b2a1d175de"
+    },
+    {
+      "file": "sungchan-instagram-avatar.jpg",
+      "reference": "图片2.JPG",
+      "dimensions": [
+        1280,
+        1280
+      ],
+      "sha256": "00e7f721d333030ec43130b3e27b6dd971a2bc96e0cd2718607b7e7ebbb1f87f"
+    }
+  ]
+}
