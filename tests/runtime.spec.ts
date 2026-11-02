@@ -181,6 +181,29 @@ test("production PWA cached story works after offline reload", async ({
   }
 });
 
+test("cached framework does not replace the independent Maque preview", async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({ serviceWorkers: "allow" });
+  try {
+    const page = await context.newPage();
+    const preview = readFileSync("maque/index.html", "utf8");
+    await page.route("**/maque/**", (route) =>
+      route.fulfill({ contentType: "text/html", body: preview }),
+    );
+    await page.goto(baseURL + "/");
+    await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+    await page.goto(baseURL + "/maque/?v=2026.11.02.1");
+    await expect(page.locator(".preview-build")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "轻点以解锁", exact: true }),
+    ).toBeVisible();
+  } finally {
+    await context.close();
+  }
+});
+
 test("blank phone contains no story or author content", async ({
   page,
   request,

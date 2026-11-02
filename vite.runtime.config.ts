@@ -20,6 +20,7 @@ export default defineConfig(({ command }) => ({
       },
       workbox: {
         clientsClaim: true,
+        navigateFallbackDenylist: [/\/maque(?:\/|$)/],
         globPatterns: ["**/*.{js,css,html,svg,json,txt,png,jpg}"],
         maximumFileSizeToCacheInBytes: 4000000,
       },
