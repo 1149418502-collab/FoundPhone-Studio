@@ -46,6 +46,34 @@ childhood-memory point in the football conversation. Original bytes and
 watermarks are retained. Source records are in `maque/assets/media-sources.json`.
 These two references are no longer pending. Existing saves are unchanged.
 
+## Preview 2026.11.02.5
+
+- The author supplied `图片素材2.0.zip`. All nine image files are bundled unchanged
+  with provenance records. Escape, baseball, and idol scene cards use their named
+  background photographs at 50% opacity. No football-campus background was in
+  this archive, so that card temporarily uses the previously supplied football
+  childhood photograph. No replacement scene photographs were generated.
+- The extra escape-character and idol images are displayed in the corresponding
+  scene introductions. These scenes still await full interactive stories.
+- The uploaded photo now represents the player's identity. Selection and loading
+  copy consistently says 我的形象. Legacy `maque_date_photo_id` remains the storage
+  key for compatibility; the selected photo is used only for the player's image
+  in the date HUD and personal story circle. It is not used as a couple photo.
+- Final baseball memories use only the two author-supplied `棒球场ins合影` images.
+  They appear in the finale and the Instagram carousel. There is no face-swap or
+  AI image-generation service in this static game; the author supplies the final
+  story images. Player uploads remain private to their current browser.
+- The baseball date is fictional: Eunseok and Sungchan agree to watch an LG Twins
+  game, are drawn as lucky spectators to participate in a ceremonial first pitch,
+  and are later selected by the stadium kiss camera. This is not a reconstruction
+  or factual claim about a real celebrity outing.
+- The interactive sequence includes a two-person ticket, lucky-spectator invite,
+  two support responses, a tappable pitching action, and two voluntary kiss-camera
+  responses. All four response combinations reach the same saved memory, with
+  the existing one-time 3%–5% affection reward. Existing saves are retained.
+- Samsara, Gifts, and Dates share a coordinated cream/blush SVG icon family.
+  Samsara uses an infinity ribbon with a heart at its center.
+
 Gift-photo URLs point to Unsplash (`https://unsplash.com/license`). The cloud
 proxy denied the image host with HTTP 403, so these remote photographs and their
 product matching have not been verified or bundled locally in this build.
@@ -56,17 +84,14 @@ and license records.
 
 ## Author material still to add
 
-`dateScenes` contains a `photos` array for each scene. The scene background uses
-the first entry (`{src, alt}`); Instagram prefers the player's selected photo.
-Before a player selects a photo, legacy posts can use the scene art.
-The scene backgrounds still use drawings and legacy baseball posts can use
-a ticket illustration. Baseball-event and other scene-background photographs
-remain pending; the ZIP provided only the football memory and IG portrait.
+`dateScenes.photos` contains the scene background (`{src, alt}`), `references`
+contains character/story reference images, and `memories` contains final couple
+photographs. Keep these roles separate from the player-uploaded identity image.
+The football-campus background and the author's identity-album content remain
+pending. The existing device-photo importer can be used to test identity setup.
 No generated likenesses were imported.
 
-The author identified the baseball background as Sungchan and Eunseok appearing
-at an LG Twins first-pitch event. An independent news source, exact event date,
-opponent, and quotes have not been verified in this environment. Do not present
-the fictional dialogue or Instagram captions as real quotes or real posts.
-The author plans to supply final captions and images. Preserve stable scene IDs
-and existing progress when replacing this material.
+The supplied baseball photographs are illustrative materials for the fictional
+date. Do not present its dialogue, lucky draw, kiss-camera event, or Instagram
+captions as real quotes, real posts, or verified news. Preserve stable scene IDs
+and existing progress when replacing or extending the author's material.

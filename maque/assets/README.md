@@ -9,3 +9,30 @@ Both files retain the original uploaded bytes, including existing markings.
 Checksums and dimensions are recorded in `media-sources.json`. The repository's
 software license does not establish ownership of these photographs; retain
 their existing attribution and copyright notices.
+
+The author supplied nine further originals in `图片素材2.0.zip`:
+
+| Original | Bundled file | Role |
+| --- | --- | --- |
+| 大逃杀背景板.JPG | `date-escape-background.jpg` | Escape scene card background |
+| 棒球场背景板.JPG | `date-baseball-background.jpg` | Baseball scene card background |
+| 一日爱豆背景板.JPG | `date-idol-background.jpg` | Idol scene card background |
+| 棒球场ins合影.JPG | `date-baseball-couple-1.jpg` | Baseball final couple photo 1 |
+| 棒球场ins合影2.jpg | `date-baseball-couple-2.jpg` | Baseball final couple photo 2 |
+| 一日爱豆素材1.JPG | `date-idol-reference-1.jpg` | Additional idol reference 1 |
+| 一日爱豆素材2.JPG | `date-idol-reference-2.jpg` | Additional idol reference 2 |
+| 大逃杀银硕素材.JPG | `date-escape-eunseok-reference.jpg` | Additional escape character reference |
+| 大逃杀成灿素材.JPG | `date-escape-sungchan-reference.jpg` | Additional escape character reference |
+
+Each file retains the exact uploaded bytes; no generated, resized, retouched,
+or recompressed version was introduced. Apply the requested approximately 50%
+background opacity in the interface. The two baseball `ins合影` files are the
+author-provided final couple photos; the player's uploaded identity image is
+separate from them. This ZIP contains no football-campus background. The four
+additional references are displayed as image galleries in their corresponding
+scene introductions; full gameplay for those scenes remains to be authored.
+
+The football-campus card temporarily reuses `sungchan-football-childhood.jpg`
+until the author supplies a dedicated background. The three matching SVG
+launcher icons (`samsara-icon.svg`, `gifts-icon.svg`, `dates-icon.svg`) are original
+interface artwork created for this project, not downloaded brand assets.

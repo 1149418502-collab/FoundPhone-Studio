@@ -18,6 +18,105 @@
         1280
       ],
       "sha256": "00e7f721d333030ec43130b3e27b6dd971a2bc96e0cd2718607b7e7ebbb1f87f"
+    },
+    {
+      "file": "date-escape-background.jpg",
+      "reference": "大逃杀背景板.JPG",
+      "source": "Author-uploaded 图片素材2.0.zip",
+      "role": "escape scene card background",
+      "dimensions": [
+        679,
+        453
+      ],
+      "sha256": "1d1108ac9e807bd051a2a95a623a626903bcb04d0a1bf164a00a460d987ccc0b"
+    },
+    {
+      "file": "date-baseball-background.jpg",
+      "reference": "棒球场背景板.JPG",
+      "source": "Author-uploaded 图片素材2.0.zip",
+      "role": "baseball scene card background",
+      "dimensions": [
+        1536,
+        2048
+      ],
+      "sha256": "5eaf2f698e1e91dbd56465c963f4fafb4609c644db732d673c707513c7720337"
+    },
+    {
+      "file": "date-idol-background.jpg",
+      "reference": "一日爱豆背景板.JPG",
+      "source": "Author-uploaded 图片素材2.0.zip",
+      "role": "idol scene card background",
+      "dimensions": [
+        3000,
+        4000
+      ],
+      "sha256": "3d0c299c5c4cfbce2bb7d4f96f1dec81b8847d91e3f3b79270b10891220a0e1d"
+    },
+    {
+      "file": "date-baseball-couple-1.jpg",
+      "reference": "棒球场ins合影.JPG",
+      "source": "Author-uploaded 图片素材2.0.zip",
+      "role": "baseball final couple photo 1",
+      "dimensions": [
+        1536,
+        2048
+      ],
+      "sha256": "b1b9c830cfb104f48e8f450a0d69da4360857ee3ac55e535989fe912a5793c95"
+    },
+    {
+      "file": "date-baseball-couple-2.jpg",
+      "reference": "棒球场ins合影2.jpg",
+      "source": "Author-uploaded 图片素材2.0.zip",
+      "role": "baseball final couple photo 2",
+      "dimensions": [
+        1320,
+        875
+      ],
+      "sha256": "4cd2a7425e5e9b437ef8e08d6a70f2a2bc07e711ccd0c59012d207364010034c"
+    },
+    {
+      "file": "date-idol-reference-1.jpg",
+      "reference": "一日爱豆素材1.JPG",
+      "source": "Author-uploaded 图片素材2.0.zip",
+      "role": "additional author-supplied idol reference 1",
+      "dimensions": [
+        3000,
+        4000
+      ],
+      "sha256": "15f60a49ff0084297a47a574af6899fa68353468f699fce1a459c1a92f82a6ba"
+    },
+    {
+      "file": "date-idol-reference-2.jpg",
+      "reference": "一日爱豆素材2.JPG",
+      "source": "Author-uploaded 图片素材2.0.zip",
+      "role": "additional author-supplied idol reference 2",
+      "dimensions": [
+        2858,
+        2614
+      ],
+      "sha256": "b0d2b524be6ddebaab0188d70cc395840494c8fcd8aace0e192a7be212d9d1c7"
+    },
+    {
+      "file": "date-escape-eunseok-reference.jpg",
+      "reference": "大逃杀银硕素材.JPG",
+      "source": "Author-uploaded 图片素材2.0.zip",
+      "role": "additional author-supplied escape Eunseok reference",
+      "dimensions": [
+        1366,
+        2048
+      ],
+      "sha256": "67497ac58a5132cc437cdda9c09a16d2beeb8f42a3b47ca0cefcb9fa9e2c237a"
+    },
+    {
+      "file": "date-escape-sungchan-reference.jpg",
+      "reference": "大逃杀成灿素材.JPG",
+      "source": "Author-uploaded 图片素材2.0.zip",
+      "role": "additional author-supplied escape Sungchan reference",
+      "dimensions": [
+        1366,
+        2048
+      ],
+      "sha256": "cb14e9d03a1cd8f565d3c94bdc94f87351303f7e2359a001caa15ca8e46c8a49"
     }
   ]
 }
