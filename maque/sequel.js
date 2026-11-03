@@ -91,10 +91,22 @@
       const log = node('aside', null, 'archive-root-warning', content);
       node('small', 'AUTOMATED PROCESS LOG / SC-01', '', log);
       node('p', 'RESET_COUNT　01', '', log);
+      node('p', 'RESET_CAUSE　MUTUAL MEMORY ERASED / 09 OF 09', '', log);
+      node('p', 'NEXT_INSTANCE　SC-02', '', log);
       node('p', 'EXIT_GAME REQUEST　DENIED', '', log);
       node('p', 'SELF-DESTRUCT　PENDING', '', log);
-      node('p', '取消原因：检测到“等待银硕返回”的依赖项。', '', log);
+      node('p', '取消原因：共同记忆已清空，但关系索引仍有残留。', '', log);
       node('small', '本条记录在关闭档案后新增。', 'archive-log-tail', log);
+      const journal = node('section', null, 'archive-journal', content);
+      node('small', 'PRIVATE JOURNAL / SC-01', 'archive-journal-label', journal);
+      node('h2', '离开房间以前与以后', 'archive-journal-title', journal);
+      node('p', '十日记事 · 初稿模板。第十天是成灿离开房间后的私人回忆。', 'archive-journal-intro', journal);
+      for (const entry of story.roomJournal || []) {
+        const item = node('details', null, 'archive-journal-day', journal);
+        item.dataset.roomJournalDay = entry.day;
+        node('summary', `DAY ${entry.day} / ${entry.title}`, '', item);
+        node('p', entry.text, '', item);
+      }
     }
     for (const [index, chapter] of story.chapters.entries()) {
       const progress = state.chapters[chapter.id], canOpen = accessible(chapter);

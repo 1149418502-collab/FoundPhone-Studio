@@ -1102,6 +1102,7 @@ test("room nine waits for the first three dates, then saves nine choices and rew
   await page.getByRole("button",{name:/开始 \/ 继续这次约会/}).click();
   await page.locator("#extraDateNext").click();
   for(let day=1;day<=9;day++) {
+    if(day===1) await expect(page.locator(".room-nine-oldrun")).toContainText("我和成灿都选择遗忘");
     await expect(page.locator(".room-nine-day")).toContainText(`${String(day).padStart(2,"0")} / 09`);
     await page.locator('.room-nine-choice[data-choice="shared"]').click();
     await page.locator("#roomNineContinue").click();
@@ -1110,6 +1111,10 @@ test("room nine waits for the first three dates, then saves nine choices and rew
   expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!).sessions.escape.roomChoices)).toHaveLength(9);
   await expect(page.locator("#affectionValue")).toHaveText("♥ 65%");
   await expect(page.locator("#pureLoveBuy")).toBeEnabled();
+  await page.evaluate("view('home')");
+  await page.locator("#archiveApp").click();
+  await expect(page.locator(".archive-journal-day")).toHaveCount(10);
+  await expect(page.locator(".archive-journal")).toContainText("第十天是成灿离开房间后的私人回忆");
 });
 
 
@@ -1126,4 +1131,18 @@ test("the encrypted diary requires two confirmations and leads to the gentle rep
   await page.getByRole("button",{name:"记起我们，再次相爱"}).click();
   await expect(page.locator("#archives")).toContainText("再次爱上他");
   await expect(page.locator("#archives")).toContainText("第一次见面");
+});
+
+
+test("a completed version-two room save replays the corrected mutual-forgetting canon without clearing its completion or reward", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("maque_extra_dates_v1", JSON.stringify({version:2,sessions:{escape:{step:2,choices:{},roomChoices:Array.from({length:9},()=>({id:"self",memory:"old"})),roomIndex:8,roomComplete:true,reward:15}},completed:["escape"],likes:[],comments:{},previousRun:{self:9,source:"SC-01"}}));
+  });
+  await open(page,65,[],["baseball","football","idol","escape"]);
+  const save=await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!));
+  expect(save.version).toBe(3);
+  expect(save.sessions.escape.step).toBe(0);
+  expect(save.sessions.escape.reward).toBe(15);
+  expect(save.completed).toContain("escape");
+  expect(JSON.parse(await page.evaluate(()=>localStorage.getItem("maque_dates_completed")!))).toContain("escape");
 });
