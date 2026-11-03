@@ -1,0 +1,48 @@
+/* Additional date chapters share the original paper-and-rose invitation palette. */
+.extra-date .extra-date-visual{height:180px}
+.extra-date-football .extra-date-visual img{object-position:center 34%}
+.extra-date-escape .extra-date-visual img{object-position:center 43%}
+.extra-date-progress{display:flex;gap:5px;margin:13px 0 15px}
+.extra-date-progress span{height:3px;flex:1;border-radius:9px;background:#dccfc9}
+.extra-date-progress span.is-visited{background:#af7d83}
+.extra-save-note{text-align:center;font-size:10px;line-height:1.7;color:#9b8076;margin:18px 5px 0}
+.extra-date-note,.extra-rehearsal-note{font-size:12px;line-height:1.9;padding:15px;background:#fffcf0;border:1px solid #dfd1b7;border-radius:6px;color:#796750;box-shadow:0 5px 12px #69524109}
+.extra-date-escape .extra-date-note{background:#f3f2e9}
+.extra-date .extra-date-choice{font-size:13px;line-height:1.8;text-align:left;color:#70564e;min-height:56px}
+.extra-number-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.extra-number-cards>div{display:flex;flex-direction:column;align-items:center;padding:20px 8px;background:#faf8f0;border:1px solid #d4ccc0;border-radius:9px;box-shadow:0 8px 15px #5f524b0a}
+.extra-number-cards small{font-size:10px;color:#887c70}
+.extra-number-cards strong{font:42px/1.5 Georgia,serif;color:#5f635e;letter-spacing:4px}
+.extra-date-lock{display:flex;flex-direction:column;gap:10px;margin:18px 0}
+.extra-date-lock label{font-size:12px;color:#796b5e;text-align:center}
+.extra-date-lock input{display:block;width:100%;padding:16px;border:1px solid #c7b6ac;border-radius:12px;background:#fffcf6;text-align:center;font:26px/1.2 ui-monospace,monospace;letter-spacing:10px;color:#5b4b47;box-sizing:border-box}
+.extra-date-lock input::placeholder{font:13px/1.2 system-ui,sans-serif;letter-spacing:2px}
+.extra-date-lock input[aria-invalid=true]{border-color:#a75e60}
+.extra-date-lock .date-primary{margin-top:2px;justify-content:center}
+.extra-puzzle-status{min-height:20px;font-size:12px;line-height:1.9;color:#a15e63;margin:0}
+.extra-football-field{height:190px;position:relative;margin:15px 0;background:linear-gradient(90deg,#7c9277 0 20%,#849a7e 20% 40%,#7c9277 40% 60%,#849a7e 60% 80%,#7c9277 80%);border-radius:15px;overflow:hidden;box-shadow:inset 0 0 35px #384c4120}
+.extra-football-field:before{content:'';position:absolute;inset:12px;border:1px solid #f2f2d77a;border-radius:4px}
+.extra-football-goal{position:absolute;left:17%;right:17%;top:16px;height:45px;border:2px solid #f6f3da;border-bottom:0;display:flex;align-items:center;justify-content:center;color:#fffdf0;font-size:11px;background:repeating-linear-gradient(90deg,#e7edd31f 0 1px,transparent 1px 12px)}
+.extra-football-ball{position:absolute;left:calc(50% - 30px);bottom:17px;width:60px;height:60px;border:0;padding:0;background:none;cursor:pointer;transition:transform .45s ease,opacity .45s}
+.extra-football-ball svg{width:100%;height:100%;filter:drop-shadow(0 5px 4px #2c493955)}
+.extra-football-field.is-kicked .extra-football-ball{transform:translate(30px,-95px) scale(.5) rotate(180deg)}
+.extra-ball-feedback{font-size:12px;line-height:1.9;text-align:center;color:#607359}
+.extra-rehearsal-status{font-size:13px;text-align:center;min-height:45px;line-height:1.8;color:#996574;margin:14px 0}
+.extra-rehearsal-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 22px}
+.extra-rehearsal-button{min-height:60px;border:1px solid #d8c6bd;border-radius:12px;background:linear-gradient(#fffaf5,#f5e7e2);font-size:14px;color:#8e6270;box-shadow:0 4px 10px #9b6c5b0b;cursor:pointer}
+.extra-rehearsal-button:disabled{background:#eee9dd;color:#8f8a75;box-shadow:none}
+.extra-date-memories{display:flex;gap:10px;align-items:flex-start;margin-top:14px}
+.extra-date-memories figure{flex:1;margin:0;padding:6px;background:#fffcf5;box-shadow:0 5px 13px #654c3920;min-width:0}
+.extra-date-memories img{display:block;width:100%;max-height:260px;object-fit:contain;border-radius:2px}
+.extra-memory-label{text-align:center;font-size:10px;line-height:1.7;color:#977c6d;margin:10px 0 18px}
+.extra-date-result h2{font:25px/1.5 Georgia,'Songti SC',serif;color:#785b50;margin:18px 0 6px}
+.extra-date-result>.date-inline-link{display:block;width:100%;margin:10px 0;text-align:center}
+.extra-date-post .ins-post-header small{font-size:9px}
+.extra-date-post .ins-photo{background:#f6f1e7}
+.extra-date-post .ins-post-image{max-height:430px;object-fit:contain}
+.extra-date-comments{padding:0 17px 15px;font-size:12px;line-height:1.7;color:#6f6059}
+.extra-date-comments p{margin:5px 0}
+.extra-date-comments .date-inline-link{font-size:12px}
+.extra-date button:focus-visible,.extra-date-post button:focus-visible{outline:2px solid #a46e7c;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.extra-football-ball{transition:none}}
+@media(max-width:350px){.extra-date .extra-date-visual{height:150px}.extra-rehearsal-controls{gap:6px}.extra-date-result h2{font-size:22px}}

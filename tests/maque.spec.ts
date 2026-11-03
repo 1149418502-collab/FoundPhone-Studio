@@ -2,6 +2,13 @@ import { test, expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 
 const html = readFileSync("maque/index.html", "utf8");
+const localModules = new Set([
+  "sequel-story.js",
+  "sequel.js",
+  "sequel.css",
+  "date-expansion.js",
+  "date-expansion.css",
+]);
 const localAssets = new Set([
   "sungchan-instagram-avatar.jpg",
   "sungchan-football-childhood.jpg",
@@ -30,7 +37,7 @@ const gifts = [
   ["手写日记本", "第一页就写今天"],
   ["香氛蜡烛", "睡觉前一定会熄灭"],
   ["手作曲奇礼盒", "忍不住又拿了一块"],
-  ["双层芝士汉堡", "没事的时候，我经常会去吃"],
+  ["双层芝士汉堡", "平时不知道吃什么的时候就会选汉堡"],
   ["签名足球", "从很小的时候就开始踢了"],
   ["明星球衣", "从小就一直踢球"],
 ];
@@ -52,6 +59,16 @@ async function open(page: Page, affection = 0, owned: string[] = []) {
   await page.route("**/maque/", (route) =>
     route.fulfill({ contentType: "text/html", body: html }),
   );
+  await page.route("**/maque/*", (route) => {
+    const name = new URL(route.request().url()).pathname.slice(
+      "/maque/".length,
+    );
+    if (!localModules.has(name)) return route.fallback();
+    return route.fulfill({
+      contentType: name.endsWith(".css") ? "text/css" : "text/javascript",
+      body: readFileSync("maque/" + name),
+    });
+  });
   await page.route("**/maque/assets/*", (route) => {
     const path = new URL(route.request().url()).pathname;
     const name = path.slice("/maque/assets/".length);
@@ -105,6 +122,8 @@ const albumFile = {
   buffer: Buffer.from(avatarData, "base64"),
 };
 async function prepareDateJourney(page: Page) {
+  await page.evaluate("albumReady");
+  if (await page.locator("#dateCatalog").isVisible()) return;
   await page.getByRole("button", { name: /开始我们的约会之旅/ }).click();
   await page.getByRole("button", { name: "是", exact: true }).click();
   await expect(page.locator("#photos")).toHaveClass(/active/);
@@ -199,6 +218,110 @@ async function finishBaseballDate(
   });
 }
 
+test("invitation notification and SMS preserve the Black Shadow clue", async ({
+  page,
+}) => {
+  await page.clock.install();
+  await page.clock.pauseAt(new Date(Date.now() + 1000));
+  await open(page);
+  await page.evaluate("pin='0319';unlock()");
+  await page.clock.fastForward(650);
+  await expect(page.locator("#noticebody")).toContainText("Black Shadow");
+  await page.locator("#notice").click();
+  await expect(page.locator("#sms")).toHaveClass(/active/);
+  await expect(page.locator("#sms .bubble").first()).toContainText(
+    "Black Shadow",
+  );
+  await expect(page.locator("#sms .bubble").first()).not.toContainText(
+    "亲爱的宋银硕",
+  );
+});
+
+test("food refusal retracts at 500ms and the second retraction still reveals the red text", async ({
+  page,
+}) => {
+  await page.clock.install();
+  await page.clock.pauseAt(new Date(Date.now() + 1000));
+  await open(page);
+  await chat(page);
+  await advance(page, 4);
+  const refuse = page.getByRole("button", { name: "我不想说", exact: true });
+  await refuse.click();
+  await refuse.click(); // Pending retraction ignores a second tap.
+  await page.clock.fastForward(499);
+  await expect(page.locator("#chatarea .chatrow.me").last()).toContainText(
+    "我不想说",
+  );
+  await expect(page.locator("#chatarea .system-bubble")).toHaveCount(0);
+  await page.clock.fastForward(1);
+  await expect(page.locator("#chatarea .system-bubble")).toHaveText(
+    "消息已撤回",
+  );
+  await expect(page.locator("#redSecret")).not.toHaveClass(/show/);
+  await refuse.click();
+  await page.clock.fastForward(499);
+  await expect(page.locator("#chatarea .system-bubble")).toHaveCount(1);
+  await page.clock.fastForward(1);
+  await expect(page.locator("#chatarea .system-bubble")).toHaveCount(2);
+  await expect(page.locator("#redSecret")).toHaveClass(/show/);
+  await expect(page.locator("#redSecret")).toHaveText("亲爱的 不要口是心非");
+  await page.clock.fastForward(1000);
+  await page.getByRole("button", { name: "今天吃了蒸饺", exact: true }).click();
+  await expect(page.locator("#chatarea .chatrow.me").last()).toContainText(
+    "今天吃了蒸饺",
+  );
+  await expect(page.locator("#replyChoices")).toHaveCount(0);
+});
+
+test("hamburger follows the supplied dialogue, gifts after three messages, and rewards at the end", async ({
+  page,
+}) => {
+  const lines = [
+    "吃过饭了吗？",
+    "我刚才吃了这个",
+    "是最近人气很高店来着",
+    "赠送给 郑成灿 · 双层芝士汉堡",
+    "啊 是汉堡",
+    "这是我很喜欢的食物！",
+    "平时不知道吃什么的时候就会选汉堡",
+    "谢谢你呀 完全是我的口味",
+    "你喜欢就好",
+    "本来还有点担心你会不会喜欢这个……",
+    "我很喜欢呀",
+    "不过我平时吃的那家店也很不错 店里还有草莓奶昔搭配的套餐",
+    "下次我们一起去店里吃吧？",
+    "好啊 不过薯条也别忘记",
+    "没问题",
+    "吃完我们一起去散步好吗？",
+    "我们可以聊聊你喜欢的食物",
+    "我还想和你一起吃很多次饭",
+  ];
+  await open(page, 0, ["双层芝士汉堡"]);
+  await chat(page);
+  await page.evaluate("Math.random=()=>0");
+  await send(page, "双层芝士汉堡");
+  for (let i = 0; i < lines.length; i++) {
+    if (i > 0) await advance(page, 1);
+    await expect(page.locator("#chatarea .chatrow").last()).toContainText(
+      lines[i],
+    );
+    await expect(page.locator("#chatarea .system-bubble")).toHaveCount(
+      i < 3 ? 0 : 1,
+    );
+    expect(
+      await page.evaluate(() =>
+        Number(localStorage.getItem("maque_affection")),
+      ),
+    ).toBe(i === lines.length - 1 ? 3 : 0);
+  }
+  await expect(page.locator("#chatGiftButton")).toBeEnabled();
+  expect(
+    await page.evaluate(() =>
+      JSON.parse(localStorage.getItem("maque_owned_gifts")!),
+    ),
+  ).toEqual([]);
+});
+
 test("chat portraits decode and match the embedded header portrait", async ({
   page,
 }) => {
@@ -241,7 +364,7 @@ for (const [name, line] of gifts) {
       );
     if (name === "双层芝士汉堡")
       await expect(page.locator("#chatarea")).toContainText(
-        "今天要和我一起吃汉堡吗",
+        "我还想和你一起吃很多次饭",
       );
     await expect(page.locator("#chatarea .system-bubble")).toHaveText(
       "赠送给 郑成灿 · " + name,
@@ -469,9 +592,7 @@ test("dating threshold guards direct access and four mobile scene cards have int
       .getByRole("button", { name: "选择约会场景：" + name, exact: true })
       .click();
     await expect(page.locator("#dateDetail .date-detail-copy")).not.toBeEmpty();
-    await expect(
-      page.getByRole("button", { name: "等待下一次邀请" }),
-    ).toBeDisabled();
+    await expect(page.locator("#dateDetail .date-primary")).toBeEnabled();
     await page
       .getByRole("button", { name: "返回约会场景", exact: true })
       .click();
@@ -564,28 +685,120 @@ for (const choice of [
   }
 }
 
-test("date invitation stays on No, shows the red hint twice, and requires a selected photo", async ({
+test("date invitation centers both labels, scales each refusal, and hides No on the third", async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
   await open(page, 5);
   await page.evaluate("openApp('dates')");
   await page.getByRole("button", { name: /开始我们的约会之旅/ }).click();
-  await page.getByRole("button", { name: "否", exact: true }).click();
+  const yes = page
+    .locator("#dateConfirm")
+    .getByRole("button", { name: "是", exact: true });
+  const no = page
+    .locator("#dateConfirm")
+    .getByRole("button", { name: "否", exact: true });
+  for (const button of [yes, no]) {
+    const offset = await button.evaluate((element) => {
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      const text = range.getBoundingClientRect();
+      const box = element.getBoundingClientRect();
+      return {
+        x: Math.abs(text.x + text.width / 2 - box.x - box.width / 2),
+        y: Math.abs(text.y + text.height / 2 - box.y - box.height / 2),
+      };
+    });
+    expect(offset.x).toBeLessThan(1);
+    expect(offset.y).toBeLessThan(2);
+  }
+  const initialYes = (await yes.boundingBox())!;
+  const initialNo = (await no.boundingBox())!;
+  await no.click();
   await expect(page.locator("#dateConfirm")).toBeVisible();
   await expect(page.locator("#dateRefusalHint")).not.toHaveClass(/show/);
-  await page.getByRole("button", { name: "否", exact: true }).click();
+  let yesBox = (await yes.boundingBox())!;
+  let noBox = (await no.boundingBox())!;
+  expect(yesBox.width / initialYes.width).toBeCloseTo(1.5, 2);
+  expect(yesBox.height / initialYes.height).toBeCloseTo(1.5, 2);
+  expect(noBox.width / initialNo.width).toBeCloseTo(0.5, 2);
+  expect(noBox.height / initialNo.height).toBeCloseTo(0.5, 2);
+  await no.click();
   await expect(page.locator("#dateRefusalHint")).toHaveText(
     "亲爱的 你不想见我吗？",
   );
   await expect(page.locator("#dateRefusalHint")).toHaveClass(/show/);
+  yesBox = (await yes.boundingBox())!;
+  noBox = (await no.boundingBox())!;
+  expect(yesBox.width / initialYes.width).toBeCloseTo(2.25, 2);
+  expect(noBox.width / initialNo.width).toBeCloseTo(0.25, 2);
+  await no.click();
+  await expect(no).toBeHidden();
+  yesBox = (await yes.boundingBox())!;
+  expect(yesBox.width / initialYes.width).toBeCloseTo(3.375, 2);
+  const phone = (await page.locator("#dates").boundingBox())!;
+  expect(yesBox.x).toBeGreaterThanOrEqual(phone.x);
+  expect(yesBox.x + yesBox.width).toBeLessThanOrEqual(phone.x + phone.width);
   await expect(page.locator("#dateCatalog")).toBeHidden();
-  await page.getByRole("button", { name: "是", exact: true }).click();
+  await yes.click();
   await expect(page.locator("#photos")).toHaveClass(/active/);
   await expect(page.locator("#photosEmpty")).toBeVisible();
   await page.getByRole("button", { name: "取消选择", exact: true }).click();
   await expect(page.locator("#dateConfirm")).toBeVisible();
   await page.evaluate("showDateCatalog()");
   await expect(page.locator("#dateCatalog")).toBeHidden();
+});
+
+test("chosen identity is reused on reopening and reload, with an optional replacement", async ({
+  page,
+}) => {
+  await open(page, 5);
+  await page.locator("#dateApp").click();
+  await prepareDateJourney(page);
+  const selected = await page.evaluate(() =>
+    localStorage.getItem("maque_date_photo_id"),
+  );
+  expect(selected).toBeTruthy();
+  await page.evaluate("goHome()");
+  await page.locator("#dateApp").click();
+  await expect(page.locator("#dateCatalog")).toBeVisible();
+  await expect(page.locator("#dateIntro")).toBeHidden();
+  await expect(page.locator("#dateConfirm")).toBeHidden();
+  await expect(page.locator("#dateUpload")).toBeHidden();
+  await page.reload();
+  await page.evaluate("view('home')");
+  await page.locator("#dateApp").click();
+  await expect(page.locator("#dateCatalog")).toBeVisible();
+  expect(
+    await page.evaluate(() => localStorage.getItem("maque_date_photo_id")),
+  ).toBe(selected);
+  await page.locator("#dateChangeIdentity").click();
+  await expect(page.locator("#photos")).toHaveClass(/active/);
+  await expect(page.locator(".photo-tile")).toHaveCount(1);
+  await page.getByRole("button", { name: "取消选择", exact: true }).click();
+  await expect(page.locator("#dateCatalog")).toBeVisible();
+  expect(
+    await page.evaluate(() => localStorage.getItem("maque_date_photo_id")),
+  ).toBe(selected);
+});
+
+test("missing identity data recovers to selection rather than leaving a stale catalog", async ({
+  page,
+}) => {
+  await open(page, 5);
+  await page.evaluate(() =>
+    localStorage.setItem("maque_date_photo_id", "missing-local-photo"),
+  );
+  await page.reload();
+  await page.evaluate("view('home')");
+  await page.locator("#dateApp").click();
+  await expect(page.locator("#dateIntro")).toBeVisible();
+  await expect(page.locator("#dateCatalog")).toBeHidden();
+  await prepareDateJourney(page);
+  await expect(page.locator("#dateCatalog")).toBeVisible();
+  expect(
+    await page.evaluate(() => localStorage.getItem("maque_date_photo_id")),
+  ).not.toBe("missing-local-photo");
 });
 
 test("chosen identity loads for one second while Instagram uses the supplied couple photos", async ({
