@@ -16,7 +16,8 @@
       state.endings = [...new Set((Array.isArray(stored.endings) ? stored.endings : []).filter(id => endingIds.includes(id)))];
       state.currentEnding = endingIds.includes(stored.currentEnding) ? stored.currentEnding : null;
       state.activeChapter = chapterIds.includes(stored.activeChapter) ? stored.activeChapter : chapterIds[0];
-      state.announced = [20, 40, 60].includes(stored.announced) ? stored.announced : 0;
+      // The original 20/40 unlocks no longer qualify; announce the revised 60% archive once.
+      state.announced = 0;
       state.dates = [...new Set((Array.isArray(stored.dates) ? stored.dates : []).filter(id => ['escape', 'baseball', 'idol', 'football'].includes(id)))];
       for (const chapter of story.chapters) {
         const old = stored.chapters?.[chapter.id];
@@ -59,10 +60,10 @@
   }
   function sync() {
     if (!initialized) return;
-    const available = affection >= 20;
+    const available = affection >= 60;
     document.getElementById('archiveApp').hidden = !available;
     document.getElementById('sequelChatEntry').hidden = !available;
-    document.getElementById('archiveTeaser').textContent = available ? '秘密档案 · 查看那封未寄出的信 ↗' : '秘密档案 · 好感度 20% 后收到新的消息';
+    document.getElementById('archiveTeaser').textContent = available ? '秘密档案 · 查看那封未寄出的信 ↗' : '秘密档案 · 好感度 60% 后收到新的消息';
     const eligible = story.chapters.filter(accessible).at(-1);
     if (eligible && eligible.threshold > state.announced) {
       state.announced = eligible.threshold; save();
@@ -71,7 +72,7 @@
     if (document.getElementById('archives').classList.contains('active')) renderArchives();
   }
   function openArchives(id) {
-    if (affection < 20) { explain('尚未收到这份记录', '好感度达到 20% 后，会收到成灿的新消息。'); return; }
+    if (affection < 60) { explain('档案还没有准备好', '好感度达到 60% 后，成灿会把秘密档案的入口交给我。'); return; }
     currentArchive = id && accessible(chapterById(id) || {}) ? id : null;
     state.currentEnding = null; save();
     renderArchives(); view('archives');
@@ -82,6 +83,7 @@
     const content = node('div', null, 'archive-content', screen);
     if (currentArchive) { renderDossier(content, chapterById(currentArchive)); return; }
     node('p', 'SOME THINGS REMEMBER US', 'sequel-eyebrow', content);
+    node('p', story.notice || '', 'archive-fiction-note', content);
     node('h1', '我遗忘的，\n仍然在这里。', 'archive-title', content);
     node('p', '一条称呼、一段旧对话、一次没有说完的告别。\n我想亲自确认，我们究竟经历过什么。', 'sequel-description', content);
     for (const [index, chapter] of story.chapters.entries()) {

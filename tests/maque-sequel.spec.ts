@@ -68,11 +68,38 @@ async function phoneFits(page: Page, selector: string) {
   expect(await content.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
 }
 
-test("secret archive is unavailable below 20 percent without disturbing the phone", async ({ page }) => {
-  const errors = await open(page, 19);
+test("secret archive is unavailable below 60 percent without disturbing the phone", async ({ page }) => {
+  const errors = await open(page, 59);
   await expect(page.locator("#archiveApp")).toBeHidden();
   await page.getByRole("button", { name: /KaKaoTalk/ }).click();
   await expect(page.locator("#sequelChatEntry")).toBeHidden();
   await expect(page.locator("#kakao")).toHaveClass(/active/);
+  expect(errors).toEqual([]);
+});
+
+test("the 60 percent archive unlocks on the phone and 01 is found through KakaoTalk and Instagram", async ({ page }) => {
+  const errors = await open(page, 60);
+  const app = page.locator("#archiveApp");
+  await expect(app).toBeVisible();
+  await expect(page.locator("#archiveTeaser")).toContainText("查看那封未寄出的信");
+  await app.click();
+  await page.locator('[data-chapter="echo"]').click();
+  await page.getByRole("button", { name: /KakaoTalk · 和成灿确认/ }).click();
+  for (let i = 0; i < 11; i++) {
+    await expect(page.locator("#sequelNext")).toBeEnabled();
+    await page.locator("#sequelNext").click();
+  }
+  await page.locator('[data-sequel-choice="trust"]').click();
+  await page.locator("#sequelBackToArchive").click();
+  await page.getByRole("button", { name: /Instagram · 查看他的快拍/ }).click();
+  await expect(page.locator(".sequel-story-overlay")).toContainText("01");
+  await page.getByRole("button", { name: "关闭快拍" }).click();
+  await page.getByRole("button", { name: "回到秘密档案" }).click();
+  await page.locator("#archiveAnswer").fill("Black Shadow");
+  await page.locator("#archiveSubmit").click();
+  await expect(page.locator("#archiveFeedback")).toContainText("还没有对上");
+  await page.locator("#archiveAnswer").fill("01");
+  await page.locator("#archiveSubmit").click();
+  await expect(page.locator("#archives")).toContainText("01 号日志");
   expect(errors).toEqual([]);
 });
