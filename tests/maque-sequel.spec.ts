@@ -5,6 +5,7 @@ const html = readFileSync("maque/index.html", "utf8");
 const files = new Set([
   "sequel-story.js", "sequel.js", "sequel.css",
   "date-expansion.js", "date-expansion.css",
+  "memory-vault.js", "memory-vault.css",
   ...[
     "sungchan-instagram-avatar.jpg", "sungchan-football-childhood.jpg",
     "date-escape-background.jpg", "date-escape-eunseok-reference.jpg",
@@ -81,7 +82,7 @@ test("the 60 percent archive unlocks on the phone and 01 is found through KakaoT
   const errors = await open(page, 60);
   const app = page.locator("#archiveApp");
   await expect(app).toBeVisible();
-  await expect(page.locator("#archiveTeaser")).toContainText("查看那封未寄出的信");
+  await expect(page.locator("#archiveTeaser")).toContainText("RECOVERY INDEX");
   await app.click();
   await page.locator('[data-chapter="echo"]').click();
   await page.getByRole("button", { name: /KakaoTalk · 和成灿确认/ }).click();

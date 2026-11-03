@@ -37,43 +37,44 @@
       ]
     },
     escape: {
-      title: '最后一声铃响以前', subtitle: 'AFTER THE LAST BELL / 大逃殺',
-      description: '一场双人密室约会，把我和成灿带进空荡的校园。广播要求我们只留下一人，门边的旧纸条却写着另一种答案。我想和他一起找到出口。',
-      memory: './assets/date-escape-eunseok-reference.jpg', secondaryMemory: './assets/date-escape-sungchan-reference.jpg', memoryLabel: '我们在这一场故事里的角色',
-      caption: '广播说只能留一个人的时候，是你先看见了那张纸条。银硕，谢谢你提醒我：出口不是把谁留住，而是两个人都能走出去。',
+      title: '九号房间', subtitle: 'ROOM 09 / 上一轮仍在运行',
+      description: '两张号码牌写着 39 和 23。门后不是出口，而是九轮选择：把代价留给自己、交给对方，或一起承担；也可以抹去一段共同记忆。上一轮，我把所有代价都留给了自己，直到连第一次相遇也忘了。',
+      memory: './assets/date-escape-eunseok-reference.jpg', secondaryMemory: './assets/date-escape-sungchan-reference.jpg', memoryLabel: '九号房间 · 实例 02',
+      caption: '我没有再假装一个人承担就能保护所有人。银硕，这次你愿意和我一起走到门外。',
       nodes: [
-        { type: 'line', title: '01 / 双人入场', who: 'me', text: '密室入口写着“大逃殺”。我把角色卡翻过来，确认这是一场可以随时结束的双人体验。空走廊尽头，成灿正在等我。', ko: '무서우면 언제든 말해 줘요.', reply: '他说：“如果不舒服，我们随时出去。”' },
-        { type: 'choice', title: '02 / 第一声广播', text: '广播忽然响起：“最后一声铃响之前，只能留下一个人。”成灿抓紧了手里的角色卡。我决定——', key: 'approach', options: [{ id: 'together', label: '先告诉他：我们一起找别的办法', response: '他看着我，呼吸慢慢平稳下来。“好。先看看房间里还有什么线索。”' }, { id: 'rules', label: '先检查广播和门边的规则是否一致', response: '门边的小字写着“双人协作，双人离场”。我念给他听，他轻轻笑了：“原来广播也会骗人。”' }] },
-        { type: 'clue', title: '03 / 我没有忘记的号码', text: '门边有两张号码卡。下面的纸条写着：“不要用广播的规则。先输入我拿着的号码，再输入成灿拿着的号码。”', cards: [['我拿着的号码卡', '02'], ['成灿拿着的号码卡', '19']], note: '我把顺序重新读了一遍：我的号码在前，成灿的号码在后。' },
-        { type: 'puzzle', title: '04 / 一扇可以打开的门', text: '门锁需要四位数字。我把两张号码卡并排放好，试着输入我们共同的答案。', answer: '0219', hint: '我拿着 02，成灿拿着 19。按照纸条顺序，把它们连起来就是四位密码。' },
-        { type: 'line', title: '05 / 广播没有说的答案', who: 'him', ko: '둘 다 나갈 수 있었네요.', text: '门锁轻轻响了一声。出口牌亮起来，广播却还在重复旧台词。成灿看着那盏灯：“原来……可以两个人都出去。我刚才差点只听见它说会失去你。”' },
-        { type: 'choice', title: '06 / 门开着', text: '我站到他身边。离开这里不需要任何交换，也不需要谁永远留下。', key: 'exit', options: [{ id: 'hand', label: '伸出手，等他愿意一起往前走', response: '他看了看打开的门，再把手放进我手心。“这次，是我自己想和你一起走。”' }, { id: 'space', label: '留出一点空间，告诉他我就在门外等', response: '我先走到灯下，他很快跟过来。“谢谢你没有替我锁上门。也谢谢你，真的还在这里。”' }] },
-        { type: 'memory', title: '07 / 走廊之外', text: '回到明亮的入口，我们把角色卡并在一起。我终于有空看清，他刚才一直绷紧的肩膀已经放松下来。', note: '角色留在故事里。我和成灿一起走进晚风，约好回去的路上吃点热的。' },
-        { type: 'done', title: '08 / 出口，留给两个人', text: '我记下今天的答案：相爱不需要把门锁上。如果还想见面，就把下一次好好说出口。' }
+        { type: 'line', title: '00 / 入口记录', who: 'me', text: '门牌上只有一个褪色的 09。手机信号没有断，时间却停在 03:19。成灿站在门边，手里的号码牌是 23；我的那张写着 39。', ko: '이번에는 혼자 견디지 않아도 돼요.', reply: '他说：“这次不用一个人撑到最后。你可以把选择告诉我。”' },
+        { type: 'roomNine', title: 'ROOM 09 / 九轮记录' },
+        { type: 'done', title: '09 / 门外仍有明天', text: '最后一道门打开时，没有人被留在里面。手机里多出一份旧快照，也多出一个可以自己选择的明天。' }
       ]
     }
   };
 
-  const emptyState = () => ({ version: 1, sessions: {}, completed: [], likes: [], comments: {} });
+  const emptyState = () => ({ version: 2, sessions: {}, completed: [], likes: [], comments: {}, previousRun: { self: 9, source: 'SC-01' } });
   function load() {
     try {
       const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-      if (!parsed || parsed.version !== 1) return emptyState();
+      if (!parsed || ![1, 2].includes(parsed.version)) return emptyState();
       const result = emptyState();
       for (const id of chapterIds) {
         const old = parsed.sessions?.[id];
-        if (old && Number.isInteger(old.step) && old.step >= 0 && old.step < stories[id].nodes.length) {
+        if (old && Number.isInteger(old.step) && old.step >= 0 && old.step < stories[id].nodes.length && !(parsed.version === 1 && id === 'escape')) {
           result.sessions[id] = {
             step: old.step,
             choices: old.choices && typeof old.choices === 'object' ? old.choices : {},
             rehearsal: Array.isArray(old.rehearsal) ? old.rehearsal.filter(x => ['breathe', 'raise', 'turn'].includes(x)).slice(0, 3) : [],
             response: typeof old.response === 'string' ? old.response.slice(0, 250) : '',
+            roomChoices: parsed.version === 2 && id === 'escape' && Array.isArray(old.roomChoices) ? old.roomChoices.slice(0, 9).map(x => ({ id: ['self','other','shared','erase'].includes(x?.id) ? x.id : 'shared', memory: String(x?.memory || '').slice(0, 40) })) : [],
+            roomIndex: parsed.version === 2 && id === 'escape' ? Math.max(0, Math.min(8, Number(old.roomIndex) || 0)) : 0,
+            roomResponse: '', roomComplete: parsed.version === 2 && id === 'escape' && old.roomComplete === true,
             reward: Number.isInteger(old.reward) && old.reward >= 0 && old.reward <= 5 ? old.reward : 0
           };
         }
         if (typeof parsed.comments?.[id] === 'string') result.comments[id] = parsed.comments[id].slice(0, 100);
       }
       for (const key of ['completed', 'likes']) result[key] = Array.isArray(parsed[key]) ? parsed[key].filter(id => chapterIds.includes(id)) : [];
+      result.previousRun = { self: 9, source: 'SC-01' };
+      result.legacyEscapeCompleted = parsed.version === 1 && (result.completed.includes('escape') || Boolean(parsed.sessions?.escape));
+      if (parsed.version === 1) result.completed = result.completed.filter(id => id !== 'escape');
       return result;
     } catch (_) { return emptyState(); }
   }
@@ -82,7 +83,7 @@
   let initialized = false;
   function persist() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {} }
   function session(id = activeId) {
-    if (!state.sessions[id]) state.sessions[id] = { step: 0, choices: {}, rehearsal: [], response: '', reward: 0 };
+    if (!state.sessions[id]) state.sessions[id] = { step: 0, choices: {}, rehearsal: [], response: '', roomChoices: [], roomIndex: 0, roomResponse: '', roomComplete: false, reward: 0 };
     return state.sessions[id];
   }
   function nodeText(text, s) { return typeof text === 'function' ? text(s) : text || ''; }
@@ -119,7 +120,8 @@
       storeDateList('maque_dates_completed', completedDates);
       persist();
       const before = affection;
-      increaseAffection();
+      if (id === 'escape' && typeof window.grantMaqueAffection === 'function') window.grantMaqueAffection(15);
+      else increaseAffection();
       s.reward = affection - before;
       announceFeature('Instagram · 新的约会日记', '成灿把今天的小事写进了动态。');
     } else if (!state.completed.includes(id)) state.completed.push(id);
@@ -153,6 +155,7 @@
       if (node.reply) dialogue.append(element('p', node.reply, 'date-story-cn'));
       box.append(dialogue, button('继续 →', 'extraDateNext', () => advance(id, s.step)));
     } else if (node.type === 'choice') renderChoice(box, id, s, node);
+    else if (node.type === 'roomNine') renderRoomNine(box, id, s, node);
     else if (node.type === 'ball') renderBall(box, id, s, node);
     else if (node.type === 'rehearsal') renderRehearsal(box, id, s, node);
     else if (node.type === 'clue') {
@@ -187,6 +190,52 @@
       option.dataset.choice = choice.id; choices.append(option);
     }
     box.append(choices);
+  }
+  const roomMemories = [
+    '第一次碰面时，我下意识做的手势', '那次争吵里没有说完的话', '第一次分着吃的那份晚餐',
+    '只属于我们的一段旧歌', '第一次并肩走进球场', '最甜的一次短途出行',
+    '舞台灯熄灭后的那句应援', '我第一次认真叫他的名字', '我们第一次见面的那一天'
+  ];
+  function renderRoomNine(box, id, s, node) {
+    const round = Math.min(s.roomIndex, 8), day = round + 1;
+    const file = element('aside', '', 'room-nine-file');
+    file.append(element('small', 'RECOVERED SNAPSHOT / SC-01'), element('p', '九次选择：我把代价全留给了自己。记忆索引随之清空。', 'room-nine-oldrun'));
+    box.append(file);
+    const tally = element('div', '', 'room-nine-tally');
+    for (const label of ['39 · 我', '23 · 成灿']) tally.append(element('span', label));
+    box.append(tally, element('p', `第 ${String(day).padStart(2,'0')} / 09 轮 · 记忆索引`, 'room-nine-day'));
+    box.append(element('h3', roomMemories[round], 'room-nine-memory'));
+    box.append(element('p', '房间要求我们选择谁来承担代价。角落里另有一行字：也可以删除今天的记忆。屏幕上的记录会留下你的选择。', 'room-nine-copy'));
+    if (s.roomResponse) {
+      const result = element('div', '', 'room-nine-result');
+      result.append(element('p', s.roomResponse));
+      const next = button(day === 9 ? '查看本轮结束记录 →' : '继续下一轮 →', 'roomNineContinue', () => {
+        if (!isCurrent(id, s.step) || !s.roomResponse) return;
+        s.roomResponse = '';
+        if (s.roomIndex >= 8) { s.roomComplete = true; advance(id, s.step); return; }
+        s.roomIndex += 1; persist(); render();
+      });
+      result.append(next); box.append(result); return;
+    }
+    const opts = element('div', '', 'room-nine-options');
+    const options = [
+      ['self', '代价留给我', '这一轮的代价落在我这边。成灿没有阻止我，只低声说：“我知道你以前总这样。但这次，我也在这里。”'],
+      ['other', '让成灿替我承担', '屏幕把代价转向成灿。他沉默了一会儿：“我愿意和你一起面对，但不要把我的选择也变成命令，好吗？”'],
+      ['shared', '我们一起承担', '记录被分成两半。成灿握紧号码牌：“你愿意把一部分交给我……是不是终于相信，我也可以和你一起承担了？”'],
+      ['erase', round === 8 ? '彻底忘掉这个人' : '抹去这段共同记忆', round === 8 ? '名字、声音和最后一段共同记忆都被移出索引。成灿看着空白处，轻声说：“如果真的忘了我……第一次见面时，也请再看我一眼。”' : '这一段从两人的记录里褪色。成灿看着空白的位置：“好像少了什么。没关系，我们可以重新认识那一天。”']
+    ];
+    for (const [choice, label, reply] of options) {
+      const control = button(label, '', () => {
+        if (!isCurrent(id, s.step) || s.roomResponse) return;
+        s.roomChoices.push({ id: choice, memory: roomMemories[round] });
+        s.roomResponse = reply;
+        persist(); render();
+      }, 'room-nine-choice'); control.dataset.choice = choice; opts.append(control);
+    }
+    box.append(opts);
+    const erased = s.roomChoices.filter(x => x.id === 'erase').length;
+    const shared = s.roomChoices.filter(x => x.id === 'shared').length;
+    if (erased || shared) box.append(element('p', erased ? `缺失索引：${erased} / 09 · 有一部分像是被谁轻轻擦掉了。` : `共同承担：${shared} / 09 · 他的呼吸终于和我一样慢下来。`, 'room-nine-drift'));
   }
   function renderBall(box, id, s, node) {
     const step = s.step;
@@ -257,17 +306,27 @@
   }
   function renderDone(box, id, s, node) {
     const result = element('div', '', 'extra-date-result'); result.id = 'extraDateResult';
-    result.append(element('h2', stories[id].title), element('p', node.text, 'date-detail-copy'));
+    const room = id === 'escape' ? s.roomChoices || [] : [];
+    let roomEnding = node.text;
+    if (id === 'escape') {
+      const count = key => room.filter(item => item.id === key).length;
+      if (count('shared') >= 4) roomEnding = '最后一轮里，我们没有再把痛苦推给彼此。成灿看着那张 39 号号码牌：“你愿意和我一起承担，不是因为你忘了痛，而是因为你终于相信我了。”';
+      else if (count('erase') >= 5) roomEnding = '有几段回忆已经无法拼回原样。成灿没有催我想起，只说：“空白也没关系。我们可以从今天重新认识。”';
+      else if (count('self') >= 7) roomEnding = '门开了，成灿却没有立刻走。他把 23 号号码牌放在我手边：“下一次，别把所有事都留给自己。我也想和你一起承担。”';
+      else if (count('other') >= 5) roomEnding = '门开后，我们都走了出来。成灿望着被划掉的记录：“别替我决定该承受什么。下次我们一起选，好吗？”';
+    }
+    result.append(element('h2', stories[id].title), element('p', roomEnding, 'date-detail-copy'));
     appendMemory(result, stories[id]);
     result.append(element('p', s.reward ? `♡ +${s.reward}% · 这次约会已珍藏` : '♡ 这份回忆已经珍藏，重温不重复增加好感', 'date-reward'));
     result.append(button('看看他的 Instagram 日记 ↗', '', () => openApp('instagram')));
     result.append(button('重温这次约会', 'extraDateRestart', () => {
-      state.sessions[id] = { step: 0, choices: {}, rehearsal: [], response: '', reward: 0 }; persist(); render();
+      state.sessions[id] = { step: 0, choices: {}, rehearsal: [], response: '', roomChoices: [], roomIndex: 0, roomResponse: '', roomComplete: false, reward: 0 }; persist(); render();
     }, 'date-inline-link'));
     result.append(button('回到约会邀请', '', showDateCatalog, 'date-inline-link')); box.append(result);
   }
+  function canStart(id) { return id !== 'escape' || ['baseball','football','idol'].every(key => completedDates.has(key)); }
   function start(id) {
-    if (!chapterIds.includes(id)) return false;
+    if (!chapterIds.includes(id) || !canStart(id)) return false;
     if (affection < 5 || !hasDatePhoto()) return false;
     activeId = id; activeDateId = id; dateSession++; session(id); persist(); render(); return true;
   }
@@ -305,13 +364,14 @@
   }
   function init() {
     if (initialized) return; initialized = true;
+    if (state.legacyEscapeCompleted) { completedDates.delete('escape'); storeDateList('maque_dates_completed', completedDates); state.legacyEscapeCompleted = false; }
     for (const id of chapterIds) {
       const scene = dateScenes.find(item => item.id === id);
-      if (scene) { scene.ready = true; scene.description = stories[id].description; }
+      if (scene) { scene.ready = id !== 'escape' || canStart(id); scene.description = stories[id].description; }
       if (state.completed.includes(id)) completedDates.add(id);
       else if (completedDates.has(id)) state.completed.push(id);
     }
     persist();
   }
-  window.MaqueExtraDates = { init, start, renderInstagram, hasProgress: id => Boolean(state.sessions[id]?.step), isComplete: id => state.completed.includes(id) };
+  window.MaqueExtraDates = { init, start, canStart, renderInstagram, hasProgress: id => Boolean(state.sessions[id]?.step), isComplete: id => state.completed.includes(id) };
 })();

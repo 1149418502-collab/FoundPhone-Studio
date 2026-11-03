@@ -62,8 +62,9 @@
     if (!initialized) return;
     const available = affection >= 60;
     document.getElementById('archiveApp').hidden = !available;
+    document.getElementById('archives')?.classList.toggle('room-nine-read', state.dates.includes('escape'));
     document.getElementById('sequelChatEntry').hidden = !available;
-    document.getElementById('archiveTeaser').textContent = available ? '秘密档案 · 查看那封未寄出的信 ↗' : '秘密档案 · 好感度 60% 后收到新的消息';
+    document.getElementById('archiveTeaser').textContent = available ? 'RECOVERY INDEX · 01 ↗' : '隐藏索引 · 好感度 60% 后出现';
     const eligible = story.chapters.filter(accessible).at(-1);
     if (eligible && eligible.threshold > state.announced) {
       state.announced = eligible.threshold; save();
@@ -79,13 +80,22 @@
   }
   function renderArchives() {
     const screen = document.getElementById('archives'); screen.replaceChildren();
-    header(screen, '秘密档案', 'SAMSARA / 私密资料库', () => { if (currentArchive) { currentArchive = null; renderArchives(); } else view('home'); });
+    header(screen, '档案', 'SAMSARA / 01' , () => { if (currentArchive) { currentArchive = null; renderArchives(); } else view('home'); });
     const content = node('div', null, 'archive-content', screen);
     if (currentArchive) { renderDossier(content, chapterById(currentArchive)); return; }
-    node('p', 'SOME THINGS REMEMBER US', 'sequel-eyebrow', content);
+    node('p', 'RECOVERY INDEX / 01', 'sequel-eyebrow', content);
     node('p', story.notice || '', 'archive-fiction-note', content);
     node('h1', '我遗忘的，\n仍然在这里。', 'archive-title', content);
-    node('p', '一条称呼、一段旧对话、一次没有说完的告别。\n我想亲自确认，我们究竟经历过什么。', 'sequel-description', content);
+    node('p', '只读副本。\n访问记录将被保留。', 'sequel-description', content);
+    if (state.dates.includes('escape')) {
+      const log = node('aside', null, 'archive-root-warning', content);
+      node('small', 'AUTOMATED PROCESS LOG / SC-01', '', log);
+      node('p', 'RESET_COUNT　01', '', log);
+      node('p', 'EXIT_GAME REQUEST　DENIED', '', log);
+      node('p', 'SELF-DESTRUCT　PENDING', '', log);
+      node('p', '取消原因：检测到“等待银硕返回”的依赖项。', '', log);
+      node('small', '本条记录在关闭档案后新增。', 'archive-log-tail', log);
+    }
     for (const [index, chapter] of story.chapters.entries()) {
       const progress = state.chapters[chapter.id], canOpen = accessible(chapter);
       const card = button(content, '', () => { currentArchive = chapter.id; state.activeChapter = chapter.id; save(); renderArchives(); }, 'archive-folder');
@@ -242,8 +252,8 @@
     }
     view('archives');
   }
-  function renderEnding(id, record = true) {
-    if (!endingIds.includes(id) || (record && !allSolved())) return;
+  function renderEnding(id, record = true, vaultOverride = false) {
+    if (!endingIds.includes(id) || (record && !allSolved() && !vaultOverride)) return;
     if (record && !state.endings.includes(id)) state.endings.push(id);
     state.currentEnding = id; save();
     const ending = story.endings[id], screen = document.getElementById('archives'); screen.replaceChildren();
@@ -270,12 +280,13 @@
       screen.setAttribute('aria-label', id === 'archives' ? '秘密档案' : 'KakaoTalk 主线对话');
     }
     const app = button(document.querySelector('#home .grid'), '', () => openArchives(), 'app', 'archiveApp');
-    const icon = node('span', '▤', 'appico sequel-app-icon', app); icon.setAttribute('aria-hidden', 'true'); node('span', '秘密档案', '', app);
+    const icon = node('span', '01', 'appico sequel-app-icon', app); icon.setAttribute('aria-hidden', 'true'); node('span', '索引', '', app);
     button(document.querySelector('#kakao .nav'), '私密对话', () => openChat(), 'sequel-chat-entry', 'sequelChatEntry');
     button(document.getElementById('info'), '', () => openArchives(), 'sequel-secondary', 'archiveTeaser');
     initialized = true; sync();
     if (document.getElementById('instagram').classList.contains('active')) renderInstagram();
   }
-  window.MaqueSequel = { init, sync, renderInstagram, onDateComplete, openArchives, openChat };
+  function finishDiaryEnding() { renderEnding('reunion', true, true); }
+  window.MaqueSequel = { init, sync, renderInstagram, onDateComplete, openArchives, openChat, finishDiaryEnding };
   init();
 })();

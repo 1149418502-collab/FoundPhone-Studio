@@ -8,6 +8,8 @@ const localModules = new Set([
   "sequel.css",
   "date-expansion.js",
   "date-expansion.css",
+  "memory-vault.js",
+  "memory-vault.css",
 ]);
 const localAssets = new Set([
   "sungchan-instagram-avatar.jpg",
@@ -25,7 +27,7 @@ const localAssets = new Set([
   "gifts-icon.svg",
   "samsara-icon.svg",
 ]);
-const special = "纯洁无瑕的爱";
+const special = "「真心」";
 const gifts = [
   ["郁金香花束", "放在显眼的地方"],
   ["红玫瑰", "藏在花里的心意"],
@@ -41,20 +43,21 @@ const gifts = [
   ["签名足球", "从很小的时候就开始踢了"],
   ["明星球衣", "从小就一直踢球"],
 ];
-async function open(page: Page, affection = 0, owned: string[] = []) {
+async function open(page: Page, affection = 0, owned: string[] = [], completedDates: string[] = []) {
   await page.addInitScript(
-    ({ affection, owned }) => {
+    ({ affection, owned, completedDates }) => {
       // Keep the existing one-time build migration from deleting this test save.
       if (!localStorage.getItem("maque_test_initialized")) {
         for (const version of ["27", "31"])
           localStorage.setItem(`maque_build_${version}_initialized`, "yes");
         localStorage.setItem("maque_affection", String(affection));
         localStorage.setItem("maque_owned_gifts", JSON.stringify(owned));
+        localStorage.setItem("maque_dates_completed", JSON.stringify(completedDates));
         localStorage.setItem("maque_gifts_unlocked", "yes");
         localStorage.setItem("maque_test_initialized", "yes");
       }
     },
-    { affection, owned },
+    { affection, owned, completedDates },
   );
   await page.route("**/maque/", (route) =>
     route.fulfill({ contentType: "text/html", body: html }),
@@ -409,37 +412,37 @@ test("one gift at a time; rapid second gift cannot interrupt or gain extra affec
   expect(score).toBeLessThanOrEqual(10);
 });
 
-test("79% blocks buying and gifting even for an old save owning the special gift", async ({
+test("under 60% blocks buying and gifting even for an old save owning the special gift", async ({
   page,
 }) => {
-  await open(page, 79, [special]);
+  await open(page, 59, ["纯洁无瑕的爱"], ["escape"]);
   await chat(page);
   await sendLockedGift();
   async function sendLockedGift() {
     await page.locator("#chatGiftButton").click();
     await expect(page.locator(".chat-gift-choice")).toBeDisabled();
-    await expect(page.locator(".chat-gift-choice")).toContainText("80%");
+    await expect(page.locator(".chat-gift-choice")).toContainText("60%");
     await page.locator(".gift-picker-close").click();
-    await page.evaluate("sendGiftInChat('纯洁无瑕的爱')");
-    await expect(page.locator("#modalbody")).toContainText("80%");
+    await page.evaluate("sendGiftInChat('「真心」')");
+    await expect(page.locator("#modalbody")).toContainText("60%");
     await page.locator("#modal button").click();
   }
   await page.evaluate("openApp('gifts')");
   await expect(page.locator("#pureLoveBuy")).toBeDisabled();
-  await expect(page.locator("#pureLoveHint")).toContainText("当前 79%");
-  await page.evaluate("buyGift('纯洁无瑕的爱',true)");
+  await expect(page.locator("#pureLoveHint")).toContainText("当前 59%");
+  await page.evaluate("buyGift('「真心」',true)");
   await expect(page.locator("#giftConfirm")).not.toHaveClass(/show/);
 });
 
-test("crossing 80% unlocks immediately, clamps at 100%, and restores after reload", async ({
+test("crossing 60% after room nine unlocks immediately and clamps at 100%", async ({
   page,
 }) => {
-  await open(page, 77, ["红玫瑰"]);
+  await open(page, 57, ["红玫瑰"], ["escape"]);
   await chat(page);
   await page.evaluate("Math.random=()=>0");
   await send(page, "红玫瑰");
   await finishGiftConversation(page);
-  await expect(page.locator("#affectionValue")).toHaveText("♥ 80%");
+  await expect(page.locator("#affectionValue")).toHaveText("♥ 60%");
   await expect(page.locator("#pureLoveBuy")).toBeEnabled();
   await page.reload();
   await expect(page.locator("#pureLoveBuy")).toBeEnabled();
@@ -450,7 +453,7 @@ test("crossing 80% unlocks immediately, clamps at 100%, and restores after reloa
 test("special gift needs two warnings, cancellation resets confirmation, and both ending choices work", async ({
   page,
 }) => {
-  await open(page, 80);
+  await open(page, 80, [], ["escape"]);
   await buy(page, special);
   await expect(page.locator("#giftConfirmText")).toContainText("第二次提醒");
   expect(
@@ -460,7 +463,7 @@ test("special gift needs two warnings, cancellation resets confirmation, and bot
   await page.locator("#pureLoveBuy").click();
   await expect(page.locator("#giftConfirmText")).toContainText("第一次提醒");
   await page.locator("#giftConfirmButton").click();
-  await expect(page.locator("#giftConfirmText")).toContainText("意义深重");
+  await expect(page.locator("#giftConfirmText")).toContainText("无法回头");
   await page.locator("#giftConfirmButton").click();
   await page.evaluate("view('home')");
   await chat(page);
@@ -564,7 +567,7 @@ test("dating threshold guards direct access and four mobile scene cards have int
   await prepareDateJourney(page);
   await expect(page.locator(".date-scene")).toHaveCount(4);
   for (const [name, source] of [
-    ["大逃殺", "date-escape-background.jpg"],
+    ["九号房间", "date-escape-background.jpg"],
     ["棒球场", "date-baseball-background.jpg"],
     ["足球校园", "sungchan-football-childhood.jpg"],
     ["一日爱豆", "date-idol-background.jpg"],
@@ -582,12 +585,12 @@ test("dating threshold guards direct access and four mobile scene cards have int
       )
       .toBe(true);
   }
-  await expect(page.locator(".scene-name-escape")).toHaveText("大 逃 殺");
+  await expect(page.locator(".scene-name-escape")).toHaveText("九号房间");
   const spacing = await page
     .locator(".scene-name-escape")
     .evaluate((el) => parseFloat(getComputedStyle(el).letterSpacing));
-  expect(spacing).toBeGreaterThan(5);
-  for (const name of ["大逃殺", "足球校园", "一日爱豆"]) {
+  expect(spacing).toBeGreaterThan(0);
+  for (const name of ["足球校园", "一日爱豆"]) {
     await page
       .getByRole("button", { name: "选择约会场景：" + name, exact: true })
       .click();
@@ -1080,4 +1083,47 @@ test("provided image 2 is the decoded IG story and post portrait", async ({
   await page
     .locator("#instagram")
     .screenshot({ path: "outputs/maque/provided-instagram-avatar.png" });
+});
+
+
+test("room nine waits for the first three dates, then saves nine choices and rewards shared trust", async ({ page }) => {
+  await open(page, 50);
+  await page.evaluate(() => {
+    const identity={id:"identity-test",src:"./assets/date-baseball-couple-1.jpg",alt:"我的形象"};
+    return savePhoto(identity).then(()=>{dateSelectedPhotoId=identity.id;dateJourneyAccepted=true;localStorage.setItem("maque_date_photo_id",identity.id);view("dates");showDateCatalog()});
+  });
+  const locked=page.getByRole("button",{name:/选择约会场景：九号房间/});
+  await expect(locked).toBeVisible();
+  await locked.click();
+  await expect(page.locator("#modalbody")).toContainText("先完成棒球、校园足球和一日爱豆");
+  await page.locator("#modal button").click();
+  await page.evaluate(()=>{completedDates.add("baseball");completedDates.add("football");completedDates.add("idol");storeDateList("maque_dates_completed",completedDates);showDateCatalog()});
+  await page.getByRole("button",{name:/选择约会场景：九号房间/}).click();
+  await page.getByRole("button",{name:/开始 \/ 继续这次约会/}).click();
+  await page.locator("#extraDateNext").click();
+  for(let day=1;day<=9;day++) {
+    await expect(page.locator(".room-nine-day")).toContainText(`${String(day).padStart(2,"0")} / 09`);
+    await page.locator('.room-nine-choice[data-choice="shared"]').click();
+    await page.locator("#roomNineContinue").click();
+  }
+  await expect(page.locator("#extraDateResult")).toContainText("终于相信我了");
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!).sessions.escape.roomChoices)).toHaveLength(9);
+  await expect(page.locator("#affectionValue")).toHaveText("♥ 65%");
+  await expect(page.locator("#pureLoveBuy")).toBeEnabled();
+});
+
+
+test("the encrypted diary requires two confirmations and leads to the gentle repeated-first-meeting ending", async ({ page }) => {
+  await open(page, 65, [], ["escape"]);
+  await page.evaluate("window.MaqueMemoryVault.purchase()");
+  await expect(page.locator("#memoryVault")).toContainText("这份记录可能改变");
+  await page.getByRole("button",{name:"现在打开"}).click();
+  await expect(page.locator("#memoryVault")).toContainText("确认打开？");
+  await page.getByRole("button",{name:"确认，打开文件夹"}).click();
+  await expect(page.locator("#memoryVault")).toContainText("你看到那个文件夹了，对吗？");
+  await expect(page.locator("#memoryVault img")).toHaveCount(2);
+  await page.getByRole("button",{name:"回复成灿"}).click();
+  await page.getByRole("button",{name:"记起我们，再次相爱"}).click();
+  await expect(page.locator("#archives")).toContainText("再次爱上他");
+  await expect(page.locator("#archives")).toContainText("第一次见面");
 });
