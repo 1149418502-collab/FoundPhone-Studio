@@ -13,6 +13,7 @@ const localModules = new Set([
 ]);
 const localAssets = new Set([
   "sungchan-instagram-avatar.jpg",
+  "locked-heart-vault.png",
   "sungchan-football-childhood.jpg",
   "date-escape-background.jpg",
   "date-escape-eunseok-reference.jpg",
@@ -77,7 +78,7 @@ async function open(page: Page, affection = 0, owned: string[] = [], completedDa
     const name = path.slice("/maque/assets/".length);
     if (!localAssets.has(name)) return route.abort();
     return route.fulfill({
-      contentType: name.endsWith(".svg") ? "image/svg+xml" : "image/jpeg",
+      contentType: name.endsWith(".svg") ? "image/svg+xml" : name.endsWith(".png") ? "image/png" : "image/jpeg",
       body: readFileSync("maque/assets/" + name),
     });
   });
@@ -412,37 +413,37 @@ test("one gift at a time; rapid second gift cannot interrupt or gain extra affec
   expect(score).toBeLessThanOrEqual(10);
 });
 
-test("under 60% blocks buying and gifting even for an old save owning the special gift", async ({
+test("under 80% blocks buying and gifting even for an old save owning the special gift", async ({
   page,
 }) => {
-  await open(page, 59, ["纯洁无瑕的爱"], ["escape"]);
+  await open(page, 79, ["纯洁无瑕的爱"], ["baseball"]);
   await chat(page);
   await sendLockedGift();
   async function sendLockedGift() {
     await page.locator("#chatGiftButton").click();
     await expect(page.locator(".chat-gift-choice")).toBeDisabled();
-    await expect(page.locator(".chat-gift-choice")).toContainText("60%");
+    await expect(page.locator(".chat-gift-choice")).toContainText("80%");
     await page.locator(".gift-picker-close").click();
     await page.evaluate("sendGiftInChat('「真心」')");
-    await expect(page.locator("#modalbody")).toContainText("60%");
+    await expect(page.locator("#modalbody")).toContainText("80%");
     await page.locator("#modal button").click();
   }
   await page.evaluate("openApp('gifts')");
   await expect(page.locator("#pureLoveBuy")).toBeDisabled();
-  await expect(page.locator("#pureLoveHint")).toContainText("当前 59%");
+  await expect(page.locator("#pureLoveHint")).toContainText("当前 79%");
   await page.evaluate("buyGift('「真心」',true)");
   await expect(page.locator("#giftConfirm")).not.toHaveClass(/show/);
 });
 
-test("crossing 60% after room nine unlocks immediately and clamps at 100%", async ({
+test("crossing 80% with the baseball shop available unlocks special gifts and clamps at 100%", async ({
   page,
 }) => {
-  await open(page, 57, ["红玫瑰"], ["escape"]);
+  await open(page, 77, ["红玫瑰"], ["baseball"]);
   await chat(page);
   await page.evaluate("Math.random=()=>0");
   await send(page, "红玫瑰");
   await finishGiftConversation(page);
-  await expect(page.locator("#affectionValue")).toHaveText("♥ 60%");
+  await expect(page.locator("#affectionValue")).toHaveText("♥ 80%");
   await expect(page.locator("#pureLoveBuy")).toBeEnabled();
   await page.reload();
   await expect(page.locator("#pureLoveBuy")).toBeEnabled();
@@ -453,7 +454,7 @@ test("crossing 60% after room nine unlocks immediately and clamps at 100%", asyn
 test("special gift needs two warnings, cancellation resets confirmation, and both ending choices work", async ({
   page,
 }) => {
-  await open(page, 80, [], ["escape"]);
+  await open(page, 80, [], ["baseball"]);
   await buy(page, special);
   await expect(page.locator("#giftConfirmText")).toContainText("第二次提醒");
   expect(
@@ -627,7 +628,15 @@ for (const choice of [
         const errors: string[] = [];
         page.on("pageerror", (e) => errors.push(e.message));
         await open(page, 5);
+        await expect(page.locator('[data-room-gift]')).toHaveCount(2);
+        await expect(page.locator('[data-room-gift]').first()).toBeHidden();
         await finishBaseballDate(page, choice, kisscamChoice);
+        await expect(page.locator('[data-room-gift]')).toHaveCount(2);
+        await expect(page.locator('[data-room-gift]').first()).not.toHaveAttribute('hidden');
+        await expect(page.locator('#pureLoveBuy')).toBeDisabled();
+        await expect(page.locator('#vaultPurchaseButton')).toBeDisabled();
+        await expect(page.locator('#featureNoticeTitle')).toHaveText('礼赠商店上新了');
+        await expect(page.locator('#featureNoticeBody')).toContainText('好感度达到 80% 后可购买');
         const score = await page.evaluate(() =>
           Number(localStorage.getItem("maque_affection")),
         );
@@ -636,24 +645,27 @@ for (const choice of [
         await page
           .getByRole("button", { name: /去看看成灿的 Instagram/ })
           .click();
-        await expect(page.locator(".ins-post")).toHaveCount(1);
-        await expect(page.locator(".ins-caption")).toContainText("银硕");
-        await expect(page.locator(".ins-post-image")).toHaveCount(1);
-        await expect(page.locator(".ins-post-image")).toHaveAttribute(
+        await expect(page.locator('.silver-profile-post')).toHaveCount(2);
+        await expect(page.locator('#insFeed > article').first()).toHaveAttribute('data-silver-post', '1');
+        await expect(page.locator('#insFeed > article[data-scene="baseball"]')).toHaveCount(1);
+        await expect(page.locator(".ins-post[data-scene=baseball]")).toHaveCount(1);
+        await expect(page.locator(".ins-post[data-scene=baseball] .ins-caption")).toContainText("银硕");
+        await expect(page.locator(".ins-post[data-scene=baseball] .ins-post-image")).toHaveCount(1);
+        await expect(page.locator(".ins-post[data-scene=baseball] .ins-post-image")).toHaveAttribute(
           "src",
           "./assets/date-baseball-couple-1.jpg",
         );
         await page
           .getByRole("button", { name: "下一张合影", exact: true })
           .click();
-        await expect(page.locator(".ins-post-image")).toHaveAttribute(
+        await expect(page.locator(".ins-post[data-scene=baseball] .ins-post-image")).toHaveAttribute(
           "src",
           "./assets/date-baseball-couple-2.jpg",
         );
         await expect
           .poll(() =>
             page
-              .locator(".ins-post-image")
+              .locator(".ins-post[data-scene=baseball] .ins-post-image")
               .evaluate(
                 (img: HTMLImageElement) => img.complete && img.naturalWidth > 0,
               ),
@@ -670,7 +682,7 @@ for (const choice of [
           .screenshot({ path: "outputs/maque/baseball-instagram.png" });
         await page.reload();
         await page.evaluate("openApp('instagram')");
-        await expect(page.locator(".ins-post")).toHaveCount(1);
+        await expect(page.locator(".ins-post[data-scene=baseball]")).toHaveCount(1);
         await expect(
           page.getByRole("button", { name: "喜欢这条动态", exact: true }),
         ).toHaveAttribute("aria-pressed", "true");
@@ -681,7 +693,7 @@ for (const choice of [
           ),
         ).toBe(score);
         await page.evaluate("openApp('instagram')");
-        await expect(page.locator(".ins-post")).toHaveCount(1);
+        await expect(page.locator(".ins-post[data-scene=baseball]")).toHaveCount(1);
         expect(errors).toEqual([]);
       },
     );
@@ -837,31 +849,31 @@ test("chosen identity loads for one second while Instagram uses the supplied cou
     .getByRole("button", { name: "选择约会场景：棒球场", exact: true })
     .click();
   await page.evaluate("openApp('instagram')");
-  await expect(page.locator(".ins-post-image")).toHaveAttribute(
+  await expect(page.locator(".ins-post[data-scene=baseball] .ins-post-image")).toHaveAttribute(
     "src",
     "./assets/date-baseball-couple-1.jpg",
   );
-  await expect(page.locator(".ins-post-image")).not.toHaveAttribute(
+  await expect(page.locator(".ins-post[data-scene=baseball] .ins-post-image")).not.toHaveAttribute(
     "src",
     identity!,
   );
   await expect
     .poll(() =>
       page
-        .locator(".ins-post-image")
+        .locator(".ins-post[data-scene=baseball] .ins-post-image")
         .evaluate(
           (img: HTMLImageElement) => img.complete && img.naturalWidth > 0,
         ),
     )
     .toBe(true);
   await page.getByRole("button", { name: "下一张合影", exact: true }).click();
-  await expect(page.locator(".ins-post-image")).toHaveAttribute(
+  await expect(page.locator(".ins-post[data-scene=baseball] .ins-post-image")).toHaveAttribute(
     "src",
     "./assets/date-baseball-couple-2.jpg",
   );
   await page.reload();
   await page.evaluate("openApp('instagram')");
-  await expect(page.locator(".ins-post-image")).toHaveAttribute(
+  await expect(page.locator(".ins-post[data-scene=baseball] .ins-post-image")).toHaveAttribute(
     "src",
     "./assets/date-baseball-couple-1.jpg",
   );
@@ -871,7 +883,7 @@ test("chosen identity loads for one second while Instagram uses the supplied cou
   await expect
     .poll(() =>
       page
-        .locator(".ins-post-image")
+        .locator(".ins-post[data-scene=baseball] .ins-post-image")
         .evaluate((img: HTMLImageElement) => img.naturalWidth > 0),
     )
     .toBe(true);
@@ -953,7 +965,7 @@ test("Instagram avatar source is independent and centered inside its story ring"
   expect(Math.abs(a.x + a.width / 2 - (b.x + b.width / 2))).toBeLessThan(0.5);
   expect(Math.abs(a.y + a.height / 2 - (b.y + b.height / 2))).toBeLessThan(0.5);
   expect(Math.abs(a.width - a.height)).toBeLessThan(0.5);
-  await expect(page.locator(".ins-post-header img")).toHaveAttribute(
+  await expect(page.locator(".ins-post-header img").first()).toHaveAttribute(
     "src",
     (await image.getAttribute("src")) as string,
   );
@@ -1073,7 +1085,7 @@ test("provided image 2 is the decoded IG story and post portrait", async ({
       ),
     )
     .toBe(true);
-  await expect(page.locator(".ins-post-header img")).toHaveAttribute(
+  await expect(page.locator(".ins-post-header img").first()).toHaveAttribute(
     "src",
     (await story.getAttribute("src")) as string,
   );
@@ -1110,7 +1122,7 @@ test("room nine waits for the first three dates, then saves nine choices and rew
   await expect(page.locator("#extraDateResult")).toContainText("终于相信我了");
   expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!).sessions.escape.roomChoices)).toHaveLength(9);
   await expect(page.locator("#affectionValue")).toHaveText("♥ 65%");
-  await expect(page.locator("#pureLoveBuy")).toBeEnabled();
+  await expect(page.locator("#pureLoveBuy")).toBeDisabled();
   await page.evaluate("view('home')");
   await page.locator("#archiveApp").click();
   await expect(page.locator(".archive-journal-day")).toHaveCount(10);
@@ -1119,7 +1131,7 @@ test("room nine waits for the first three dates, then saves nine choices and rew
 
 
 test("the encrypted diary requires two confirmations and leads to the gentle repeated-first-meeting ending", async ({ page }) => {
-  await open(page, 65, [], ["escape"]);
+  await open(page, 80, [], ["baseball"]);
   await page.evaluate("window.MaqueMemoryVault.purchase()");
   await expect(page.locator("#memoryVault")).toContainText("这份记录可能改变");
   await page.getByRole("button",{name:"现在打开"}).click();
@@ -1134,15 +1146,16 @@ test("the encrypted diary requires two confirmations and leads to the gentle rep
 });
 
 
-test("a completed version-two room save replays the corrected mutual-forgetting canon without clearing its completion or reward", async ({ page }) => {
+test("a completed historical room save stays archived and never restarts the old round", async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem("maque_extra_dates_v1", JSON.stringify({version:2,sessions:{escape:{step:2,choices:{},roomChoices:Array.from({length:9},()=>({id:"self",memory:"old"})),roomIndex:8,roomComplete:true,reward:15}},completed:["escape"],likes:[],comments:{},previousRun:{self:9,source:"SC-01"}}));
   });
-  await open(page,65,[],["baseball","football","idol","escape"]);
+  await open(page,80,[],["baseball","football","idol","escape"]);
   const save=await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!));
   expect(save.version).toBe(3);
-  expect(save.sessions.escape.step).toBe(0);
+  expect(save.sessions.escape.step).toBe(2);
   expect(save.sessions.escape.reward).toBe(15);
+  expect(save.sessions.escape.roomChoices).toHaveLength(9);
   expect(save.completed).toContain("escape");
   expect(JSON.parse(await page.evaluate(()=>localStorage.getItem("maque_dates_completed")!))).toContain("escape");
 });

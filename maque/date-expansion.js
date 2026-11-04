@@ -37,8 +37,8 @@
       ]
     },
     escape: {
-      title: '九号房间', subtitle: 'ROOM 09 / 上一轮仍在运行',
-      description: '两张号码牌写着 39 和 23。门后不是出口，而是九轮选择：把代价留给自己、交给对方，或一起承担；也可以抹去一段共同记忆。上一轮，我和成灿每次都一起选择了遗忘。九段记忆清空后，关系索引归零，第二回目因此启动。',
+      title: '九号房间', subtitle: 'ROOM 09 / 当前会话',
+      description: '两张号码牌写着 39 和 23。门后不是出口，而是九轮选择：把代价留给自己、交给对方，或一起承担；也可以抹去一段共同记忆。档案里留着一份旧记录：那一次，我和成灿都选择遗忘，九段记忆因此被清空。它只是封存的往事，不需要重新经历。眼前这扇门，属于现在的我和成灿。',
       memory: './assets/date-escape-eunseok-reference.jpg', secondaryMemory: './assets/date-escape-sungchan-reference.jpg', memoryLabel: '九号房间 · 实例 02',
       caption: '我没有再假装一个人承担就能保护所有人。银硕，这次你愿意和我一起走到门外。',
       nodes: [
@@ -57,7 +57,7 @@
       const result = emptyState();
       for (const id of chapterIds) {
         const old = parsed.sessions?.[id];
-        if (old && Number.isInteger(old.step) && old.step >= 0 && old.step < stories[id].nodes.length && !(parsed.version === 1 && id === 'escape') && !(parsed.version === 2 && id === 'escape' && Array.isArray(parsed.completed) && parsed.completed.includes('escape'))) {
+        if (old && Number.isInteger(old.step) && old.step >= 0 && old.step < stories[id].nodes.length) {
           result.sessions[id] = {
             step: old.step,
             choices: old.choices && typeof old.choices === 'object' ? old.choices : {},
@@ -66,16 +66,13 @@
             roomChoices: parsed.version >= 2 && id === 'escape' && Array.isArray(old.roomChoices) ? old.roomChoices.slice(0, 9).map(x => ({ id: ['self','other','shared','erase'].includes(x?.id) ? x.id : 'shared', memory: String(x?.memory || '').slice(0, 40) })) : [],
             roomIndex: parsed.version >= 2 && id === 'escape' ? Math.max(0, Math.min(8, Number(old.roomIndex) || 0)) : 0,
             roomResponse: '', roomComplete: parsed.version >= 2 && id === 'escape' && old.roomComplete === true,
-            reward: Number.isInteger(old.reward) && old.reward >= 0 && old.reward <= 5 ? old.reward : 0
+            reward: Number.isInteger(old.reward) && old.reward >= 0 && old.reward <= (parsed.version < 3 && id === 'escape' ? 15 : 5) ? old.reward : 0
           };
         }
         if (typeof parsed.comments?.[id] === 'string') result.comments[id] = parsed.comments[id].slice(0, 100);
       }
       for (const key of ['completed', 'likes']) result[key] = Array.isArray(parsed[key]) ? parsed[key].filter(id => chapterIds.includes(id)) : [];
       result.previousRun = { erase: 9, both: true, source: 'SC-01' };
-      result.legacyEscapeCompleted = parsed.version === 1 && (result.completed.includes('escape') || Boolean(parsed.sessions?.escape));
-      result.replayEscapeOnLoad = parsed.version === 2 && result.completed.includes('escape');
-      if (parsed.version === 1) result.completed = result.completed.filter(id => id !== 'escape');
       return result;
     } catch (_) { return emptyState(); }
   }
@@ -200,7 +197,7 @@
   function renderRoomNine(box, id, s, node) {
     const round = Math.min(s.roomIndex, 8), day = round + 1;
     const file = element('aside', '', 'room-nine-file');
-    file.append(element('small', 'RECOVERED SNAPSHOT / SC-01'), element('p', '九次选择：我和成灿都选择遗忘，没有让对方承受代价。九段记忆清空后，关系索引归零，第二回目启动。', 'room-nine-oldrun'));
+    file.append(element('small', 'RECOVERED SNAPSHOT / SC-01'), element('p', '旧记录的九次选择：我和成灿都选择遗忘，没有让对方承受代价。九段记忆清空后，关系索引归零。这段往事已经封存，不需要重新经历。', 'room-nine-oldrun'));
     box.append(file);
     const tally = element('div', '', 'room-nine-tally');
     for (const label of ['39 · 我', '23 · 成灿']) tally.append(element('span', label));
@@ -365,8 +362,6 @@
   }
   function init() {
     if (initialized) return; initialized = true;
-    if (state.legacyEscapeCompleted) { completedDates.delete('escape'); storeDateList('maque_dates_completed', completedDates); state.legacyEscapeCompleted = false; }
-    if (state.replayEscapeOnLoad) { state.sessions.escape = { step: 0, choices: {}, rehearsal: [], response: '', roomChoices: [], roomIndex: 0, roomResponse: '', roomComplete: false, reward: 15 }; state.replayEscapeOnLoad = false; }
     for (const id of chapterIds) {
       const scene = dateScenes.find(item => item.id === id);
       if (scene) { scene.ready = id !== 'escape' || canStart(id); scene.description = stories[id].description; }

@@ -9,7 +9,7 @@
   screen.id = 'memoryVault'; screen.className = 'view memory-vault-screen'; screen.setAttribute('aria-label', '上锁的旧日记');
   phone.append(screen); ids.push('memoryVault');
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (_) {} };
-  function syncCard() { const button=document.getElementById('vaultPurchaseButton'); if(button) button.textContent=state.owned?'打开旧日记':'购买这份旧日记'; }
+  function syncCard() { const button=document.getElementById('vaultPurchaseButton'); if(button) button.textContent=state.owned?'打开旧日记':'购买这份旧日记'; window.MaqueRoomGiftPurchaseUnlocked?.(); }
   const el = (tag, text, cls, parent) => { const n = document.createElement(tag); if (text) n.textContent = text; if (cls) n.className = cls; if (parent) parent.append(n); return n; };
   const btn = (text, handler, cls='vault-button') => { const b=el('button',text,cls); b.type='button'; b.onclick=handler; return b; };
   function shell(title='上锁的旧日记') {
@@ -19,8 +19,8 @@
   }
   function purchase() {
     if (!state.owned) {
-      const done = (()=>{try{return JSON.parse(localStorage.getItem('maque_dates_completed')||'[]').includes('escape')}catch(_){return false}})();
-      if (!done || affection < 60) { explain('还不能读取这份旧日记','先完成九号房间，并让好感度达到 60%。它和「真心」可能会改变故事的走向。'); return; }
+      if (!window.MaqueRoomGiftsUnlocked?.()) { explain('这份旧日记还未上架','完成棒球场约会后，可以在礼赠商店找到它。'); return; }
+      if (affection < 80) { explain('尚未解锁','好感度达到 80% 后，才能购买这份旧日记。'); return; }
       state.owned=true; save(); syncCard();
     }
     openChoice();
