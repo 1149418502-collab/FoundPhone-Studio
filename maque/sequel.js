@@ -16,8 +16,8 @@
       state.endings = [...new Set((Array.isArray(stored.endings) ? stored.endings : []).filter(id => endingIds.includes(id)))];
       state.currentEnding = endingIds.includes(stored.currentEnding) ? stored.currentEnding : null;
       state.activeChapter = chapterIds.includes(stored.activeChapter) ? stored.activeChapter : chapterIds[0];
-      // The original 20/40 unlocks no longer qualify; announce the revised 60% archive once.
-      state.announced = 0;
+      // Retain valid announcements, while old thresholds below 60 no longer qualify.
+      state.announced = Number.isFinite(stored.announced) && stored.announced >= 60 && stored.announced <= 100 ? stored.announced : 0;
       state.dates = [...new Set((Array.isArray(stored.dates) ? stored.dates : []).filter(id => ['escape', 'baseball', 'idol', 'football'].includes(id)))];
       for (const chapter of story.chapters) {
         const old = stored.chapters?.[chapter.id];

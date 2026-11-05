@@ -3,6 +3,7 @@ export default defineConfig({
   testDir: "tests",
   testMatch: [
     "maque.spec.ts",
+    "maque-phone-details.spec.ts",
     "maque-sequel.spec.ts",
     "runtime.spec.ts",
     "release.spec.ts",

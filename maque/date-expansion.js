@@ -67,7 +67,7 @@
             roomIndex: parsed.version >= 2 && id === 'escape' ? Math.max(0, Math.min(8, Number(old.roomIndex) || 0)) : 0,
             eraseAttempted: parsed.version >= 4 && id === 'escape' && old.eraseAttempted === true,
             roomResponse: '', roomComplete: parsed.version >= 2 && id === 'escape' && old.roomComplete === true,
-            reward: Number.isInteger(old.reward) && old.reward >= 0 && old.reward <= (parsed.version < 3 && id === 'escape' ? 15 : 5) ? old.reward : 0
+            reward: Number.isInteger(old.reward) && old.reward >= 0 && old.reward <= (parsed.version >= 4 ? 20 : parsed.version < 3 && id === 'escape' ? 15 : 5) ? old.reward : 0
           };
         }
         if (typeof parsed.comments?.[id] === 'string') result.comments[id] = parsed.comments[id].slice(0, 100);

@@ -70,8 +70,8 @@ These two references are no longer pending. Existing saves are unchanged.
 - The interactive sequence includes a two-person ticket, lucky-spectator invite,
   two support responses, a tappable pitching action, and two voluntary kiss-camera
   responses. All four response combinations reach the same saved memory, with
-  the existing one-time 3%–5% affection reward. Existing saves are retained.
-- Samsara, Gifts, and Dates share a coordinated cream/blush SVG icon family.
+  the one-time +20% affection reward; ordinary gifts retain their 3%–5% rewards. Existing saves are retained.
+- Samsara, Gifts, and Dates share a coordinated black/white SVG icon family with a rose heart.
   Samsara uses an infinity ribbon with a heart at its center.
 
 Gift-photo URLs point to Unsplash (`https://unsplash.com/license`). The cloud
@@ -88,10 +88,19 @@ and license records.
 contains character/story reference images, and `memories` contains final couple
 photographs. Keep these roles separate from the player-uploaded identity image.
 The football-campus background and the author's identity-album content remain
-pending. The existing device-photo importer can be used to test identity setup.
+pending. Date identity selection reads only the author-supplied in-game album; device import is hidden and disabled in this mode.
 No generated likenesses were imported.
 
 The supplied baseball photographs are illustrative materials for the fictional
 date. Do not present its dialogue, lucky draw, kiss-camera event, or Instagram
 captions as real quotes, real posts, or verified news. Preserve stable scene IDs
 and existing progress when replacing or extending the author's material.
+
+## Phone details · 2026.11.05.2
+
+- Optional Notes contains a persistent food checklist. Completing the baseball date adds a keepsake note using the two supplied couple photographs. At 60% affection, searching Notes for `01` reveals a short recovered draft. These details do not change affection or core story choices.
+- The dock Settings icon opens wallpaper choices and a reduced-motion toggle. Couple wallpapers unlock only after the baseball date. The original backgrounds can be restored, and appearance choices survive reloading.
+- Double-tapping an Instagram photo uses the post’s existing like handler, preserving its save rules; repeated double taps never unlike the post.
+- Photo details support previous/next controls, horizontal touch swipes, arrow keys and Escape. Game album favorites read the canonical saved record. Bundled photos remain readable if IndexedDB is unavailable; imported personal images still require browser storage.
+- Date rewards up to 20% and valid archive announcement flags survive reloading. This visible version update does not run another save-reset migration.
+- The author’s identity album remains empty pending supplied images. Do not fill it with unrelated or generated likenesses to bypass that step.

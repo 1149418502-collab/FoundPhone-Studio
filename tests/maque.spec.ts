@@ -8,6 +8,7 @@ const localModules = new Set([
   "sequel.css",
   "date-expansion.js",
   "date-expansion.css",
+  "phone-extras.js", "phone-extras.css",
   "memory-vault.js",
   "memory-vault.css",
 ]);
