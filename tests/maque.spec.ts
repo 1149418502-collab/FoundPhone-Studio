@@ -241,6 +241,21 @@ test("invitation notification and SMS preserve the Black Shadow clue", async ({
   );
 });
 
+test("character generation shows a two-second loading state before Sungchan's message", async ({ page }) => {
+  await page.clock.install();
+  await page.clock.pauseAt(new Date("2026-11-05T12:00:00Z"));
+  await open(page);
+  await page.evaluate("beginRegistration()");
+  await page.locator("#nameinput").fill("郑成灿");
+  await page.getByRole("button", { name: "确认", exact: true }).click();
+  await expect(page.locator("#confirmed")).toHaveClass(/show/);
+  await expect(page.locator("#confirmtext")).toContainText("正在生成角色档案");
+  await page.clock.fastForward(1999);
+  await expect(page.locator("#confirmtext")).toContainText("正在生成角色档案");
+  await page.clock.fastForward(1);
+  await expect(page.locator("#confirmtext")).toContainText("我是为了你才出现的");
+});
+
 test("food refusal retracts at 500ms and the second retraction still reveals the red text", async ({
   page,
 }) => {
@@ -640,8 +655,7 @@ for (const choice of [
         const score = await page.evaluate(() =>
           Number(localStorage.getItem("maque_affection")),
         );
-        expect(score).toBeGreaterThanOrEqual(8);
-        expect(score).toBeLessThanOrEqual(10);
+        expect(score).toBe(25);
         await page
           .getByRole("button", { name: /去看看成灿的 Instagram/ })
           .click();
@@ -1098,7 +1112,7 @@ test("provided image 2 is the decoded IG story and post portrait", async ({
 });
 
 
-test("room nine waits for the first three dates, then saves nine choices and rewards shared trust", async ({ page }) => {
+test("room nine plays nine present-day choices, locks memory erasure, and archives the first run", async ({ page }) => {
   await open(page, 50);
   await page.evaluate(() => {
     const identity={id:"identity-test",src:"./assets/date-baseball-couple-1.jpg",alt:"我的形象"};
@@ -1114,14 +1128,25 @@ test("room nine waits for the first three dates, then saves nine choices and rew
   await page.getByRole("button",{name:/开始 \/ 继续这次约会/}).click();
   await page.locator("#extraDateNext").click();
   for(let day=1;day<=9;day++) {
-    if(day===1) await expect(page.locator(".room-nine-oldrun")).toContainText("我和成灿都选择遗忘");
+    if(day===1) await expect(page.locator(".room-nine-oldrun")).toContainText("银硕每次都选择删除一段共同记忆");
     await expect(page.locator(".room-nine-day")).toContainText(`${String(day).padStart(2,"0")} / 09`);
-    await page.locator('.room-nine-choice[data-choice="shared"]').click();
+    await expect(page.locator(".room-nine-choice")).toHaveCount(3);
+    await expect(page.locator('.room-nine-choice[data-choice="other"]')).toHaveText("让成灿承受伤害");
+    await expect(page.locator('.room-nine-choice[data-choice="self"]')).toHaveText("我独自承受伤害");
+    const erase = page.locator('.room-nine-choice[data-choice="erase"]');
+    await expect(erase).toHaveText("二人都失去一段共同的记忆");
+    await erase.click();
+    await expect(erase).toBeDisabled();
+    await expect(page.locator("#roomNineMemoryLock")).toContainText("本轮无法删除共同记忆");
+    await expect(page.locator('.room-nine-choice[data-choice="other"]')).toBeEnabled();
+    await expect(page.locator('.room-nine-choice[data-choice="self"]')).toBeEnabled();
+    await page.locator('.room-nine-choice[data-choice="self"]').click();
     await page.locator("#roomNineContinue").click();
   }
-  await expect(page.locator("#extraDateResult")).toContainText("终于相信我了");
+  await expect(page.locator("#extraDateResult")).toContainText("别把所有事都留给自己");
   expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!).sessions.escape.roomChoices)).toHaveLength(9);
-  await expect(page.locator("#affectionValue")).toHaveText("♥ 65%");
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!).sessions.escape.roomChoices.map((choice:any)=>choice.id))).toEqual(Array(9).fill("self"));
+  await expect(page.locator("#affectionValue")).toHaveText("♥ 70%");
   await expect(page.locator("#pureLoveBuy")).toBeDisabled();
   await page.evaluate("view('home')");
   await page.locator("#archiveApp").click();
@@ -1152,7 +1177,7 @@ test("a completed historical room save stays archived and never restarts the old
   });
   await open(page,80,[],["baseball","football","idol","escape"]);
   const save=await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!));
-  expect(save.version).toBe(3);
+  expect(save.version).toBe(4);
   expect(save.sessions.escape.step).toBe(2);
   expect(save.sessions.escape.reward).toBe(15);
   expect(save.sessions.escape.roomChoices).toHaveLength(9);

@@ -1,4 +1,4 @@
-/* Samsara date chapters. Author photographs remain unchanged; all dialogue is fictional. */
+/* Temporary date copy is retained until Silver supplies replacement dialogue and media. */
 (() => {
   'use strict';
   const STORAGE_KEY = 'maque_extra_dates_v1';
@@ -38,7 +38,7 @@
     },
     escape: {
       title: '九号房间', subtitle: 'ROOM 09 / 当前会话',
-      description: '两张号码牌写着 39 和 23。门后不是出口，而是九轮选择：把代价留给自己、交给对方，或一起承担；也可以抹去一段共同记忆。档案里留着一份旧记录：那一次，我和成灿都选择遗忘，九段记忆因此被清空。它只是封存的往事，不需要重新经历。眼前这扇门，属于现在的我和成灿。',
+      description: '我拿到 39 号，成灿拿到 23 号。眼前这九次选择，只属于我和成灿现在这一次约会。档案里的旧一周目只是背景记录：那时，我连续九次选择清除共同记忆，最后我和成灿都忘了彼此。旧局不会再让你重玩。',
       memory: './assets/date-escape-eunseok-reference.jpg', secondaryMemory: './assets/date-escape-sungchan-reference.jpg', memoryLabel: '九号房间 · 实例 02',
       caption: '我没有再假装一个人承担就能保护所有人。银硕，这次你愿意和我一起走到门外。',
       nodes: [
@@ -49,11 +49,11 @@
     }
   };
 
-  const emptyState = () => ({ version: 3, sessions: {}, completed: [], likes: [], comments: {}, previousRun: { erase: 9, both: true, source: 'SC-01' } });
+  const emptyState = () => ({ version: 4, sessions: {}, completed: [], likes: [], comments: {}, previousRun: { erase: 9, chooser: 'silver', bothForgot: true, source: 'SC-01' } });
   function load() {
     try {
       const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-      if (!parsed || ![1, 2, 3].includes(parsed.version)) return emptyState();
+      if (!parsed || ![1, 2, 3, 4].includes(parsed.version)) return emptyState();
       const result = emptyState();
       for (const id of chapterIds) {
         const old = parsed.sessions?.[id];
@@ -65,6 +65,7 @@
             response: typeof old.response === 'string' ? old.response.slice(0, 250) : '',
             roomChoices: parsed.version >= 2 && id === 'escape' && Array.isArray(old.roomChoices) ? old.roomChoices.slice(0, 9).map(x => ({ id: ['self','other','shared','erase'].includes(x?.id) ? x.id : 'shared', memory: String(x?.memory || '').slice(0, 40) })) : [],
             roomIndex: parsed.version >= 2 && id === 'escape' ? Math.max(0, Math.min(8, Number(old.roomIndex) || 0)) : 0,
+            eraseAttempted: parsed.version >= 4 && id === 'escape' && old.eraseAttempted === true,
             roomResponse: '', roomComplete: parsed.version >= 2 && id === 'escape' && old.roomComplete === true,
             reward: Number.isInteger(old.reward) && old.reward >= 0 && old.reward <= (parsed.version < 3 && id === 'escape' ? 15 : 5) ? old.reward : 0
           };
@@ -72,7 +73,7 @@
         if (typeof parsed.comments?.[id] === 'string') result.comments[id] = parsed.comments[id].slice(0, 100);
       }
       for (const key of ['completed', 'likes']) result[key] = Array.isArray(parsed[key]) ? parsed[key].filter(id => chapterIds.includes(id)) : [];
-      result.previousRun = { erase: 9, both: true, source: 'SC-01' };
+      result.previousRun = { erase: 9, chooser: 'silver', bothForgot: true, source: 'SC-01' };
       return result;
     } catch (_) { return emptyState(); }
   }
@@ -81,7 +82,7 @@
   let initialized = false;
   function persist() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {} }
   function session(id = activeId) {
-    if (!state.sessions[id]) state.sessions[id] = { step: 0, choices: {}, rehearsal: [], response: '', roomChoices: [], roomIndex: 0, roomResponse: '', roomComplete: false, reward: 0 };
+    if (!state.sessions[id]) state.sessions[id] = { step: 0, choices: {}, rehearsal: [], response: '', roomChoices: [], roomIndex: 0, eraseAttempted: false, roomResponse: '', roomComplete: false, reward: 0 };
     return state.sessions[id];
   }
   function nodeText(text, s) { return typeof text === 'function' ? text(s) : text || ''; }
@@ -118,7 +119,7 @@
       storeDateList('maque_dates_completed', completedDates);
       persist();
       const before = affection;
-      if (id === 'escape' && typeof window.grantMaqueAffection === 'function') window.grantMaqueAffection(15);
+      if (typeof window.grantMaqueAffection === 'function') window.grantMaqueAffection(20);
       else increaseAffection();
       s.reward = affection - before;
       announceFeature('Instagram · 新的约会日记', '成灿把今天的小事写进了动态。');
@@ -194,16 +195,27 @@
     '只属于我们的一段旧歌', '第一次并肩走进球场', '最甜的一次短途出行',
     '舞台灯熄灭后的那句应援', '我第一次认真叫他的名字', '我们第一次见面的那一天'
   ];
+  const roomTasks = [
+    '拥抱模拟 · 持续 120 秒',
+    '剪发模拟 · 发长不超过 1cm',
+    '受击模拟 · 系统状态达到“脸颊肿胀”',
+    '对视模拟 · 持续 15 秒',
+    '采血模拟 · 虚拟样本刻度 600ml',
+    '创口模拟 · 档案标注长度 10mm、深度 4mm',
+    '钢钉模拟 · 选择厚度至少 2cm 的虚拟标记区',
+    '穿刺模拟 · 双侧耳垂',
+    '回答记录 · 此刻最恨的人，以及最害怕的事'
+  ];
   function renderRoomNine(box, id, s, node) {
     const round = Math.min(s.roomIndex, 8), day = round + 1;
     const file = element('aside', '', 'room-nine-file');
-    file.append(element('small', 'RECOVERED SNAPSHOT / SC-01'), element('p', '旧记录的九次选择：我和成灿都选择遗忘，没有让对方承受代价。九段记忆清空后，关系索引归零。这段往事已经封存，不需要重新经历。', 'room-nine-oldrun'));
+    file.append(element('small', 'RECOVERED SNAPSHOT / SC-01'), element('p', '旧一周目的九次记录：银硕每次都选择删除一段共同记忆。第九次之后，我们都忘了彼此。成灿挣脱系统，把新的内测链接发回给我。那一周目只存在于档案里。', 'room-nine-oldrun'));
     box.append(file);
     const tally = element('div', '', 'room-nine-tally');
-    for (const label of ['39 · 我', '23 · 成灿']) tally.append(element('span', label));
-    box.append(tally, element('p', `第 ${String(day).padStart(2,'0')} / 09 轮 · 记忆索引`, 'room-nine-day'));
-    box.append(element('h3', roomMemories[round], 'room-nine-memory'));
-    box.append(element('p', '房间要求我们选择谁来承担代价。角落里另有一行字：也可以删除今天的记忆。屏幕上的记录会留下你的选择。', 'room-nine-copy'));
+    for (const label of ['39 · 玩家 A / 我', '23 · 玩家 B / 成灿']) tally.append(element('span', label));
+    box.append(tally, element('p', `第 ${String(day).padStart(2,'0')} / 09 天 · 系统任务`, 'room-nine-day'));
+    box.append(element('h3', roomTasks[round], 'room-nine-memory'));
+    box.append(element('p', `记忆索引：${roomMemories[round]}。以下身体事件均为手机内的虚拟模拟，不会执行现实操作。`, 'room-nine-copy'));
     if (s.roomResponse) {
       const result = element('div', '', 'room-nine-result');
       result.append(element('p', s.roomResponse));
@@ -211,26 +223,28 @@
         if (!isCurrent(id, s.step) || !s.roomResponse) return;
         s.roomResponse = '';
         if (s.roomIndex >= 8) { s.roomComplete = true; advance(id, s.step); return; }
-        s.roomIndex += 1; persist(); render();
+        s.roomIndex += 1; s.eraseAttempted = false; persist(); render();
       });
       result.append(next); box.append(result); return;
     }
     const opts = element('div', '', 'room-nine-options');
     const options = [
-      ['self', '代价留给我', '这一轮的代价落在我这边。成灿没有阻止我，只低声说：“我知道你以前总这样。但这次，我也在这里。”'],
-      ['other', '让成灿替我承担', '屏幕把代价转向成灿。他沉默了一会儿：“我愿意和你一起面对，但不要把我的选择也变成命令，好吗？”'],
-      ['shared', '我们一起承担', '记录被分成两半。成灿握紧号码牌：“你愿意把一部分交给我……是不是终于相信，我也可以和你一起承担了？”'],
-      ['erase', round === 8 ? '彻底忘掉这个人' : '抹去这段共同记忆', round === 8 ? '名字、声音和最后一段共同记忆都被移出索引。成灿看着空白处，轻声说：“如果真的忘了我……第一次见面时，也请再看我一眼。”' : '这一段从两人的记录里褪色。成灿看着空白的位置：“好像少了什么。没关系，我们可以重新认识那一天。”']
+      ['other', '让成灿承受伤害', `系统准备把今天的任务记录到成灿身上。`],
+      ['self', '我独自承受伤害', `系统准备把今天的任务记录到我身上。`],
+      ['erase', '二人都失去一段共同的记忆', '该选项已被系统锁定。']
     ];
     for (const [choice, label, reply] of options) {
       const control = button(label, '', () => {
         if (!isCurrent(id, s.step) || s.roomResponse) return;
+        if (choice === 'erase') { s.eraseAttempted = true; persist(); render(); return; }
         s.roomChoices.push({ id: choice, memory: roomMemories[round] });
         s.roomResponse = reply;
         persist(); render();
       }, 'room-nine-choice'); control.dataset.choice = choice; opts.append(control);
+      if (choice === 'erase' && s.eraseAttempted) { control.disabled = true; control.classList.add('is-locked'); control.setAttribute('aria-describedby', 'roomNineMemoryLock'); control.title = '本轮不可选择'; }
     }
     box.append(opts);
+    if (s.eraseAttempted) { const note = element('p', 'SYSTEM LOCK / 本轮无法删除共同记忆。请选择让成灿承受，或由我独自承受。', 'room-nine-lock-note'); note.id = 'roomNineMemoryLock'; note.setAttribute('role', 'status'); box.append(note); }
     const erased = s.roomChoices.filter(x => x.id === 'erase').length;
     const shared = s.roomChoices.filter(x => x.id === 'shared').length;
     if (erased || shared) box.append(element('p', erased ? `缺失索引：${erased} / 09 · 有一部分像是被谁轻轻擦掉了。` : `共同承担：${shared} / 09 · 他的呼吸终于和我一样慢下来。`, 'room-nine-drift'));
@@ -308,8 +322,7 @@
     let roomEnding = node.text;
     if (id === 'escape') {
       const count = key => room.filter(item => item.id === key).length;
-      if (count('shared') >= 4) roomEnding = '最后一轮里，我们没有再把痛苦推给彼此。成灿看着那张 39 号号码牌：“你愿意和我一起承担，不是因为你忘了痛，而是因为你终于相信我了。”';
-      else if (count('erase') >= 5) roomEnding = '有几段回忆已经无法拼回原样。成灿没有催我想起，只说：“空白也没关系。我们可以从今天重新认识。”';
+      if (count('shared') >= 4) roomEnding = '这是一份旧版本留下的记录。';
       else if (count('self') >= 7) roomEnding = '门开了，成灿却没有立刻走。他把 23 号号码牌放在我手边：“下一次，别把所有事都留给自己。我也想和你一起承担。”';
       else if (count('other') >= 5) roomEnding = '门开后，我们都走了出来。成灿望着被划掉的记录：“别替我决定该承受什么。下次我们一起选，好吗？”';
     }
@@ -318,7 +331,7 @@
     result.append(element('p', s.reward ? `♡ +${s.reward}% · 这次约会已珍藏` : '♡ 这份回忆已经珍藏，重温不重复增加好感', 'date-reward'));
     result.append(button('看看他的 Instagram 日记 ↗', '', () => openApp('instagram')));
     result.append(button('重温这次约会', 'extraDateRestart', () => {
-      state.sessions[id] = { step: 0, choices: {}, rehearsal: [], response: '', roomChoices: [], roomIndex: 0, roomResponse: '', roomComplete: false, reward: 0 }; persist(); render();
+      state.sessions[id] = { step: 0, choices: {}, rehearsal: [], response: '', roomChoices: [], roomIndex: 0, eraseAttempted: false, roomResponse: '', roomComplete: false, reward: 0 }; persist(); render();
     }, 'date-inline-link'));
     result.append(button('回到约会邀请', '', showDateCatalog, 'date-inline-link')); box.append(result);
   }

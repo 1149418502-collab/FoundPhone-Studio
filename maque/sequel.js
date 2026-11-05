@@ -91,11 +91,11 @@
       const log = node('aside', null, 'archive-root-warning', content);
       node('small', 'AUTOMATED PROCESS LOG / SC-01', '', log);
       node('p', 'RESET_COUNT　01', '', log);
-      node('p', 'RESET_CAUSE　MUTUAL MEMORY ERASED / 09 OF 09', '', log);
+      node('p', 'RESET_CAUSE　SILVER ERASED SHARED MEMORY / 09 OF 09', '', log);
       node('p', 'NEXT_INSTANCE　SC-02', '', log);
       node('p', 'EXIT_GAME REQUEST　DENIED', '', log);
       node('p', 'SELF-DESTRUCT　PENDING', '', log);
-      node('p', '取消原因：共同记忆已清空，但关系索引仍有残留。', '', log);
+      node('p', '恢复原因：成灿的执念穿透重置边界，并将新的内测邀请送回银硕的手机。', '', log);
       node('small', '本条记录在关闭档案后新增。', 'archive-log-tail', log);
       const journal = node('section', null, 'archive-journal', content);
       node('small', 'PRIVATE JOURNAL / SC-01', 'archive-journal-label', journal);
