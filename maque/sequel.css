@@ -10,3 +10,24 @@
 .archive-root-warning{margin:22px 0 26px;padding:13px 12px;background:#1a1516;border:1px solid #422f32;border-left:2px solid #8a4248;color:#b49e9e;font:10px/1.8 ui-monospace,monospace}.archive-root-warning p{margin:4px 0}.archive-root-warning small{color:#755d61}.archive-root-warning .archive-log-tail{display:block;margin-top:8px;color:#a6797f}.room-nine-read .archive-title{animation:archive-flicker 5.8s steps(1,end) infinite}@keyframes archive-flicker{0%,96%,100%{opacity:1}97%{opacity:.78;text-shadow:2px 0 #672f35}98%{opacity:1}99%{opacity:.91}}@media(prefers-reduced-motion:reduce){.room-nine-read .archive-title{animation:none}}
 
 .archive-journal{margin:22px 0 28px;padding:14px 12px;border:1px solid #302a2a;background:#151414}.archive-journal-label{font:9px ui-monospace,monospace;letter-spacing:1px;color:#806b6d}.archive-journal-title{font:18px Georgia,'Songti SC',serif;font-weight:400;color:#c8bdbc;margin:9px 0}.archive-journal-intro{font-size:10px;line-height:1.8;color:#84797a}.archive-journal-day{border-top:1px solid #2f2929;padding:10px 2px;color:#bdb2b1}.archive-journal-day summary{cursor:pointer;font:10px ui-monospace,monospace;letter-spacing:.3px}.archive-journal-day p{font-size:11px;line-height:1.9;color:#9e9292;margin:10px 0 4px;white-space:pre-line}.archive-journal-day:last-child summary{color:#c09298}
+
+/* Samsara shared letter epilogue */
+.epilogue-content{max-width:740px;margin-inline:auto;text-align:center}
+.epilogue-envelope{position:relative;width:min(74vw,340px);height:min(48vw,220px);margin:36px auto 25px;border:1px solid #d9b8b2;border-radius:10px;background:linear-gradient(145deg,#f6e9e5,#e8d2ce);box-shadow:0 25px 70px #21171a29;transition:transform .7s ease,opacity .7s ease}
+.epilogue-envelope:before,.epilogue-envelope:after{content:"";position:absolute;inset:0;border-radius:10px}
+.epilogue-envelope:before{background:linear-gradient(35deg,transparent 49.5%,#c7a6a0 50%,transparent 50.5%),linear-gradient(-35deg,transparent 49.5%,#d4b6b0 50%,transparent 50.5%);clip-path:polygon(0 40%,50% 78%,100% 40%,100% 100%,0 100%)}
+.epilogue-envelope:after{background:#eee0dc;clip-path:polygon(0 0,100% 0,50% 58%);transform-origin:top;transition:transform .7s ease}
+.epilogue-envelope.is-open{transform:translateY(45px) scale(.9);opacity:.35}
+.epilogue-envelope.is-open:after{transform:rotateX(180deg)}
+.epilogue-seal{position:absolute;z-index:2;left:50%;top:57%;transform:translate(-50%,-50%);width:42px;height:42px;display:grid;place-items:center;border-radius:50%;background:#8e253b;color:#fff;font-size:24px;box-shadow:0 3px 12px #67152866;transition:opacity .25s ease}
+.epilogue-envelope.is-open .epilogue-seal{opacity:0}
+.epilogue-note{max-width:620px;margin:0 auto 24px;padding:clamp(25px,6vw,58px);background:#fffaf6;color:#382b2c;border:1px solid #eadbd2;box-shadow:0 16px 50px #180f1020;text-align:left;animation:epilogueAppear .8s ease both}
+.epilogue-note[hidden]{display:none}
+@keyframes epilogueAppear{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.epilogue-word{font:italic 42px Georgia,serif;color:#7b3346;margin:0 0 16px}
+.epilogue-definition{line-height:1.85;color:#6d6260}
+.epilogue-game-meaning{margin:22px 0;padding:16px 18px;border-left:2px solid #ad5062;background:#f8efeb;line-height:1.9}
+.epilogue-salutation{margin-top:28px;font-weight:700}
+.epilogue-letter-body{line-height:2;white-space:pre-line}
+.epilogue-signature{text-align:right;margin-top:28px;color:#7b3346;font-family:Georgia,serif}
+@media(prefers-reduced-motion:reduce){.epilogue-envelope,.epilogue-envelope:after,.epilogue-note{transition:none;animation:none}}

@@ -125,19 +125,27 @@ const albumFile = {
   mimeType: "image/jpeg",
   buffer: Buffer.from(avatarData, "base64"),
 };
+async function seedGamePhotoAlbum(page: Page) {
+  await page.evaluate(`(() => {
+    const photo = {id:"test-game-photo", name:"游戏相册照片.jpg", src:"./assets/sungchan-instagram-avatar.jpg", alt:"游戏相册测试素材", importedAt:"2026-01-01T00:00:00Z", takenAt:"2026-01-01T00:00:00Z", favorite:false, width:1280, height:1280, bytes:1000, type:"image/jpeg"};
+    mediaAssets.album.splice(0, mediaAssets.album.length, photo);
+    photoRecords.set(photo.id, photo);
+  })()`);
+}
 async function prepareDateJourney(page: Page) {
   await page.evaluate("albumReady");
+  await seedGamePhotoAlbum(page);
   if (await page.locator("#dateCatalog").isVisible()) return;
   await page.getByRole("button", { name: /开始我们的约会之旅/ }).click();
   await page.getByRole("button", { name: "是", exact: true }).click();
-  await expect(page.locator("#photos")).toHaveClass(/active/);
+  await expect(page.locator("#photos")).toBeVisible();
   await expect(page.locator("#photoPickerCaption")).toHaveText(
-    "选择一张我的形象照片",
+    "从游戏相册选择我的形象",
   );
-  if ((await page.locator(".photo-tile").count()) === 0) {
-    await page.locator("#photoImport").setInputFiles(albumFile);
-    await expect(page.locator(".photo-tile")).toHaveCount(1);
-  }
+  await expect(page.locator(".photos-add")).toBeHidden();
+  await expect(page.locator(".photos-import-button")).toBeHidden();
+  await expect(page.locator("#photoImport")).toBeDisabled();
+  await expect(page.locator(".photo-tile")).toHaveCount(1);
   await page.locator(".photo-tile").first().click();
   await page.getByRole("button", { name: "使用这张形象", exact: true }).click();
   await expect(page.locator("#dateUploadTitle")).toHaveText("形象已准备好");
@@ -162,7 +170,7 @@ async function finishBaseballDate(
   await expect(page.locator("#dateDetail")).toContainText("两张球票");
   await expect(page.locator(".date-player-chip img")).toHaveAttribute(
     "src",
-    /^blob:/,
+    "./assets/sungchan-instagram-avatar.jpg",
   );
   await page.locator("#dateArrivalStart").click();
   await expect(page.locator(".date-story-label")).toHaveText("EUNSEOK / 我");
@@ -180,7 +188,7 @@ async function finishBaseballDate(
   );
   await page.locator("#dateDetail .date-primary").click();
   await page.locator("#datePitchThrow").click();
-  await expect(page.locator("#datePitchThrow")).toBeDisabled();
+  await expect(page.locator("#datePitchThrow")).toBeHidden();
   await expect(page.locator("#dateKissChoices")).toBeVisible();
   await page.locator("#dates").screenshot({
     path: "outputs/maque/baseball-kisscam.png",
@@ -243,7 +251,7 @@ test("invitation notification and SMS preserve the Black Shadow clue", async ({
 
 test("character generation shows a two-second loading state before Sungchan's message", async ({ page }) => {
   await page.clock.install();
-  await page.clock.pauseAt(new Date("2026-11-05T12:00:00Z"));
+  await page.clock.pauseAt(new Date(Date.now() + 1000));
   await open(page);
   await page.evaluate("beginRegistration()");
   await page.locator("#nameinput").fill("郑成灿");
@@ -496,6 +504,18 @@ test("special gift needs two warnings, cancellation resets confirmation, and bot
     .getByRole("button", { name: "我当然会全心全意爱你", exact: true })
     .click();
   await expect(page.locator("#loveEnding")).toHaveClass(/show/);
+  await expect(page.locator("#lovePhotoStorm .love-memory-photo")).toHaveCount(28);
+  await expect(page.locator("#loveEndingRedline")).toContainText("这些你都忘了吗");
+  await expect(page.locator("#loveTypingScreen")).toBeVisible({ timeout: 5000 });
+  await expect(page.locator("#loveTypedRows .love-typed-row")).toHaveCount(34, { timeout: 6000 });
+  await expect(page.locator("#loveFinalFlash")).toContainText("我们生生世世不分离");
+  await page.getByRole("button", { name: "继续", exact: true }).click();
+  await expect(page.locator(".sequel-ending h1")).toContainText("「真心」");
+  await expect(page.locator(".sequel-ending-count")).toContainText("/ 5");
+  await page.getByRole("button", { name: "打开片尾的信" }).click();
+  await page.getByRole("button", { name: "拆开最后的情书" }).click();
+  await expect(page.locator(".epilogue-note")).toBeVisible();
+  await expect(page.locator(".epilogue-note")).toContainText("梵语 saṃsāra");
   expect(
     await page.evaluate(() =>
       JSON.parse(localStorage.getItem("maque_owned_gifts")!),
@@ -695,6 +715,7 @@ for (const choice of [
           .locator("#instagram")
           .screenshot({ path: "outputs/maque/baseball-instagram.png" });
         await page.reload();
+        await seedGamePhotoAlbum(page);
         await page.evaluate("openApp('instagram')");
         await expect(page.locator(".ins-post[data-scene=baseball]")).toHaveCount(1);
         await expect(
@@ -796,6 +817,7 @@ test("chosen identity is reused on reopening and reload, with an optional replac
   await expect(page.locator("#dateUpload")).toBeHidden();
   await page.reload();
   await page.evaluate("view('home')");
+  await seedGamePhotoAlbum(page);
   await page.locator("#dateApp").click();
   await expect(page.locator("#dateCatalog")).toBeVisible();
   expect(
@@ -803,6 +825,7 @@ test("chosen identity is reused on reopening and reload, with an optional replac
   ).toBe(selected);
   await page.locator("#dateChangeIdentity").click();
   await expect(page.locator("#photos")).toHaveClass(/active/);
+  await expect(page.locator("#photoImport")).toBeDisabled();
   await expect(page.locator(".photo-tile")).toHaveCount(1);
   await page.getByRole("button", { name: "取消选择", exact: true }).click();
   await expect(page.locator("#dateCatalog")).toBeVisible();
@@ -838,15 +861,16 @@ test("chosen identity loads for one second while Instagram uses the supplied cou
   await open(page, 5);
   await page.evaluate("openApp('dates')");
   await page.getByRole("button", { name: /开始我们的约会之旅/ }).click();
+  await seedGamePhotoAlbum(page);
   await page.getByRole("button", { name: "是", exact: true }).click();
-  await page.locator("#photoImport").setInputFiles(albumFile);
+  await expect(page.locator("#photoImport")).toBeDisabled();
   await expect(page.locator(".photo-tile")).toHaveCount(1);
   await page.locator(".photo-tile").click();
   await page.getByRole("button", { name: "使用这张形象", exact: true }).click();
   const identity = await page
     .locator("#dateUploadPreview img")
     .getAttribute("src");
-  expect(identity).toMatch(/^blob:/);
+  expect(identity).toBe("./assets/sungchan-instagram-avatar.jpg");
   const selectedPhotoId = await page.evaluate(() =>
     localStorage.getItem("maque_date_photo_id"),
   );
@@ -901,11 +925,12 @@ test("chosen identity loads for one second while Instagram uses the supplied cou
         .evaluate((img: HTMLImageElement) => img.naturalWidth > 0),
     )
     .toBe(true);
+  await seedGamePhotoAlbum(page);
   await page.evaluate("openApp('photos')");
   await expect(page.locator(".photo-tile")).toHaveCount(1);
   await expect(page.locator(".photo-tile img")).toHaveAttribute(
     "src",
-    /^blob:/,
+    "./assets/sungchan-instagram-avatar.jpg",
   );
 });
 

@@ -124,15 +124,11 @@
 .date-secondary{display:block;width:100%;padding:14px;margin-top:10px;border:1px solid #d7beaf;border-radius:100px;background:transparent;color:#997769;cursor:pointer}.date-invite-heart{font:80px Georgia,serif;color:#b77978;margin:34px 0 23px}.date-invite-title{font:normal 36px/1.45 Georgia,'Songti SC',serif;color:#795349;margin:0 0 22px}.date-refusal-hint{position:absolute;z-index:95;bottom:113px}.date-upload-frame{height:250px;margin-top:25px;border:8px solid #fffdf5;box-shadow:0 3px 14px #6e4b3420;overflow:hidden;transform:rotate(-2deg)}.date-upload-frame img{width:100%;height:100%;object-fit:cover;display:block}.date-upload-track{height:4px;background:#dfd1c2;border-radius:4px;margin-top:35px;overflow:hidden}.date-upload-track span{display:block;height:100%;background:#ab7772;width:0;animation:photoPrepare 1s linear forwards}.date-upload-success{color:#8c7661;font-size:11px;letter-spacing:1px;margin-top:24px}@keyframes photoPrepare{to{width:100%}}
 .ios-photos{background:#fff;color:#161616;overflow-y:auto;overscroll-behavior:contain}.photos-header{padding:42px 19px 0;background:#ffffffed;backdrop-filter:blur(16px);position:sticky;top:0;z-index:3}.photos-topline{display:flex;justify-content:space-between;align-items:center}.photos-text-button{border:0;background:none;padding:6px 0;color:#1671e5;font-size:13px;cursor:pointer}.photos-add{border:0;background:#f1f1f4;border-radius:50%;font-size:25px;width:31px;height:31px;color:#1671e5;cursor:pointer}.photos-header h1{font-size:31px;margin:5px 0 19px;font-weight:750;letter-spacing:-1px}.photos-kicker{font-size:11px;color:#96969d;margin:15px 0 3px}.photos-tabs{display:flex;border-bottom:1px solid #ededf0;gap:22px}.photos-tabs button{border:0;border-bottom:2px solid transparent;padding:0 0 10px;background:none;font-size:13px;font-weight:650;color:#8d8d94;cursor:pointer}.photos-tabs button[aria-pressed=true]{color:#111;border-color:#111}.photos-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px}.photo-tile{position:relative;aspect-ratio:1;border:0;padding:0;overflow:hidden;background:#eee;cursor:pointer}.photo-tile img{display:block;width:100%;height:100%;object-fit:cover}.photo-tile>span{position:absolute;right:7px;bottom:6px;color:white;text-shadow:0 1px 3px #000;font-size:14px}.photos-count{text-align:center;color:#8e8e95;font-size:11px;padding:20px 12px 30px;margin:0}.photos-import-status{font-size:11px;color:#797981;margin:0;padding:9px 18px;line-height:1.6;min-height:18px}.photos-import-status:empty{padding:4px}.photos-empty{text-align:center;margin:65px 27px;color:#9999a1;font-size:12px;line-height:1.9}.photos-empty h2{font-size:18px;color:#333;margin:12px 0 8px}.photos-empty-mark{font-size:47px;color:#aeb3be}.photos-import-button{border:0;background:#087af3;border-radius:30px;color:#fff;padding:12px 24px;margin-top:20px;font-size:13px;cursor:pointer}.photo-detail{position:absolute;inset:0;background:#080808;color:white;z-index:6;display:flex;flex-direction:column}.photo-detail>header{padding:43px 15px 13px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none}.photo-detail>header>div{text-align:center;min-width:0}.photo-detail>header b,.photo-detail>header small{display:block;font-size:11px}.photo-detail>header small{font-size:10px;color:#9b9ba1;margin-top:4px}.photo-detail-image{min-height:0;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}.photo-detail-image img{display:block;width:100%;height:100%;object-fit:contain}.photo-detail>footer{display:flex;justify-content:space-around;align-items:center;gap:10px;padding:18px 16px 25px;flex:none;background:#131313}.photo-detail>footer button{border:0;background:none;color:#4b9dfa;font-size:25px;cursor:pointer}.photo-detail>footer .photos-use-button{font-size:12px;border:1px solid #3f77ad;border-radius:22px;padding:10px 17px}.photo-detail-info{font-size:22px;color:#4b9dfa;background:none;border:0;cursor:pointer}.photo-info{background:#1c1c1f;padding:18px 19px;color:#b7b7be;border-radius:18px 18px 0 0;flex:none;max-height:38%;overflow:auto}.photo-info h3{font-size:12px;color:#eee;margin:0 0 13px;word-break:break-all}.photo-info dl{display:grid;grid-template-columns:70px minmax(0,1fr);font-size:11px;line-height:1.7;gap:8px 10px;margin:0}.photo-info dt{color:#7d7d85}.photo-info dd{margin:0;word-break:break-all}.photo-detail footer button[aria-pressed=true]{color:#ff6c8c}
 
-/* Replace each desktop icon's inner markup with an empty-alt img using the
-   matching local SVG, and add maque-family-icon to its .appico wrapper:
-   <span class="appico maque-family-icon"><img src="assets/samsara-icon.svg" alt="" aria-hidden="true"></span>
-   gifts-icon.svg belongs to #giftApp; dates-icon.svg belongs to #dateApp.
-   Remove the existing inline background from Samsara and gift wrappers. */
+/* The three Samsara launchers share a black, white-loop, rose-heart identity. */
 .appico.maque-family-icon {
-  background: #fff8f0;
-  border: 0;
-  box-shadow: 0 3px 8px #6a41451a;
+  background: #08090c;
+  border: 1px solid #25262a;
+  box-shadow: 0 4px 12px #0005;
 }
 .appico.maque-family-icon img {
   display: block;
@@ -200,6 +196,24 @@
 #dateConfirm #dateDecline{background:#e9dbd1;color:#80574e}
 #dateConfirm #dateDecline[hidden]{display:none}
 #loveEnding .love-ending-return{position:absolute;z-index:5;bottom:30px;left:50%;transform:translateX(-50%);padding:12px 24px;border:1px solid #a45a5a;border-radius:30px;background:#201111;color:#f2d8d0;cursor:pointer}
+
+/* True-heart ending: photo flood, pale typewriter loop, then a final red lock. */
+#loveEnding{display:none;position:fixed;inset:0;z-index:999999;background:#050505;color:#fff;overflow:hidden;isolation:isolate}
+#loveEnding.show{display:block}
+#loveEnding .love-photo-storm{position:absolute;inset:0;z-index:1;overflow:hidden}
+#loveEnding .love-memory-photo{position:absolute;left:var(--x);top:var(--y);width:clamp(100px,23vw,260px);aspect-ratio:4/3;object-fit:cover;border:5px solid #fff;box-shadow:0 10px 35px #0009;opacity:0;transform:translate(-50%,-50%) rotate(var(--r)) scale(.18);animation:lovePhotoBurst .72s cubic-bezier(.12,.72,.18,1) var(--delay) forwards}
+@keyframes lovePhotoBurst{55%{opacity:1;transform:translate(-50%,-50%) rotate(calc(var(--r) + 9deg)) scale(1.12)}100%{opacity:.94;transform:translate(-50%,-50%) rotate(var(--r)) scale(1)}}
+#loveEnding .love-ending-redline{position:absolute;z-index:3;left:5%;right:5%;top:50%;transform:translateY(-50%);margin:0;padding:18px 14px;background:#a50018e8;color:#fff;font:900 clamp(20px,5vw,48px)/1.6 sans-serif;text-align:center;text-shadow:0 2px 14px #500;animation:loveRedPulse .7s steps(2,end) infinite}
+@keyframes loveRedPulse{50%{opacity:.68;filter:blur(.45px)}}
+#loveEnding .love-typing-screen{position:absolute;z-index:4;inset:0;background:#fff;color:#181316;overflow:hidden;padding:7vh 7vw;box-sizing:border-box}
+#loveEnding .love-typed-rows{display:flex;flex-direction:column;gap:.12em;font:900 clamp(28px,8vw,92px)/1.08 Georgia,serif;letter-spacing:.06em;word-break:break-all}
+#loveEnding .love-typed-row{min-height:1.08em;animation:loveTypeIn .12s steps(12,end) both}
+@keyframes loveTypeIn{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0)}}
+#loveEnding .love-final-flash{position:absolute;z-index:5;inset:0;background:#b40020;color:#fff;display:grid;place-items:center;padding:8vw;box-sizing:border-box;text-align:center;font:1000 clamp(38px,10vw,120px)/1.4 sans-serif;letter-spacing:.08em;animation:loveFinalPulse .5s steps(2,end) infinite}
+@keyframes loveFinalPulse{50%{background:#740015;color:#ffdce4;transform:scale(1.012)}}
+#loveEnding [hidden]{display:none!important}
+#loveEnding .love-ending-return{position:absolute;z-index:6;bottom:26px;left:50%;transform:translateX(-50%);padding:12px 24px;border:1px solid #d9a8b4;border-radius:28px;background:#120b0d;color:#fff;cursor:pointer}
+@media(prefers-reduced-motion:reduce){#loveEnding *,#loveEnding *:before,#loveEnding *:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
 </style>
 <link rel="stylesheet" href="./sequel.css">
 <link rel="stylesheet" href="./date-expansion.css">
@@ -1153,6 +1167,18 @@ function sendGiftInChat(name){
  pendingOrdinaryGiftName=name;ordinaryGiftStage=1;
  addMsg(...ordinaryGiftDialogue[name][0]);
 }
+let loveEndingTimers=[];
+function clearLoveEndingTimers(){loveEndingTimers.forEach(clearTimeout);loveEndingTimers=[]}
+function finishLoveEnding(){clearLoveEndingTimers();document.getElementById('loveEnding').classList.remove('show');document.getElementById('lovePhotoStorm').replaceChildren();window.MaqueSequel?.finishTrueHeartEnding()}
+function showLoveEnding(){
+ const screen=document.getElementById('loveEnding'),storm=document.getElementById('lovePhotoStorm'),redline=document.getElementById('loveEndingRedline'),typing=document.getElementById('loveTypingScreen'),rows=document.getElementById('loveTypedRows'),flash=document.getElementById('loveFinalFlash'),close=document.getElementById('loveEndingReturn');
+ clearLoveEndingTimers();storm.replaceChildren();rows.replaceChildren();redline.hidden=false;typing.hidden=true;flash.hidden=true;close.hidden=true;screen.classList.add('show');
+ const photos=['./assets/date-baseball-couple-1.jpg','./assets/date-baseball-couple-2.jpg','./assets/date-baseball-couple-1.jpg','./assets/date-baseball-couple-2.jpg'];
+ for(let i=0;i<28;i++){const image=document.createElement('img');image.className='love-memory-photo';image.src=photos[i%photos.length];image.alt='我和成灿的约会合照';image.style.setProperty('--x',(5+Math.random()*90)+'%');image.style.setProperty('--y',(7+Math.random()*86)+'%');image.style.setProperty('--r',(Math.random()*38-19)+'deg');image.style.setProperty('--delay',(i*72)+'ms');storm.append(image)}
+ loveEndingTimers.push(setTimeout(()=>{redline.hidden=true;storm.replaceChildren();typing.hidden=false;
+  let count=0;const typeNext=()=>{const row=document.createElement('span');row.className='love-typed-row';row.textContent='生生世世';rows.append(row);rows.parentElement.scrollTop=rows.parentElement.scrollHeight;count++;if(count<34)loveEndingTimers.push(setTimeout(typeNext,92));else loveEndingTimers.push(setTimeout(()=>{typing.hidden=true;flash.hidden=false;close.hidden=false;close.focus()},1200))};typeNext();
+ },2700));
+}
 function answerPureLove(accept){
  if(!pureLovePending)return;
  document.getElementById('pureLoveChoices').classList.remove('show');
@@ -1170,8 +1196,7 @@ function answerPureLove(accept){
  addMsg('him','당신도 꼭 약속을 지켜야 해요.','你也要说到做到。');
  addMsg('him','우리 영원히, 몇 번의 생을 거듭해도 함께해요.','我们生生世世永远不分离。');
  addMsg('him','헤어지지 마요. 헤어지지 마요. 헤어지지 마요.','不分离不分离不分离不分离不分离不分离。');
- const ending=document.getElementById('loveEnding');
- ending.classList.add('show');
+ showLoveEnding();
  increaseAffection();setGiftBusy(false);
 }
 
@@ -1784,7 +1809,10 @@ function answerDateJourney(yes){
 async function openPhotos(mode='browse'){
  photoSelectionMode=mode;photoFilter='all';await albumReady;closePhotoDetail();
  document.getElementById('photoCancel').textContent=mode==='date'?'取消选择':'返回桌面';
- document.getElementById('photoPickerCaption').textContent=mode==='date'?'选择一张我的形象照片':'我的照片';
+ document.getElementById('photoPickerCaption').textContent=mode==='date'?'从游戏相册选择我的形象':'我的照片';
+ document.querySelector('.photos-add').hidden=mode==='date';
+ document.querySelector('.photos-import-button').hidden=mode==='date';
+ document.getElementById('photoImport').disabled=mode==='date';
  renderPhotos();view('photos');
 }
 function closePhotos(){
@@ -1792,7 +1820,8 @@ function closePhotos(){
 }
 function setPhotoFilter(filter){photoFilter=filter;renderPhotos()}
 function renderPhotos(){
- const all=[...photoRecords.values()].sort((a,b)=>new Date(a.importedAt)-new Date(b.importedAt));
+ const source=photoSelectionMode==='date'?mediaAssets.album:[...photoRecords.values()];
+ const all=[...source].sort((a,b)=>new Date(a.takenAt||a.importedAt||0)-new Date(b.takenAt||b.importedAt||0));
  const visible=all.filter(record=>photoFilter!=='favorite'||record.favorite),grid=document.getElementById('photoGrid');grid.replaceChildren();
  document.getElementById('photosAll').setAttribute('aria-pressed',String(photoFilter==='all'));document.getElementById('photosFavorites').setAttribute('aria-pressed',String(photoFilter==='favorite'));
  for(const record of visible){
@@ -1803,6 +1832,7 @@ function renderPhotos(){
  document.getElementById('photoCount').textContent=visible.length+' 张照片';
 }
 async function importPhotos(files){
+ if(photoSelectionMode==='date')return;
  const status=document.getElementById('photoImportStatus');status.textContent='正在添加照片…';let added=0,failed=0;
  for(const file of files){
   if(!['image/jpeg','image/png','image/webp','image/gif','image/avif'].includes(file.type)||file.size>20*1024*1024){failed++;continue}
@@ -1851,11 +1881,12 @@ window.maqueDatesReady=true;
 syncDateUnlock();
 
 </script></main>
-<div id="loveEnding" aria-label="生生世世不分离">
-  <div class="love-ending-noise"></div>
-  <div class="love-ending-title">生生世世不分离</div>
-  <div class="love-ending-stream" aria-hidden="true"></div>
-  <button class="love-ending-return" onclick="document.getElementById('loveEnding').classList.remove('show');goHome()">返回手机</button>
+<div id="loveEnding" aria-label="真心结局">
+  <div class="love-photo-storm" id="lovePhotoStorm" aria-hidden="true"></div>
+  <p class="love-ending-redline" id="loveEndingRedline">这些你都忘了吗？你怎么能留我一个人痛苦？我们说好了，生生世世不分开。</p>
+  <div class="love-typing-screen" id="loveTypingScreen" hidden aria-live="polite"><div class="love-typed-rows" id="loveTypedRows"></div></div>
+  <div class="love-final-flash" id="loveFinalFlash" hidden><span>我们生生世世不分离</span></div>
+  <button class="love-ending-return" id="loveEndingReturn" hidden onclick="finishLoveEnding()">继续</button>
 </div>
 <script src="./date-expansion.js"></script>
 <script src="./sequel-story.js"></script>

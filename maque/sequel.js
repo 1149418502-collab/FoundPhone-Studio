@@ -5,7 +5,7 @@
   if (!story) return;
   const KEY = 'maque_sequel_v1';
   const chapterIds = story.chapters.map(chapter => chapter.id);
-  const endingIds = ['reunion', 'farewell', 'suspense', 'loop'];
+  const endingIds = ['reunion', 'farewell', 'suspense', 'loop', 'trueHeart'];
   const freshChapter = () => ({ cursor: 0, choice: null, solved: false, storySeen: false, liked: false, saved: false, comment: false });
   const state = { version: 1, chapters: {}, endings: [], currentEnding: null, activeChapter: chapterIds[0], announced: 0, dates: [] };
   let initialized = false, busy = false, chatToken = 0, currentArchive = null;
@@ -264,20 +264,45 @@
     }
     view('archives');
   }
+  function showClosingLetter(endingId) {
+    const letter = story.closingLetter;
+    const screen = document.getElementById('archives'); screen.replaceChildren(); currentArchive = null;
+    const shell = node('div', null, 'sequel-ending sequel-epilogue', screen);
+    header(shell, 'Samsara', '最后一封信', () => renderEnding(endingId, false, true));
+    const content = node('div', null, 'sequel-ending-content epilogue-content', shell);
+    node('p', 'A LETTER FOR THE END OF THIS LOOP', 'sequel-eyebrow', content);
+    const envelope = node('div', null, 'epilogue-envelope', content);
+    const flap = node('span', '♡', 'epilogue-seal', envelope); flap.setAttribute('aria-hidden', 'true');
+    const openButton = button(content, '拆开这封信', () => {
+      envelope.classList.add('is-open'); openButton.disabled = true;
+      window.setTimeout(() => { note.hidden = false; note.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 650);
+    }, 'sequel-button', 'openClosingLetter');
+    openButton.setAttribute('aria-label', '拆开最后的情书');
+    const note = node('article', null, 'epilogue-note', content); note.hidden = true;
+    node('p', letter.word, 'epilogue-word', note);
+    node('p', letter.transliteration, 'epilogue-definition', note);
+    node('p', letter.definition, 'epilogue-definition', note);
+    node('p', letter.gameMeaning, 'epilogue-game-meaning', note);
+    node('p', letter.salutation, 'epilogue-salutation', note);
+    node('p', letter.body, 'epilogue-letter-body', note);
+    node('p', '—— ' + letter.signature, 'epilogue-signature', note);
+    button(content, '重新看一遍这个结局', () => renderEnding(endingId, false, true), 'sequel-secondary');
+    button(content, '合上信，回到手机', () => view('home'), 'sequel-secondary');
+    view('archives'); screen.scrollTop = 0;
+  }
   function renderEnding(id, record = true, vaultOverride = false) {
     if (!endingIds.includes(id) || (record && !allSolved() && !vaultOverride)) return;
     if (record && !state.endings.includes(id)) state.endings.push(id);
     state.currentEnding = id; save();
     const ending = story.endings[id], screen = document.getElementById('archives'); screen.replaceChildren();
     const shell = node('div', null, 'sequel-ending ending-' + id, screen);
-    header(shell, 'Samsara', '我们抵达的地方', () => openArchives());
+    header(shell, 'Samsara', '我们抵达的地方', () => showClosingLetter(id));
     const content = node('div', null, 'sequel-ending-content', shell);
     node('p', 'ENDING / ' + id.toUpperCase(), 'sequel-eyebrow', content); node('h1', ending.title, '', content); node('p', ending.subtitle, 'sequel-ending-subtitle', content);
     for (const paragraph of ending.paragraphs) node('p', paragraph, 'sequel-ending-paragraph', content);
     const last = node('div', null, 'sequel-ending-message', content); node('small', 'KakaoTalk · 成灿', '', last); node('p', ending.lastMessage, '', last);
-    node('p', '已收录结局 ' + state.endings.length + ' / 4', 'sequel-ending-count', content);
-    button(content, '回到分岔口', renderFinalChoice, 'sequel-button', 'sequelReplay');
-    button(content, '回到手机桌面', () => view('home'), 'sequel-secondary');
+    node('p', '已收录结局 ' + state.endings.length + ' / 5', 'sequel-ending-count', content);
+    button(content, '打开片尾的信', () => showClosingLetter(id), 'sequel-button', 'sequelClosingLetter');
     view('archives'); screen.scrollTop = 0;
   }
   function onDateComplete(id) {
@@ -299,6 +324,7 @@
     if (document.getElementById('instagram').classList.contains('active')) renderInstagram();
   }
   function finishDiaryEnding() { renderEnding('reunion', true, true); }
-  window.MaqueSequel = { init, sync, renderInstagram, onDateComplete, openArchives, openChat, finishDiaryEnding };
+  function finishTrueHeartEnding() { renderEnding('trueHeart', true, true); }
+  window.MaqueSequel = { init, sync, renderInstagram, onDateComplete, openArchives, openChat, finishDiaryEnding, finishTrueHeartEnding };
   init();
 })();
