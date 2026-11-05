@@ -104,3 +104,13 @@ and existing progress when replacing or extending the author's material.
 - Photo details support previous/next controls, horizontal touch swipes, arrow keys and Escape. Game album favorites read the canonical saved record. Bundled photos remain readable if IndexedDB is unavailable; imported personal images still require browser storage.
 - Date rewards up to 20% and valid archive announcement flags survive reloading. This visible version update does not run another save-reset migration.
 - The author’s identity album remains empty pending supplied images. Do not fill it with unrelated or generated likenesses to bypass that step.
+
+## Everyday correspondence · 2026.11.05.3
+
+Twelve consecutive, saved conversations are authored in `maque/correspondence-story.js`. They expand ordinary moments and reciprocal care without replacing the four date scripts or changing gift/date affection. KakaoTalk, Notes, the date catalog and the game introduction link to this route.
+
+Each chapter has a cross-app artifact, a personal response, subsequent chat and a kept page. Four artifacts allow freely keeping an actual quote; one assembles a short text; one uses an in-game bedtime checklist. No real microphone or system alarm is used. Old first-playthrough room nine remains archival background, not another playable run.
+
+Reading progress, fragment ordering, chosen quotes, personal responses and kept pages persist under `maque_correspondence_v1`. Later conversations recall four earlier responses; Notes retains all twelve, and the existing ending letter can include memories and an optional player-written line.
+
+The route has over 14,000 Han characters on its shortest first-pass path. See `docs/MAQUE_PLAYTIME.md` for the full-route 45–65 minute target and its limits. Static script/style URLs include the visible build version so a previously cached phone module cannot hide the new Notes entries.

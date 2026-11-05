@@ -5,6 +5,7 @@ const html = readFileSync("maque/index.html", "utf8");
 const files = new Set([
   "sequel-story.js", "sequel.js", "sequel.css",
   "date-expansion.js", "date-expansion.css",
+  "correspondence-story.js", "correspondence.js", "correspondence.css",
   "phone-extras.js", "phone-extras.css",
   "memory-vault.js", "memory-vault.css",
   ...[

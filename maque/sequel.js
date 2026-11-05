@@ -285,6 +285,13 @@
     node('p', letter.gameMeaning, 'epilogue-game-meaning', note);
     node('p', letter.salutation, 'epilogue-salutation', note);
     node('p', letter.body, 'epilogue-letter-body', note);
+    const memories = window.MaqueCorrespondence?.endingMemories() || [];
+    if (memories.length) {
+      node('small', '这一路留下的几件小事', 'epilogue-salutation', note);
+      for (const memory of memories) node('p', memory, 'epilogue-definition', note);
+    }
+    const keepsake = window.MaqueCorrespondence?.closingKeepsake();
+    if (keepsake) { node('small', '我留给下次的一句话', 'epilogue-salutation', note); node('blockquote', keepsake, 'epilogue-game-meaning', note); }
     node('p', '—— ' + letter.signature, 'epilogue-signature', note);
     button(content, '重新看一遍这个结局', () => renderEnding(endingId, false, true), 'sequel-secondary');
     button(content, '合上信，回到手机', () => view('home'), 'sequel-secondary');
