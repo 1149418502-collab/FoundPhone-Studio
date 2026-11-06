@@ -1,4 +1,4 @@
-/* Author-supplied captions and publication dates. Original photographs are bundled unchanged. */
+/* Author-supplied captions, publication dates and unlock milestones. Original photographs are unchanged. */
 window.MaqueSilverInstagramStory = {
   "schemaVersion": 1,
   "username": "eunseok",
@@ -65,6 +65,68 @@ window.MaqueSilverInstagramStory = {
           "alt": "小时候的爆炸头照片"
         }
       ]
+    },
+    {
+      "id": "eunseok-2026-10-20",
+      "author": "eunseok",
+      "publishedOn": "2026-10-20",
+      "caption": "커플템으로 가자 ~",
+      "photos": [
+        {
+          "src": "./assets/eunseok-instagram-20261020-1.jpg",
+          "alt": "我的情侣装镜子自拍"
+        }
+      ]
+    },
+    {
+      "id": "eunseok-2026-10-06",
+      "author": "eunseok",
+      "publishedOn": "2026-10-06",
+      "dayOrder": 1,
+      "unlockAfter": "baseball-post",
+      "caption": "오늘 잘 즐기다 왔다 ~",
+      "photos": [
+        {
+          "src": "./assets/eunseok-instagram-20261006-1.jpg",
+          "alt": "那天看台前的棒球场"
+        },
+        {
+          "src": "./assets/eunseok-instagram-20261006-2.jpg",
+          "alt": "我和棒球应援棒的自拍"
+        }
+      ]
+    },
+    {
+      "id": "eunseok-2025-07-09",
+      "author": "eunseok",
+      "publishedOn": "2025-07-09",
+      "unlockAfter": "idol-memory",
+      "caption": "成璨nim康桑哈密哒",
+      "photos": [
+        {
+          "src": "./assets/eunseok-instagram-20250709-1.jpg",
+          "alt": "我和成灿留下的角色互换合影"
+        }
+      ]
+    },
+    {
+      "id": "sungchan-2025-08-17",
+      "photoAspect": "1 / 1",
+      "author": "sungchan",
+      "publishedOn": "2025-08-17",
+      "unlockAfter": "idol-complete",
+      "caption": "和一位很害羞的男粉一起",
+      "photos": [
+        {
+          "src": "./assets/sungchan-instagram-20250817-1.jpg",
+          "alt": "成灿发来的爱豆与粉丝合影"
+        }
+      ],
+      "commentChoices": [
+        "康桑哈密达！",
+        "我是夫熙俊"
+      ]
     }
-  ]
+  ],
+  "avatarSrc": "./assets/eunseok-instagram-avatar.jpg"
 };

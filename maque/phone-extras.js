@@ -52,7 +52,7 @@
     const list = el('div', null, 'phone-note-list', body);
     const render = () => {
       list.replaceChildren(); const query = search.value.trim();
-      const entries = [{ id: 'food', title: '下次别忘了', detail: '汉堡、薯条，还有……' }, ...(window.MaqueCorrespondence?.noteEntries() || [])];
+      const entries = [{ id: 'food', title: '下次别忘了', detail: '汉堡、薯条，还有……' }];
       if (completedDates.has('baseball')) entries.push({ id: 'ticket', title: '球票夹在这里', detail: '两张照片。一张也舍不得删。' });
       if (affection >= 60 && query === '01') entries.push({ id: 'draft', title: '01 · 未发送', detail: '恢复的草稿' });
       for (const item of entries.filter(item => !query || (item.title + item.detail).includes(query))) {

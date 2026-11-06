@@ -208,6 +208,110 @@
         1135
       ],
       "sha256": "de46d9177d0136938cee37a711d323a8f8138daaeeeae8e8c1846e335238767f"
+    },
+    {
+      "file": "date-football-background.jpg",
+      "reference": "足球背景板.JPG",
+      "source": "Author-uploaded 新素材.zip",
+      "role": "football date background",
+      "dimensions": [
+        1536,
+        2048
+      ],
+      "sha256": "a26f7fa83cda35eb03122af211139dea8ab93fdf41f488973169789116a640af"
+    },
+    {
+      "file": "eunseok-instagram-avatar.jpg",
+      "reference": "银硕ins'头像.JPG",
+      "source": "Author-uploaded 新素材.zip",
+      "role": "Eunseok Instagram avatar",
+      "dimensions": [
+        960,
+        1280
+      ],
+      "sha256": "1b000d6a1cbd20254d2e01d3215cd90aca979ca0637ec9b602a9a7330c4f6075"
+    },
+    {
+      "file": "eunseok-instagram-20261020-1.jpg",
+      "reference": "커플템으로 가자 ~.JPG",
+      "source": "Author-uploaded 新素材.zip",
+      "role": "Instagram post 2026-10-20",
+      "dimensions": [
+        960,
+        1280
+      ],
+      "sha256": "a7fb12afa0a6d78850d507fc9a6dc387ff587b4753a3573c8645c603768f086e"
+    },
+    {
+      "file": "eunseok-instagram-20261006-2.jpg",
+      "reference": "오늘 잘 즐기다 왔다 ~1.JPG",
+      "source": "Author-uploaded 新素材.zip",
+      "role": "Instagram baseball post 2026-10-06 slide 2",
+      "dimensions": [
+        961,
+        1280
+      ],
+      "sha256": "2ba86aa89c5ccb4fff3f113fca0cb2ec0d701b0ebe098fce3d9bbe6afece0370"
+    },
+    {
+      "file": "eunseok-instagram-20261006-1.jpg",
+      "reference": "오늘 잘 즐기다 왔다 ~.JPG",
+      "source": "Author-uploaded 新素材.zip",
+      "role": "Instagram baseball post 2026-10-06 slide 1",
+      "dimensions": [
+        960,
+        1280
+      ],
+      "sha256": "4a5ae0d6431efe71cd77e1a11f567dffa619e5c13daa17294ca5ddb4303fb547"
+    },
+    {
+      "file": "eunseok-instagram-20250709-1.jpg",
+      "reference": "250709.JPG",
+      "source": "Author-uploaded 新素材.zip",
+      "role": "Instagram idol post 2025-07-09",
+      "dimensions": [
+        3000,
+        4000
+      ],
+      "sha256": "aa87db5680fed6f425a3f370c75a70ed112b46bddd0dffb824c26035622d6107"
+    },
+    {
+      "file": "sungchan-instagram-20250817-1.jpg",
+      "reference": "250817.JPG",
+      "source": "Author-uploaded 新素材.zip",
+      "role": "Instagram idol post 2025-08-17",
+      "dimensions": [
+        1181,
+        1080
+      ],
+      "sha256": "d57a6ce7b770c5eb9b189c7aae341fd8b88460e6bc8ae4904af9f467ea06627a"
+    },
+    {
+      "file": "gift-collection.png",
+      "source": "Original gift still-life artwork generated with OpenAI image generation",
+      "role": "15 coordinated gift thumbnails in a 3 by 5 sprite sheet",
+      "dimensions": [
+        971,
+        1619
+      ],
+      "sha256": "c834f31c3cc62645e1b82ff8a44468fc770ca0465d1f72206c37a4cef74fd187",
+      "items": [
+        "郁金香花束",
+        "红玫瑰",
+        "草莓奶油蛋糕",
+        "软绵绵玩偶",
+        "冰美式",
+        "无线耳机",
+        "柔软围巾",
+        "手写日记本",
+        "香氛蜡烛",
+        "手作曲奇礼盒",
+        "双层芝士汉堡",
+        "签名足球",
+        "明星球衣",
+        "「真心」",
+        "上锁的旧日记"
+      ]
     }
   ]
 }

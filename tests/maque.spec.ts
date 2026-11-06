@@ -3,19 +3,20 @@ import { readFileSync } from "node:fs";
 
 const html = readFileSync("maque/index.html", "utf8");
 const localModules = new Set([
+  "gift-collection.css",
   "silver-instagram-story.js", "silver-instagram.js", "silver-instagram.css",
   "sequel-story.js",
   "sequel.js",
   "sequel.css",
   "date-expansion.js",
   "date-expansion.css",
-  "correspondence-story.js", "correspondence.js", "correspondence.css",
   "phone-extras.js", "phone-extras.css",
   "memory-vault.js",
   "memory-vault.css",
 ]);
 const localAssets = new Set([
   "sungchan-instagram-avatar.jpg",
+  "gift-collection.png","date-football-background.jpg","eunseok-instagram-avatar.jpg","eunseok-instagram-20261020-1.jpg","eunseok-instagram-20261006-1.jpg","eunseok-instagram-20261006-2.jpg","eunseok-instagram-20250709-1.jpg","sungchan-instagram-20250817-1.jpg",
   ...["20240510-1","20240621-1","20240621-2","20240903-1","20240918-1","20240918-2","20240921-1"].map(id => "eunseok-instagram-" + id + ".jpg"),
   "locked-heart-vault.png",
   "sungchan-football-childhood.jpg",
@@ -628,7 +629,7 @@ test("dating threshold guards direct access and four mobile scene cards have int
   for (const [name, source] of [
     ["九号房间", "date-escape-background.jpg"],
     ["棒球场", "date-baseball-background.jpg"],
-    ["足球校园", "sungchan-football-childhood.jpg"],
+    ["足球校园", "date-football-background.jpg"],
     ["一日爱豆", "date-idol-background.jpg"],
   ]) {
     const background = page
@@ -702,8 +703,8 @@ for (const choice of [
         await page
           .getByRole("button", { name: /去看看成灿的 Instagram/ })
           .click();
-        await expect(page.locator('.silver-profile-post')).toHaveCount(5);
-        await expect(page.locator('#insFeed > article').first()).toHaveAttribute('data-scene', 'baseball');
+        await expect(page.locator('.silver-profile-post')).toHaveCount(7);
+        await expect(page.locator('#insFeed > article').first()).toHaveAttribute('data-silver-post', 'eunseok-2026-10-20');
         await expect(page.locator('#insFeed > article[data-scene="baseball"]')).toHaveCount(1);
         await expect(page.locator(".ins-post[data-scene=baseball]")).toHaveCount(1);
         await expect(page.locator(".ins-post[data-scene=baseball] .ins-caption")).toContainText("银硕");
@@ -1028,7 +1029,7 @@ test("Instagram avatar source is independent and centered inside its story ring"
   expect(Math.abs(a.x + a.width / 2 - (b.x + b.width / 2))).toBeLessThan(0.5);
   expect(Math.abs(a.y + a.height / 2 - (b.y + b.height / 2))).toBeLessThan(0.5);
   expect(Math.abs(a.width - a.height)).toBeLessThan(0.5);
-  await expect(page.locator(".ins-post-header img").first()).toHaveAttribute(
+  await expect(page.locator('.ins-post[data-scene="baseball"] .ins-post-header img')).toHaveAttribute(
     "src",
     (await image.getAttribute("src")) as string,
   );
@@ -1148,7 +1149,7 @@ test("provided image 2 is the decoded IG story and post portrait", async ({
       ),
     )
     .toBe(true);
-  await expect(page.locator(".ins-post-header img").first()).toHaveAttribute(
+  await expect(page.locator('.ins-post[data-scene="baseball"] .ins-post-header img')).toHaveAttribute(
     "src",
     (await story.getAttribute("src")) as string,
   );

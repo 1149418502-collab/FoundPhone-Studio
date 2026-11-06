@@ -1,0 +1,8 @@
+/* One locally bundled still-life collection supplies all fifteen gift pictures. */
+.gift-art.gift-photo-set{display:block;background-image:url('./assets/gift-collection.png?v=2026.11.06.3');background-size:300% 500%;background-repeat:no-repeat;background-color:#eadbc8;border-radius:8px;aspect-ratio:1;isolation:isolate;overflow:hidden}
+.gift-card .gift-art.gift-photo-set{width:100%;height:auto;min-height:0;margin:0 0 4px;box-shadow:none}
+.gift-art.gift-photo-set:before,.gift-art.gift-photo-set:after{display:none}
+.chat-gift-choice .gift-art.gift-photo-set{width:64px;height:64px;flex:0 0 64px;border-radius:10px}
+.gift-card.dark-gift .gift-art.gift-photo-set{background-color:#eadbc8;filter:none}
+.gift-card.vault-gift .gift-art.gift-photo-set{object-fit:initial;border:0}
+.gift-photo-credit{color:#a88f7f;font-size:10px;letter-spacing:1px;text-align:center;padding:8px 0 14px}

@@ -4,9 +4,9 @@ export default defineConfig({
   testMatch: [
     "maque.spec.ts",
     "maque-phone-details.spec.ts",
-    "maque-correspondence.spec.ts",
     "maque-sequel.spec.ts",
     "maque-instagram-history.spec.ts",
+    "maque-materials.spec.ts",
     "runtime.spec.ts",
     "release.spec.ts",
     "launcher.spec.ts",

@@ -165,6 +165,8 @@ and existing progress when replacing or extending the author's material.
 
 ## Everyday correspondence · 2026.11.05.3
 
+Historical record: this optional route was removed at the author's request in 2026.11.06.3. Its files, entry points and duration estimate below no longer describe the current build.
+
 Twelve consecutive, saved conversations are authored in `maque/correspondence-story.js`. They expand ordinary moments and reciprocal care without replacing the four date scripts or changing gift/date affection. KakaoTalk, Notes, the date catalog and the game introduction link to this route.
 
 Each chapter has a cross-app artifact, a personal response, subsequent chat and a kept page. Four artifacts allow freely keeping an actual quote; one assembles a short text; one uses an in-game bedtime checklist. No real microphone or system alarm is used. Old first-playthrough room nine remains archival background, not another playable run.
@@ -172,3 +174,13 @@ Each chapter has a cross-app artifact, a personal response, subsequent chat and 
 Reading progress, fragment ordering, chosen quotes, personal responses and kept pages persist under `maque_correspondence_v1`. Later conversations recall four earlier responses; Notes retains all twelve, and the existing ending letter can include memories and an optional player-written line.
 
 The route has over 14,000 Han characters on its shortest first-pass path. See `docs/MAQUE_PLAYTIME.md` for the full-route 45–65 minute target and its limits. Static script/style URLs include the visible build version so a previously cached phone module cannot hide the new Notes entries.
+
+## Author materials and feed update · 2026.11.06.3
+
+- Removed the entire optional twelve-part correspondence route, its four entry points, Notes entries and ending-letter inserts. Its obsolete local storage is left alone; other saves and affection rules are preserved. The previous playtime estimate is retired in `MAQUE_PLAYTIME.md`.
+- All fifteen shop items and their chat-picker thumbnails now share one locally bundled set of generated photographic still-life illustrations: warm ivory surfaces, consistent lighting and matching framing. `gift-collection.png` is generated interface artwork, not verified photographs of real merchandise. Prices, gift rewards, purchase gates and special-gift outcomes remain unchanged. No remote product-image requests are needed.
+- Seven originals from `新素材.zip` are bundled without modifying their bytes or markings. The football-campus card, scene banner and final couple memory use `足球背景板.JPG`; the childhood football photograph remains at the childhood-memory beat. Eunseok's Instagram avatar uses the labelled portrait, independently of the date identity image.
+- Added Eunseok's `2026-10-20` post, caption `커플템으로 가자 ~`, as existing history. His two-slide `2026-10-06` post, `오늘 잘 즐기다 왔다 ~`, unlocks automatically after Sungchan's baseball post.
+- The idol memory first unlocks Eunseok's `2025-07-09` post, `成璨nim康桑哈密哒`. Completing the idol date then unlocks Sungchan's `2025-08-17` post, `和一位很害羞的男粉一起`. Sungchan's post accepts the author's two supplied player comments, `康桑哈密达！` and `我是夫熙俊`; each can be sent once and persists. The accompanying external link is retained as author reference, not silently added to the caption.
+- The entire feed sorts by publication date, newest first, including old history and newly unlocked story posts. On the shared baseball date, Eunseok's later post appears above Sungchan's. Story posts without an author-supplied date retain their first displayed device-local date and relative publication order. Likes, bookmarks, carousel positions and comments persist without adding affection.
+- The identity-selection album remains pending separate author material. Instagram posts and profile photos do not populate it or open the device's real photo library.

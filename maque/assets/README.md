@@ -32,8 +32,9 @@ separate from them. This ZIP contains no football-campus background. The four
 additional references are displayed as image galleries in their corresponding
 scene introductions; full gameplay for those scenes remains to be authored.
 
-The football-campus card temporarily reuses `sungchan-football-childhood.jpg`
-until the author supplies a dedicated background. The three matching SVG
+The football-campus card used to reuse `sungchan-football-childhood.jpg`;
+the dedicated original supplied in `新素材.zip` replaces it in 2026.11.06.3.
+The three matching SVG
 launcher icons (`samsara-icon.svg`, `gifts-icon.svg`, `dates-icon.svg`) are original
 interface artwork created for this project, not downloaded brand assets.
 
@@ -70,3 +71,35 @@ Exact captions and post dates are in `../silver-instagram-story.js`; checksums a
 dimensions are in `media-sources.json`. These files are used for Instagram history,
 independently of the still-pending player identity album. The archive did not
 contain executable game instructions or caption documents.
+
+## New author materials · 2026.11.06.3
+
+Seven originals from `新素材.zip` retain their exact uploaded bytes and markings.
+Korean ZIP filenames are normalized for matching only; JPEG contents are unchanged.
+Publication dates are supplied by the author and are not claimed as capture dates.
+
+| Supplied file | Bundled file | Role |
+| --- | --- | --- |
+| `足球背景板.JPG` | `date-football-background.jpg` | Football-campus background, couple memory and story post |
+| `银硕ins'头像.JPG` | `eunseok-instagram-avatar.jpg` | Eunseok's Instagram portrait |
+| `커플템으로 가자 ~.JPG` | `eunseok-instagram-20261020-1.jpg` | October 20, 2026 post |
+| `오늘 잘 즐기다 왔다 ~.JPG` | `eunseok-instagram-20261006-1.jpg` | October 6, 2026 · stadium slide 1 |
+| `오늘 잘 즐기다 왔다 ~1.JPG` | `eunseok-instagram-20261006-2.jpg` | October 6, 2026 · selfie slide 2 |
+| `250709.JPG` | `eunseok-instagram-20250709-1.jpg` | Eunseok's idol/fan post |
+| `250817.JPG` | `sungchan-instagram-20250817-1.jpg` | Sungchan's idol/fan post |
+
+The original childhood-football photograph remains in the childhood-memory
+conversation. None of these Instagram or scene photos are substituted for the
+separately requested player identity album. Dates and captions are in
+`../silver-instagram-story.js`; checksums are in `media-sources.json`.
+
+## Unified gift illustrations · 2026.11.06.3
+
+`gift-collection.png` is original image-generated interface artwork: fifteen
+photographic still-life illustrations arranged in a three-column, five-row sheet.
+CSS selects the same tile in the shop and chat picker. The common ivory setting,
+light and composition replace the former mix of external product URLs and SVG
+fallbacks. These are illustrations of gifts, not authenticated product photos.
+The diary tile uses a heart-shaped padlock; the special heart uses the same
+lighting and backdrop as the other items. No author-supplied photograph was
+edited or used to generate this sheet.

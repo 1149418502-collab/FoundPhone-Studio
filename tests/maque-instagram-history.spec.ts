@@ -6,6 +6,7 @@ const html = readFileSync('maque/index.html', 'utf8');
 const modules = new Set(readdirSync('maque').filter(name => /\.(?:js|css)$/.test(name)));
 const assets = new Set(readdirSync('maque/assets').map(name => 'assets/' + name));
 const expected = [
+  { date: '2026-10-20', code: '20261020', caption: '커플템으로 가자 ~', count: 1 },
   { date: '2024-09-21', code: '20240921', caption: '爆炸银硕！', count: 1 },
   { date: '2024-09-18', code: '20240918', caption: '大家~中秋假期过得好吗？ 我久违地回老家看了查理 感觉变大了 ㅎㅎ 남은剩下的假期多吃点好吃的,好好休息!!😊', count: 2 },
   { date: '2024-09-03', code: '20240903', caption: '很有意思下次还会再来的🤗😚🧡', count: 1 },
@@ -38,9 +39,9 @@ async function open(page: Page, affection = 0, currentPosts = false) {
   return errors;
 }
 
-test('five original captions are paired with the supplied dated photos, newest first, on a fresh phone', async({page})=>{
+test('six unconditional captions are paired with the supplied dated photos, newest first, on a fresh phone', async({page})=>{
   const errors = await open(page);
-  await expect(page.locator('.silver-profile-post')).toHaveCount(5);
+  await expect(page.locator('.silver-profile-post')).toHaveCount(6);
   expect(await page.locator('.silver-profile-post').evaluateAll(nodes=>nodes.map(node=>(node as HTMLElement).dataset.publishedOn))).toEqual(expected.map(item=>item.date));
   for (const item of expected) {
     const article=post(page,item.date);
@@ -117,11 +118,13 @@ test('horizontal swipes change a photo while vertical scrolling leaves the carou
   await expect(article.getByRole('button',{name:'喜欢这条动态',exact:true})).toHaveAttribute('aria-pressed','false');
 });
 
-test('new game posts stay above all five historical posts, including after private-post interactions',async({page})=>{
+test('game posts and supplied history follow publication dates, including after private-post interactions',async({page})=>{
   const errors=await open(page,60,true);
   const check=async()=>{
-    expect(await page.locator('#insFeed > article').evaluateAll(nodes=>nodes.slice(-5).map(node=>(node as HTMLElement).dataset.publishedOn))).toEqual(expected.map(item=>item.date));
-    await expect(page.locator('.silver-profile-post')).toHaveCount(5);
+    expect(await page.locator('#insFeed > article').evaluateAll(nodes=>nodes.slice(-5).map(node=>(node as HTMLElement).dataset.publishedOn))).toEqual(expected.slice(1).map(item=>item.date));
+    await expect(page.locator('.silver-profile-post')).toHaveCount(7);
+    const dates=await page.locator('#insFeed > article').evaluateAll(nodes=>nodes.map(node=>(node as HTMLElement).dataset.publishedOn!));
+    expect(dates).toEqual([...dates].sort().reverse());
   };
   await check();
   await expect(page.locator('[data-scene="baseball"]')).toHaveCount(1);
@@ -138,7 +141,7 @@ for(const width of [320,390]) {
   test(`dated Instagram photos and captions fit a ${width}px phone`,async({page})=>{
     await page.setViewportSize({width,height:844}); await open(page);
     const screen=page.locator('#instagram');
-    await expect.poll(()=>post(page,'2024-09-21').locator('.ins-post-image').evaluate((image:HTMLImageElement)=>image.complete&&image.naturalWidth>0)).toBe(true);
+    await expect.poll(()=>post(page,'2026-10-20').locator('.ins-post-image').evaluate((image:HTMLImageElement)=>image.complete&&image.naturalWidth>0)).toBe(true);
     await screen.screenshot({path:`outputs/maque/silver-instagram-history-${width}.png`});
     for(const item of expected) {
       const article=post(page,item.date);await article.scrollIntoViewIfNeeded();

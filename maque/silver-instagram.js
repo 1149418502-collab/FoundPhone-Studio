@@ -6,7 +6,7 @@
   const posts = [...story.posts].sort((a, b) => b.publishedOn.localeCompare(a.publishedOn));
   const ids = new Set(posts.map(post => post.id));
   const KEY = 'maque_silver_instagram_v1';
-  const state = { version: 1, liked: [], saved: [], slides: {} };
+  const state = { version: 1, liked: [], saved: [], slides: {}, comments: {}, announced: [], storyDates: {}, storyOrder: {} };
   try {
     const old = JSON.parse(localStorage.getItem(KEY) || 'null');
     if (old?.version === 1) {
@@ -14,6 +14,12 @@
       for (const post of posts) {
         const index = old.slides?.[post.id];
         if (Number.isInteger(index) && index >= 0 && index < post.photos.length) state.slides[post.id] = index;
+        state.comments[post.id] = Array.isArray(old.comments?.[post.id]) ? [...new Set(old.comments[post.id].filter(text => post.commentChoices?.includes(text)))] : [];
+      }
+      state.announced = Array.isArray(old.announced) ? [...new Set(old.announced.filter(id => ids.has(id)))] : [];
+      for (const id of ['scene-baseball','extra-football','extra-escape','secret-echo','secret-second','secret-dawn']) {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(old.storyDates?.[id] || '')) state.storyDates[id] = old.storyDates[id];
+        if (Number.isInteger(old.storyOrder?.[id]) && old.storyOrder[id] > 0) state.storyOrder[id] = old.storyOrder[id];
       }
     }
   } catch (_) { /* Old or unavailable storage does not prevent reading the posts. */ }
@@ -34,8 +40,38 @@
     const [year, month, day] = date.split('-').map(Number);
     return `${year}年${month}月${day}日`;
   }
+  function getAvatar() { return story.avatarSrc || './assets/eunseok-instagram-avatar.jpg'; }
+  function available(post) {
+    if (post.unlockAfter === 'baseball-post') return openedDates.has('baseball') || completedDates.has('baseball');
+    if (post.unlockAfter === 'idol-memory') return completedDates.has('idol') || window.MaqueExtraDates?.hasReachedIdolMemory();
+    if (post.unlockAfter === 'idol-complete') return completedDates.has('idol');
+    return true;
+  }
+  function notifyUnlocks(silent = false) {
+    for (const post of [...posts].reverse()) {
+      if (!post.unlockAfter || !available(post) || state.announced.includes(post.id)) continue;
+      state.announced.push(post.id);
+      if (!silent) announceFeature(post.author === 'sungchan' ? 'Instagram · 成灿更新了动态' : 'Instagram · 我的新动态', post.caption);
+    }
+    persist();
+  }
+  function sortFeed(feed) {
+    const articles = [...feed.querySelectorAll(':scope > .ins-post')];
+    const now = new Date(), today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    for (const article of articles) {
+      if (article.dataset.publishedOn) continue;
+      const id = article.dataset.scene ? 'scene-' + article.dataset.scene : article.dataset.extraDatePost ? 'extra-' + article.dataset.extraDatePost : 'secret-' + article.dataset.sequelPost;
+      state.storyDates[id] ||= today;
+      state.storyOrder[id] ||= Math.max(0, ...Object.values(state.storyOrder)) + 1;
+      article.dataset.publishedOn = state.storyDates[id]; article.dataset.publishedOrder = String(state.storyOrder[id]);
+    }
+    articles.sort((a,b) => b.dataset.publishedOn.localeCompare(a.dataset.publishedOn) || Number(b.dataset.publishedOrder || 0) - Number(a.dataset.publishedOrder || 0));
+    for (const article of articles) feed.append(article);
+    persist();
+  }
   function renderPhotos(parent, post) {
     const media = el('div', null, 'ins-photo silver-carousel', parent);
+    if (post.photoAspect) media.style.aspectRatio = post.photoAspect;
     const image = el('img', null, 'ins-post-image', media); image.loading = 'lazy'; image.decoding = 'async';
     let at = state.slides[post.id] || 0;
     const many = post.photos.length > 1;
@@ -80,19 +116,27 @@
     update();
   }
   function render(feed) {
-    feed.querySelectorAll('.silver-profile-post').forEach(post => post.remove());
-    const identity = getDatePhoto();
-    for (const post of posts) {
-      const article = el('article', null, 'ins-post silver-profile-post', feed);
-      article.dataset.silverPost = post.id; article.dataset.publishedOn = post.publishedOn;
+    feed.querySelectorAll('.authored-instagram-post').forEach(post => post.remove());
+    notifyUnlocks(true);
+    for (const post of posts.filter(available)) {
+      const authorName = post.author || story.username;
+      const own = authorName !== 'sungchan';
+      const article = el('article', null, 'ins-post authored-instagram-post ' + (own ? 'silver-profile-post' : 'authored-sungchan-post'), feed);
+      article.dataset.authoredPost = post.id; article.dataset.author = authorName;
+      if (own) article.dataset.silverPost = post.id;
+      article.dataset.publishedOn = post.publishedOn; article.dataset.publishedOrder = String(post.dayOrder || 0);
       const header = el('div', null, 'ins-post-header', article);
-      if (identity) { const image = el('img', null, '', header); image.src = photoURL(identity); image.alt = '我选择的形象'; }
-      else el('span', '银', 'silver-profile-avatar', header);
-      const author = el('div', null, '', header); el('b', story.username, '', author); el('small', '我的动态 · Instagram', '', author);
+      const avatar = el('img', null, '', header); avatar.src = own ? getAvatar() : getInstagramAvatar(); avatar.alt = own ? '我的 Instagram 头像' : '成灿';
+      const author = el('div', null, '', header); el('b', authorName, '', author); el('small', own ? '我的动态 · Instagram' : '一日爱豆 · Instagram', '', author);
       el('span', '···', '', header);
       renderPhotos(article, post);
       const actions = el('div', null, 'ins-actions', article);
+      let commentsControl;
       for (const [key, label] of [['liked', '喜欢这条动态'], ['saved', '收藏这条动态']]) {
+        if (key === 'saved' && post.commentChoices) {
+          commentsControl = button(actions, '评论这条动态', '', 'authored-comment-toggle', () => { thread.hidden = !thread.hidden; commentsControl.setAttribute('aria-expanded', String(!thread.hidden)); });
+          commentsControl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 11a8 8 0 0 1-12 7l-5 2 2-5a8 8 0 1 1 15-4Z"/></svg>';
+        }
         const control = button(actions, label, '', key === 'saved' ? 'silver-save' : 'silver-like', () => {
           state[key] = state[key].includes(post.id) ? state[key].filter(id => id !== post.id) : [...state[key], post.id]; persist();
           control.setAttribute('aria-pressed', String(state[key].includes(post.id)));
@@ -100,10 +144,32 @@
         control.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="' + (key === 'saved' ? 'M6 3h12v18l-6-4-6 4V3Z' : 'M12 20S3 14.7 3 8.7C3 3.5 9 2.8 12 7c3-4.2 9-3.5 9 1.7C21 14.7 12 20 12 20Z') + '"/></svg>';
         control.setAttribute('aria-pressed', String(state[key].includes(post.id)));
       }
-      const caption = el('div', null, 'ins-caption', article); el('b', story.username, '', caption); el('p', post.caption, 'cn silver-post-caption', caption);
+      const caption = el('div', null, 'ins-caption', article); el('b', authorName, '', caption); el('p', post.caption, 'cn silver-post-caption', caption);
+      const thread = el('div', null, 'authored-comments', caption);
+      if (post.commentChoices) {
+        const renderThread = () => {
+          thread.replaceChildren();
+          for (const text of state.comments[post.id] || []) {
+            const row = el('p', null, 'authored-comment', thread); el('b', story.username, '', row); el('span', text, '', row);
+          }
+          const choices = el('div', null, 'authored-comment-choices', thread);
+          for (const text of post.commentChoices) {
+            const send = button(choices, '评论：' + text, text, '', () => {
+              state.comments[post.id] ||= [];
+              if (!state.comments[post.id].includes(text)) state.comments[post.id].push(text);
+              persist(); renderThread();
+            });
+            send.disabled = (state.comments[post.id] || []).includes(text);
+          }
+        };
+        thread.hidden = !(state.comments[post.id] || []).length;
+        commentsControl.setAttribute('aria-expanded', String(!thread.hidden));
+        renderThread();
+      } else thread.hidden = true;
       const date = el('time', dateLabel(post.publishedOn), 'silver-post-date', caption); date.dateTime = post.publishedOn;
     }
   }
-  window.MaqueSilverInstagram = { render };
+  if (completedDates.has('baseball') && !openedDates.has('baseball')) { openedDates.add('baseball'); storeDateList('maque_date_posts', openedDates); }
+  window.MaqueSilverInstagram = { render, getAvatar, notifyUnlocks, sortFeed };
   if (document.getElementById('instagram')?.classList.contains('active')) renderInstagram();
 })();

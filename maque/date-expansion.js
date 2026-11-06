@@ -7,7 +7,7 @@
     football: {
       title: '把晚风，留到终场', subtitle: 'AFTER CLASS / 足球校园',
       description: '放学后的操场还亮着灯。我想试着踢一脚球，也想听成灿讲讲小时候。输赢不是今天最重要的事，等他一起走出校门才是。',
-      memory: './assets/sungchan-football-childhood.jpg', memoryLabel: '他翻给我看的童年足球旧照',
+      memory: './assets/sungchan-football-childhood.jpg', coupleMemory: './assets/date-football-background.jpg', memoryLabel: '他翻给我看的童年足球旧照',
       caption: '银硕，今天的传球我收到了。以前一有空就往操场跑，现在跑到终场，最想见的人就在旁边。下次也一起慢慢走回去吧。',
       nodes: [
         { type: 'line', title: '01 / 放学以后', who: 'me', text: '我沿着跑道走到场边，成灿抱着足球向我跑来。鞋尖沾了一点草屑，他却先问我等了多久。', ko: '오래 기다렸어요?', reply: '“没有。我也刚到。今天让我一起玩吧。”' },
@@ -23,7 +23,7 @@
     idol: {
       title: '灯光之外的名字', subtitle: 'BEHIND THE SPOTLIGHT / 一日爱豆',
       description: '我和成灿一起走进排练室，记住一小段动作，再玩一次只属于我们的身份交换：这一场，我也可以是站上舞台的人，而成灿会做我的粉丝。掌声落下后，我们再换回来。',
-      memory: './assets/date-idol-reference-1.jpg', secondaryMemory: './assets/date-idol-reference-2.jpg', memoryLabel: '我们留下的舞台日记',
+      memory: './assets/eunseok-instagram-20250709-1.jpg', secondaryMemory: './assets/sungchan-instagram-20250817-1.jpg', memoryLabel: '我们互换身份时留下的合影',
       caption: '今天排练结束后，最先听见的是你的声音。银硕，台上要记很多拍子，和你相处的时候，好像只要慢慢呼吸就可以了。',
       nodes: [
         { type: 'line', title: '01 / 练习室的门', who: 'me', text: '我推开练习室的门。成灿把一张写着名字的通行卡递给我，笑着让出身边的位置：“今天一起试试？”', ko: '오늘은 같이 해 볼까요?' },
@@ -145,6 +145,7 @@
       s.reward = affection - before;
       announceFeature('Instagram · 新的约会日记', '成灿把今天的小事写进了动态。');
     } else if (!state.completed.includes(id)) state.completed.push(id);
+    if (id === 'idol') window.MaqueSilverInstagram?.notifyUnlocks();
     window.MaqueSequel?.onDateComplete?.(id);
   }
   function render() {
@@ -183,12 +184,13 @@
       box.append(element('p', node.text, 'date-detail-copy'));
       const cards = element('div', '', 'extra-number-cards');
       for (const [label, code] of node.cards) { const card = element('div'); card.append(element('small', label), element('strong', code)); cards.append(card); }
-      box.append(cards, element('p', node.note, 'extra-date-note'), button('记住号码，去门边看看 →', 'extraDateNext', () => advance(id, s.step)));
+      box.append(cards, element('p', node.note, 'extra-date-note'), button('记住号码，去门边看看 →', 'extraDateNext', () => advance(id, step)));
     } else if (node.type === 'puzzle') renderPuzzle(box, id, s, node);
     else if (node.type === 'memory') {
       box.append(element('p', node.text, 'date-detail-copy'));
       appendMemory(box, story);
-      box.append(element('p', node.note, 'extra-date-note'), button('继续 →', 'extraDateNext', () => advance(id, s.step)));
+      if (id === 'idol') window.MaqueSilverInstagram?.notifyUnlocks();
+      box.append(element('p', node.note, 'extra-date-note'), button('继续 →', 'extraDateNext', () => advance(id, step)));
     } else if (node.type === 'done') renderDone(box, id, s, node);
     if (node.type !== 'done') box.append(element('p', '离开时会记住进度。下一次，可以从这里继续。', 'extra-save-note'));
     view('dates'); showDatePane('dateDetail');
@@ -324,12 +326,13 @@
       status.textContent = node.hint; input.removeAttribute('aria-invalid');
     }, 'date-inline-link'));
   }
-  function appendMemory(box, story) {
+  function appendMemory(box, story, finale = false) {
+    const memoryLabel = finale && story.coupleMemory ? '我和成灿的足球校园合影' : story.memoryLabel;
     const gallery = element('div', '', 'extra-date-memories');
-    for (const src of [story.memory, story.secondaryMemory].filter(Boolean)) {
-      const figure = element('figure'), img = element('img'); img.src = src; img.alt = story.memoryLabel; img.loading = 'lazy'; figure.append(img); gallery.append(figure);
+    for (const src of [finale && story.coupleMemory ? story.coupleMemory : story.memory, story.secondaryMemory].filter(Boolean)) {
+      const figure = element('figure'), img = element('img'); img.src = src; img.alt = memoryLabel; img.loading = 'lazy'; figure.append(img); gallery.append(figure);
     }
-    box.append(gallery, element('p', story.memoryLabel, 'extra-memory-label'));
+    box.append(gallery, element('p', memoryLabel, 'extra-memory-label'));
   }
   function renderDone(box, id, s, node) {
     const result = element('div', '', 'extra-date-result'); result.id = 'extraDateResult';
@@ -341,9 +344,9 @@
       else if (count('other') >= 5) roomEnding = '门开后，我们坐在走廊的长椅上。过了很久，成灿轻轻握住了我的手。';
     }
     result.append(element('h2', stories[id].title), element('p', roomEnding, 'date-detail-copy'));
-    appendMemory(result, stories[id]);
+    appendMemory(result, stories[id], true);
     result.append(element('p', s.reward ? `♡ +${s.reward}% · 这次约会已珍藏` : '♡ 这份回忆已经珍藏，重温不重复增加好感', 'date-reward'));
-    result.append(button('看看他的 Instagram 日记 ↗', '', () => openApp('instagram')));
+    result.append(button('看看他的 Instagram 日记 ↗', '', () => { openApp('instagram'); if (id === 'idol') requestAnimationFrame(() => document.querySelector('[data-authored-post="sungchan-2025-08-17"]')?.scrollIntoView({ block: 'start' })); }));
     result.append(button('重温这次约会', 'extraDateRestart', () => {
       state.sessions[id] = freshSession(); persist(); render();
     }, 'date-inline-link'));
@@ -375,12 +378,12 @@
     if (state.completed.length) feed.querySelector('.ins-empty')?.remove();
     for (const id of [...state.completed].reverse()) {
       const story = stories[id];
-      if (!story) continue;
+      if (!story || id === 'idol') continue;
       const post = element('article', '', 'ins-post extra-date-post'); post.dataset.extraDatePost = id;
       const header = element('div', '', 'ins-post-header'), portrait = element('img');
       portrait.src = getInstagramAvatar(); portrait.alt = '成灿';
       const name = element('div'); name.append(element('b', 'sungchan'), element('small', story.subtitle)); header.append(portrait, name, element('span', '···')); post.append(header);
-      const media = element('div', '', 'ins-photo'); const image = element('img', '', 'ins-post-image'); image.src = story.memory; image.alt = story.memoryLabel; media.append(image); post.append(media);
+      const media = element('div', '', 'ins-photo'); const image = element('img', '', 'ins-post-image'); image.src = story.coupleMemory || story.memory; image.alt = story.coupleMemory ? '我和成灿的足球校园合影' : story.memoryLabel; media.append(image); post.append(media);
       const actions = element('div', '', 'ins-actions');
       const like = button(state.likes.includes(id) ? '♥' : '♡', '', () => {
         state.likes = state.likes.includes(id) ? state.likes.filter(item => item !== id) : [...state.likes, id]; persist();
@@ -399,6 +402,7 @@
       }
       post.append(comments); feed.insertBefore(post, feed.querySelector('.silver-profile-post'));
     }
+    window.MaqueSilverInstagram?.sortFeed(feed);
   }
   function init() {
     if (initialized) return; initialized = true;
@@ -410,5 +414,5 @@
     }
     persist();
   }
-  window.MaqueExtraDates = { init, start, canStart, renderEntryControls, renderInstagram, hasProgress: id => Boolean(state.sessions[id]?.step), isComplete: id => state.completed.includes(id) };
+  window.MaqueExtraDates = { init, start, canStart, renderEntryControls, renderInstagram, hasReachedIdolMemory: () => state.completed.includes('idol') || (state.sessions.idol?.step || 0) >= 5, hasProgress: id => Boolean(state.sessions[id]?.step), isComplete: id => state.completed.includes(id) };
 })();
