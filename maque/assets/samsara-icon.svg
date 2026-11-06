@@ -1,7 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" fill="none">
-  <rect width="96" height="96" rx="24" fill="#08090C"/>
-  <path d="M48 18c-8 0-14 5-14 11 0 8 11 11 14 19 3-8 14-11 14-19 0-6-6-11-14-11Z" stroke="#F5F2F1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M48 78c8 0 14-5 14-11 0-8-11-11-14-19-3 8-14 11-14 19 0 6 6 11 14 11Z" stroke="#F5F2F1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M39 43c-9-4-16 0-16 7 0 5 4 9 10 10m24-7c9 4 16 0 16-7 0-5-4-9-10-10" stroke="#F5F2F1" stroke-width="4" stroke-linecap="round"/>
-  <path d="M48 58 39.7 50c-5.3-5.1 2.6-11.4 8.3-5.7 5.7-5.7 13.6.6 8.3 5.7L48 58Z" fill="#F05B79" stroke="#FFB1BF" stroke-width="1.7" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <defs><linearGradient id="ground" x1="20" y1="0" x2="108" y2="128" gradientUnits="userSpaceOnUse"><stop stop-color="#1B1C21"/><stop offset="1" stop-color="#08090C"/></linearGradient></defs>
+  <rect width="128" height="128" rx="30" fill="url(#ground)"/>
+  <rect x=".75" y=".75" width="126.5" height="126.5" rx="29.25" stroke="white" stroke-opacity=".09" stroke-width="1.5"/>
+  <!-- Infinity outline adapted from Lucide (ISC); see LUCIDE-LICENSE.txt. -->
+  <g transform="translate(13.6 13.6) scale(4.2)">
+    <path d="M6 16c5 0 7-8 12-8a4 4 0 0 1 0 8c-5 0-7-8-12-8a4 4 0 1 0 0 8Z" stroke="#F5F5F7" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <path d="M64 77 52.8 66.4c-8-7.8 3.8-18.2 11.2-9.3 7.4-8.9 19.2 1.5 11.2 9.3L64 77Z" fill="#EF4965" stroke="#101115" stroke-width="5.5" stroke-linejoin="round"/>
 </svg>

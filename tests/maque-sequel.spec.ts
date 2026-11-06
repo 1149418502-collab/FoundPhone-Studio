@@ -16,6 +16,16 @@ const files = new Set([
     "date-idol-background.jpg", "date-idol-reference-1.jpg",
     "date-idol-reference-2.jpg", "dates-icon.svg", "gifts-icon.svg",
     "samsara-icon.svg",
+    "launcher-photos.png",
+    "launcher-kakao.jpg",
+    "launcher-camera.png",
+    "launcher-instagram.png",
+    "launcher-notes.png",
+    "launcher-phone.png",
+    "launcher-settings.png",
+    "launcher-messages.png",
+    "launcher-mail.png",
+
   ].map((name) => "assets/" + name),
 ]);
 

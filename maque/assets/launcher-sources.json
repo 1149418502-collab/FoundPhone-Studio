@@ -1,0 +1,68 @@
+{
+  "note": "Reused unchanged from the existing FoundPhone Studio bundled app icons. Preserve repository license and source notices. Logos and marks belong to their respective owners.",
+  "icons": {
+    "photos": {
+      "file": "launcher-photos.png",
+      "source": "assets/app-icons/photos.png",
+      "sha256": "e9fc87f3c46264481680f4e2fb3e1f94575ed67850c0571426736c490d1aab4f",
+      "copied_unchanged": true
+    },
+    "kakao": {
+      "file": "launcher-kakao.jpg",
+      "source": "assets/app-icons/kakao.jpg",
+      "sha256": "1033985cf59d38412bf2bd653844be8471559fa45af3b9479046b6226b10b322",
+      "copied_unchanged": true
+    },
+    "camera": {
+      "file": "launcher-camera.png",
+      "source": "assets/app-icons/camera.png",
+      "sha256": "7cd8b74e81ab87efc393bcdc321a724d7a031e5c4b0336480d28afd49f04446e",
+      "copied_unchanged": true
+    },
+    "instagram": {
+      "file": "launcher-instagram.png",
+      "source": "assets/app-icons/instagram.png",
+      "sha256": "b97f0c0b70f7866b8c045ee01bd087b63921c021afd87432f0eb723c33f4837c",
+      "copied_unchanged": true
+    },
+    "notes": {
+      "file": "launcher-notes.png",
+      "source": "assets/app-icons/notes.png",
+      "sha256": "5182b74a7547bd43595a4ce8f65363898dfe390578a5f106f3277faa17be8fd1",
+      "copied_unchanged": true
+    },
+    "phone": {
+      "file": "launcher-phone.png",
+      "source": "assets/app-icons/phone.png",
+      "sha256": "0eec9027f6adc0f490b4a291af664b6af9d0a16ef57007ad99ef5de8d2e67ab2",
+      "copied_unchanged": true
+    },
+    "settings": {
+      "file": "launcher-settings.png",
+      "source": "assets/app-icons/settings.png",
+      "sha256": "6be74af5f712ded989c813a7f6ba9c41e49c658f766bfee3318c67f27841afea",
+      "copied_unchanged": true
+    },
+    "messages": {
+      "file": "launcher-messages.png",
+      "source": "assets/app-icons/messages.png",
+      "sha256": "c54e383eead22cc0e1a4697a72ae7243766fdd7bab7eb75622c3a7b6f9e80c94",
+      "copied_unchanged": true
+    },
+    "mail": {
+      "file": "launcher-mail.png",
+      "source": "assets/app-icons/mail.png",
+      "sha256": "5ef4ff0ae4b585ecb8ca6305c604f0c66b9a741dace58d173135cbb6ee5afe27",
+      "copied_unchanged": true
+    }
+  },
+  "custom_symbols": {
+    "samsara_infinity": {
+      "source": "Lucide infinity icon",
+      "url": "https://lucide.dev/icons/infinity",
+      "license": "ISC",
+      "notice": "LUCIDE-LICENSE.txt"
+    },
+    "calendar_and_gift": "Original vector layouts for this game"
+  }
+}

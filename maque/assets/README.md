@@ -36,3 +36,12 @@ The football-campus card temporarily reuses `sungchan-football-childhood.jpg`
 until the author supplies a dedicated background. The three matching SVG
 launcher icons (`samsara-icon.svg`, `gifts-icon.svg`, `dates-icon.svg`) are original
 interface artwork created for this project, not downloaded brand assets.
+
+
+## Launcher correction · 2026.11.05.4
+
+The three custom SVGs use a shared matte-black ground, white symbol and rose accent. Samsara has a horizontal continuous infinity band and a heart; Dates uses a calendar and heart; Gifts uses a wrapped present and a rose ribbon. Their silhouettes differ intentionally.
+
+The nine `launcher-*` app images are reused unchanged from the existing repository `assets/app-icons/` bundle. The source filenames and SHA-256 hashes are recorded in `launcher-sources.json`; existing repository license and attribution notices remain applicable. No new remote image source is used for launcher icons.
+
+The Samsara infinity outline adapts the Lucide infinity symbol under ISC; its complete notice is bundled as `LUCIDE-LICENSE.txt`.

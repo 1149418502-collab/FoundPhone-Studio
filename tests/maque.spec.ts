@@ -29,6 +29,16 @@ const localAssets = new Set([
   "dates-icon.svg",
   "gifts-icon.svg",
   "samsara-icon.svg",
+  "launcher-photos.png",
+  "launcher-kakao.jpg",
+  "launcher-camera.png",
+  "launcher-instagram.png",
+  "launcher-notes.png",
+  "launcher-phone.png",
+  "launcher-settings.png",
+  "launcher-messages.png",
+  "launcher-mail.png",
+
 ]);
 const special = "「真心」";
 const gifts = [
@@ -572,7 +582,9 @@ test("dating unlocks at 5%, keeps the current chat and focus, and uses 1.5 secon
 test("Samsara, dates and gifts load the matching local SVG launcher icons", async ({
   page,
 }) => {
-  await open(page, 5);
+  await page.setViewportSize({width:390,height:844});
+  await page.addInitScript(() => { localStorage.setItem("maque_installed", "yes"); localStorage.setItem("maque_registered", "yes"); });
+  await open(page, 85);
   for (const [app, asset] of [
     ["samsaraApp", "samsara-icon.svg"],
     ["dateApp", "dates-icon.svg"],
@@ -580,7 +592,7 @@ test("Samsara, dates and gifts load the matching local SVG launcher icons", asyn
   ]) {
     const icon = page.locator("#" + app + " img");
     await expect(icon).toHaveCount(1);
-    await expect(icon).toHaveAttribute("src", "./assets/" + asset);
+    await expect(icon).toHaveAttribute("src", "./assets/" + asset + "?v=2026.11.05.4");
     await expect
       .poll(() =>
         icon.evaluate(
@@ -590,6 +602,12 @@ test("Samsara, dates and gifts load the matching local SVG launcher icons", asyn
       )
       .toBe(true);
   }
+  const nativeIcons=page.locator("#home .native-app-icon img");
+  await expect(nativeIcons).toHaveCount(9);
+  for(const icon of await nativeIcons.all()) await expect.poll(() => icon.evaluate((img:HTMLImageElement) => img.complete && img.naturalWidth>0)).toBe(true);
+  await expect(page.locator("#samsaraApp")).toBeVisible();
+  await expect(page.locator("#featureNotice")).toBeHidden({timeout:6000});
+  await page.locator("#home").screenshot({path:"outputs/maque/launcher-icons-revised.png"});
 });
 
 test("dating threshold guards direct access and four mobile scene cards have introductions", async ({

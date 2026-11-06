@@ -119,11 +119,14 @@
     view('phoneSettings');
   }
   const app = button(document.querySelector('#home .grid'), '', openNotes, 'app'); app.id = 'phoneNotesApp';
-  el('span', '≡', 'appico phone-notes-icon', app); el('span', '备忘录', '', app);
+  const notesIcon = el('span', null, 'appico native-app-icon', app);
+  const notesImage = el('img', null, '', notesIcon); notesImage.src = './assets/launcher-notes.png?v=2026.11.05.4'; notesImage.alt = ''; notesImage.setAttribute('aria-hidden', 'true');
+  el('span', '备忘录', '', app);
   const oldSettings = document.querySelector('#home .dock [title="设置"]');
   if (oldSettings) {
     const control = document.createElement('button'); control.type = 'button'; control.className = oldSettings.className;
-    control.style.cssText = oldSettings.style.cssText; control.textContent = oldSettings.textContent;
+    control.style.cssText = oldSettings.style.cssText;
+    for (const child of oldSettings.childNodes) control.append(child.cloneNode(true));
     control.setAttribute('aria-label', '打开手机设置'); control.onclick = openSettings; oldSettings.replaceWith(control);
   }
   applyAppearance();
