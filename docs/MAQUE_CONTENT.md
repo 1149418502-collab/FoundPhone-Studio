@@ -3,6 +3,27 @@
 The independent game is `maque/index.html`; its date and gift content is separate
 from the general FoundPhone runtime and `stories/template/story.json`.
 
+## Eunseok Instagram history · 2026.11.06.2
+
+The author supplied `银硕ins.zip` and five exact captions. Seven original JPEGs
+are bundled unchanged, with source filenames, dimensions and SHA-256 hashes in
+`maque/assets/media-sources.json`. `silver-instagram-story.js` holds the authored
+caption/photo/date mapping, independently of gameplay and save data.
+
+Five posts are available before any date is opened. Their publication sequence is
+2024-05-10, 2024-06-21, 2024-09-03, 2024-09-18, 2024-09-21; the feed displays newest
+first. June 21 and September 18 each contain a two-photo carousel. The explicitly
+labelled September 18 second image remains second. Caption spelling, punctuation,
+emoji and the mixed Korean/Chinese text are retained verbatim. Displayed dates are
+publication dates, not inferred photograph capture dates.
+
+The two invented baseball-history placeholders are replaced. Newly created date,
+archive and correspondence posts remain above the historical posts, including
+after interacting with them. Carousels support arrows, keyboard and horizontal
+swipes; like, bookmark and slide position are saved under
+`maque_silver_instagram_v1`. These interactions do not award affection or change
+date progress. The author-provided identity album remains separate and unchanged.
+
 ## Nine Room progression and archive design · 2026.11.06.1
 
 - The room introduction offers an explicit start from day one and, when present,

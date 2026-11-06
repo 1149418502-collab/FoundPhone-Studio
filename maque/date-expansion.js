@@ -397,7 +397,7 @@
         const comment = button('回复：下次也一起吧', '', () => { state.comments[id] = '下次也一起吧。'; persist(); renderInstagram(); }, 'date-inline-link');
         comment.setAttribute('aria-label', '回复这条约会日记'); comments.append(comment);
       }
-      post.append(comments); feed.append(post);
+      post.append(comments); feed.insertBefore(post, feed.querySelector('.silver-profile-post'));
     }
   }
   function init() {

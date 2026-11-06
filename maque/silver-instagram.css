@@ -1,0 +1,19 @@
+.silver-profile-post .silver-carousel{aspect-ratio:3/4;background:#fafafa;touch-action:pan-y pinch-zoom}
+.silver-profile-post .ins-post-image{position:absolute;inset:0;height:100%;width:100%;object-fit:contain;background:#fafafa}
+.silver-profile-post .ins-caption{padding-bottom:16px}
+.silver-profile-post .silver-post-caption{white-space:pre-wrap;overflow-wrap:anywhere;color:#292929;font-size:13px;font-weight:400;line-height:1.8}
+.silver-post-date{display:block;margin-top:11px;font-size:10px;line-height:1.5;color:#8b8b8b}
+.silver-photo-counter{position:absolute;z-index:1;top:14px;right:14px;padding:5px 9px;border-radius:20px;background:#151515a6;color:white;font:10px/1.2 system-ui,sans-serif}
+.silver-profile-post .silver-photo-previous,.silver-profile-post .silver-photo-next{position:absolute;z-index:1;top:calc(50% - 24px);display:grid;place-items:center;width:44px;height:48px;border:0;border-radius:50%;background:transparent;color:white;font:30px/1 Georgia,serif;cursor:pointer;text-shadow:0 1px 5px #222a;touch-action:manipulation}
+.silver-photo-previous{left:5px}.silver-photo-next{right:5px}
+.silver-photo-dots{position:absolute;bottom:13px;left:0;right:0;display:flex;justify-content:center;gap:5px;pointer-events:none}
+.silver-photo-dots>span{width:5px;height:5px;border-radius:50%;background:#bbb;box-shadow:0 0 2px #fff}
+.silver-photo-dots>span.is-current{background:#3897f0}
+.silver-profile-post .ins-actions{justify-content:flex-start;align-items:center}
+.silver-profile-post .silver-like{min-width:34px;min-height:38px;padding:0!important}
+.silver-profile-post .silver-like[aria-pressed=true]{color:#ed4956}
+.silver-profile-post .ins-actions svg{display:block;width:24px;height:24px}
+.silver-profile-post .silver-like[aria-pressed=true] svg{fill:#ed4956}
+.silver-profile-post .silver-save[aria-pressed=true] svg{fill:#222}
+.silver-profile-post .silver-save{margin-left:auto;min-width:34px;min-height:38px;padding:0!important;font-size:23px}
+.silver-profile-post button:focus-visible,.silver-carousel:focus-visible{outline:2px solid #3897f0;outline-offset:-3px}

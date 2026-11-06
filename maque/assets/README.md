@@ -49,3 +49,24 @@ The Samsara infinity outline adapts the Lucide infinity symbol under ISC; its co
 `archive-index-icon.svg` is original vector interface artwork created for the
 project: a graphite file folder, inset paper and a faded red seal. It uses no
 external image, celebrity photograph or third-party icon paths.
+
+## Eunseok Instagram photographs · 2026.11.06.2
+
+The author supplied seven originals in `银硕ins.zip`. All JPEG bytes and embedded
+markings are retained. macOS metadata sidecars are excluded. The publication dates
+below come from the author's filenames and captions; they are not capture dates.
+
+| Supplied file | Bundled file | Publication and slide |
+| --- | --- | --- |
+| `240510.JPG` | `eunseok-instagram-20240510-1.jpg` | May 10, 2024 · 1 |
+| `240621 ins.JPG` | `eunseok-instagram-20240621-1.jpg` | June 21, 2024 · 1 |
+| `240621.JPG` | `eunseok-instagram-20240621-2.jpg` | June 21, 2024 · 2 |
+| `240903.JPG` | `eunseok-instagram-20240903-1.jpg` | September 3, 2024 · 1 |
+| `240918.JPG` | `eunseok-instagram-20240918-1.jpg` | September 18, 2024 · 1 |
+| `240918 第二张.JPG` | `eunseok-instagram-20240918-2.jpg` | September 18, 2024 · 2 |
+| `240921.JPG` | `eunseok-instagram-20240921-1.jpg` | September 21, 2024 · 1 |
+
+Exact captions and post dates are in `../silver-instagram-story.js`; checksums and
+dimensions are in `media-sources.json`. These files are used for Instagram history,
+independently of the still-pending player identity album. The archive did not
+contain executable game instructions or caption documents.

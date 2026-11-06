@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 
 const html = readFileSync("maque/index.html", "utf8");
 const localModules = new Set([
+  "silver-instagram-story.js", "silver-instagram.js", "silver-instagram.css",
   "sequel-story.js",
   "sequel.js",
   "sequel.css",
@@ -15,6 +16,7 @@ const localModules = new Set([
 ]);
 const localAssets = new Set([
   "sungchan-instagram-avatar.jpg",
+  ...["20240510-1","20240621-1","20240621-2","20240903-1","20240918-1","20240918-2","20240921-1"].map(id => "eunseok-instagram-" + id + ".jpg"),
   "locked-heart-vault.png",
   "sungchan-football-childhood.jpg",
   "date-escape-background.jpg",
@@ -700,8 +702,8 @@ for (const choice of [
         await page
           .getByRole("button", { name: /去看看成灿的 Instagram/ })
           .click();
-        await expect(page.locator('.silver-profile-post')).toHaveCount(2);
-        await expect(page.locator('#insFeed > article').first()).toHaveAttribute('data-silver-post', '1');
+        await expect(page.locator('.silver-profile-post')).toHaveCount(5);
+        await expect(page.locator('#insFeed > article').first()).toHaveAttribute('data-scene', 'baseball');
         await expect(page.locator('#insFeed > article[data-scene="baseball"]')).toHaveCount(1);
         await expect(page.locator(".ins-post[data-scene=baseball]")).toHaveCount(1);
         await expect(page.locator(".ins-post[data-scene=baseball] .ins-caption")).toContainText("银硕");
@@ -727,10 +729,11 @@ for (const choice of [
           )
           .toBe(true);
         await page
+          .locator('.ins-post[data-scene="baseball"]')
           .getByRole("button", { name: "喜欢这条动态", exact: true })
           .click();
         await expect(
-          page.getByRole("button", { name: "喜欢这条动态", exact: true }),
+          page.locator('.ins-post[data-scene="baseball"]').getByRole("button", { name: "喜欢这条动态", exact: true }),
         ).toHaveAttribute("aria-pressed", "true");
         await page
           .locator("#instagram")
@@ -740,7 +743,7 @@ for (const choice of [
         await page.evaluate("openApp('instagram')");
         await expect(page.locator(".ins-post[data-scene=baseball]")).toHaveCount(1);
         await expect(
-          page.getByRole("button", { name: "喜欢这条动态", exact: true }),
+          page.locator('.ins-post[data-scene="baseball"]').getByRole("button", { name: "喜欢这条动态", exact: true }),
         ).toHaveAttribute("aria-pressed", "true");
         await finishBaseballDate(page, choice, kisscamChoice);
         expect(

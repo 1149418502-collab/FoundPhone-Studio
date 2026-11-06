@@ -216,7 +216,7 @@
     const ring = node('div', null, 'ins-ring', storyButton); const portrait = node('img', null, '', ring); portrait.src = getInstagramAvatar(); portrait.alt = '';
     node('span', '只给你看', '', storyButton); storyButton.setAttribute('aria-label', '查看成灿的私密快拍');
     for (const chapter of [...chapters].reverse()) {
-      const progress = state.chapters[chapter.id], post = node('article', null, 'ins-post sequel-instagram-post', feed); post.dataset.sequelPost = chapter.id;
+      const progress = state.chapters[chapter.id], post = node('article', null, 'ins-post sequel-instagram-post'); feed.insertBefore(post, feed.querySelector('.silver-profile-post')); post.dataset.sequelPost = chapter.id;
       const head = node('div', null, 'ins-post-header', post); const avatar = node('img', null, '', head); avatar.src = getInstagramAvatar(); avatar.alt = '成灿';
       const author = node('div', null, '', head); node('b', 'sungchan', '', author); node('small', '密友 · 仅与你分享', '', author);
       const photo = node('img', null, 'sequel-ins-photo', post); photo.src = chapter.instagram.image; photo.alt = chapter.title + ' · 回忆照片'; photo.loading = 'lazy';

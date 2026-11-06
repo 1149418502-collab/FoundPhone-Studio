@@ -266,7 +266,7 @@
       const like = button(actions, progress.liked ? '♥' : '♡', () => { progress.liked = !progress.liked; save(); like.textContent = progress.liked ? '♥' : '♡'; like.setAttribute('aria-pressed', String(progress.liked)); }, '');
       like.setAttribute('aria-label', '喜欢这条日常快拍'); like.setAttribute('aria-pressed', String(progress.liked));
       button(actions, '打开完整快拍', () => openEvidence(episode.id), 'cw-inline');
-      if (progress.closed) feed.append(post); else feed.prepend(post);
+      if (progress.closed) feed.insertBefore(post, feed.querySelector('.silver-profile-post')); else feed.prepend(post);
     }
   }
   const entry = button(document.querySelector('#kakao .compose'), '', openHub, 'cw-entry'); entry.id = 'correspondenceEntry';

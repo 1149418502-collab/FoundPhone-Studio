@@ -3,13 +3,15 @@ import { readFileSync } from "node:fs";
 
 const html = readFileSync("maque/index.html", "utf8");
 const files = new Set([
+  "silver-instagram-story.js", "silver-instagram.js", "silver-instagram.css",
   "sequel-story.js", "sequel.js", "sequel.css",
   "date-expansion.js", "date-expansion.css",
   "correspondence-story.js", "correspondence.js", "correspondence.css",
   "phone-extras.js", "phone-extras.css",
   "memory-vault.js", "memory-vault.css",
   ...[
-    "sungchan-instagram-avatar.jpg", "sungchan-football-childhood.jpg",
+    "sungchan-instagram-avatar.jpg",
+    ...["20240510-1","20240621-1","20240621-2","20240903-1","20240918-1","20240918-2","20240921-1"].map(id => "eunseok-instagram-" + id + ".jpg"), "sungchan-football-childhood.jpg",
     "date-escape-background.jpg", "date-escape-eunseok-reference.jpg",
     "date-escape-sungchan-reference.jpg", "date-baseball-background.jpg",
     "date-baseball-couple-1.jpg", "date-baseball-couple-2.jpg",

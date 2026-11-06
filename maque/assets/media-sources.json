@@ -117,6 +117,97 @@
         2048
       ],
       "sha256": "cb14e9d03a1cd8f565d3c94bdc94f87351303f7e2359a001caa15ca8e46c8a49"
+    },
+    {
+      "file": "eunseok-instagram-20240510-1.jpg",
+      "reference": "240510.JPG",
+      "source": "Author-uploaded 银硕ins.zip",
+      "role": "Eunseok Instagram post photo",
+      "publishedOn": "2024-05-10",
+      "slide": 1,
+      "dimensions": [
+        1290,
+        2275
+      ],
+      "sha256": "77f4a2ea545f75aa2d5fe62623d8ab855dfe0ffb7dc09edbdc122d9754a3e5d2"
+    },
+    {
+      "file": "eunseok-instagram-20240621-1.jpg",
+      "reference": "240621 ins.JPG",
+      "source": "Author-uploaded 银硕ins.zip",
+      "role": "Eunseok Instagram post photo",
+      "publishedOn": "2024-06-21",
+      "slide": 1,
+      "dimensions": [
+        3024,
+        4032
+      ],
+      "sha256": "3986d796dff37b66b70a5758219df8f463886ee1e323dd99dae30264ea221089"
+    },
+    {
+      "file": "eunseok-instagram-20240621-2.jpg",
+      "reference": "240621.JPG",
+      "source": "Author-uploaded 银硕ins.zip",
+      "role": "Eunseok Instagram post photo",
+      "publishedOn": "2024-06-21",
+      "slide": 2,
+      "dimensions": [
+        3024,
+        4032
+      ],
+      "sha256": "41c9daa5784aff529a01791da4f239d865e8fc8cfb447526963e8c548e73fb94"
+    },
+    {
+      "file": "eunseok-instagram-20240921-1.jpg",
+      "reference": "240921.JPG",
+      "source": "Author-uploaded 银硕ins.zip",
+      "role": "Eunseok Instagram post photo",
+      "publishedOn": "2024-09-21",
+      "slide": 1,
+      "dimensions": [
+        1170,
+        2084
+      ],
+      "sha256": "182775643d7e9947e37636e483f7e173f95dcd0e94c060f7f0aed0fb54f5dfe5"
+    },
+    {
+      "file": "eunseok-instagram-20240903-1.jpg",
+      "reference": "240903.JPG",
+      "source": "Author-uploaded 银硕ins.zip",
+      "role": "Eunseok Instagram post photo",
+      "publishedOn": "2024-09-03",
+      "slide": 1,
+      "dimensions": [
+        1920,
+        2560
+      ],
+      "sha256": "079e5ac06cb17220abf288da0bf6f4da5d41bc602cadc6f8746d1d2a2f97fe16"
+    },
+    {
+      "file": "eunseok-instagram-20240918-2.jpg",
+      "reference": "240918 第二张.JPG",
+      "source": "Author-uploaded 银硕ins.zip",
+      "role": "Eunseok Instagram post photo",
+      "publishedOn": "2024-09-18",
+      "slide": 2,
+      "dimensions": [
+        1080,
+        1440
+      ],
+      "sha256": "323eea788d4a2dae9799dcdca250130171ebf2444e37dcbc65a377ac8e459ee3"
+    },
+    {
+      "file": "eunseok-instagram-20240918-1.jpg",
+      "reference": "240918.JPG",
+      "source": "Author-uploaded 银硕ins.zip",
+      "role": "Eunseok Instagram post photo",
+      "publishedOn": "2024-09-18",
+      "slide": 1,
+      "dimensions": [
+        851,
+        1135
+      ],
+      "sha256": "de46d9177d0136938cee37a711d323a8f8138daaeeeae8e8c1846e335238767f"
     }
   ]
 }
