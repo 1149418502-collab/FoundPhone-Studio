@@ -45,6 +45,7 @@
     el.type = 'button'; if (id) el.id = id; el.onclick = onClick; return el;
   }
   function chapterById(id) { return story.chapters.find(chapter => chapter.id === id); }
+  function archiveIconURL() { return './assets/archive-index-icon.svg?v=' + encodeURIComponent(document.querySelector('meta[name="maque-build"]')?.content || '1'); }
   function accessible(chapter) {
     const index = chapterIds.indexOf(chapter.id);
     return affection >= chapter.threshold && (index === 0 || state.chapters[chapterIds[index - 1]].solved);
@@ -65,7 +66,6 @@
     document.getElementById('archives')?.classList.toggle('room-nine-read', state.dates.includes('escape'));
     document.getElementById('sequelChatEntry').hidden = !available;
     document.getElementById('archiveTeaser').hidden = !available;
-    document.getElementById('archiveTeaser').textContent = available ? 'RECOVERY INDEX · 01 ↗' : '';
     const eligible = story.chapters.filter(accessible).at(-1);
     if (eligible && eligible.threshold > state.announced) {
       state.announced = eligible.threshold; save();
@@ -80,14 +80,33 @@
     renderArchives(); view('archives');
   }
   function renderArchives() {
-    const screen = document.getElementById('archives'); screen.replaceChildren();
+    const screen = document.getElementById('archives'); screen.replaceChildren(); screen.classList.add('archive-reading');
     header(screen, '档案', 'SAMSARA / 01' , () => { if (currentArchive) { currentArchive = null; renderArchives(); } else view('home'); });
-    const content = node('div', null, 'archive-content', screen);
+    const content = node('div', null, 'archive-content' + (currentArchive ? ' archive-dossier' : ' archive-index'), screen);
     if (currentArchive) { renderDossier(content, chapterById(currentArchive)); return; }
-    node('p', 'RECOVERY INDEX / 01', 'sequel-eyebrow', content);
-    node('p', story.notice || '', 'archive-fiction-note', content);
-    node('h1', '我遗忘的，\n仍然在这里。', 'archive-title', content);
-    node('p', '只读副本。\n访问记录将被保留。', 'sequel-description', content);
+    const cover = node('section', null, 'archive-index-cover', content);
+    const top = node('div', null, 'archive-cover-top', cover);
+    node('span', 'PRIVATE ARCHIVE / 01', '', top);
+    node('span', '只读', 'archive-readonly-seal', top);
+    node('h1', '未寄出的\n记录', 'archive-title', cover);
+    node('p', '归档副本。访问记录将被保留。', 'archive-cover-note', cover);
+    const coverIcon = node('img', null, 'archive-cover-icon', cover); coverIcon.src = archiveIconURL(); coverIcon.alt = '';
+    const catalogue = node('div', null, 'archive-catalogue-heading', content);
+    node('h2', '归档目录', '', catalogue);
+    node('span', String(story.chapters.length).padStart(2, '0') + ' FILES', '', catalogue);
+    for (const [index, chapter] of story.chapters.entries()) {
+      const progress = state.chapters[chapter.id], canOpen = accessible(chapter);
+      const card = button(content, '', () => { currentArchive = chapter.id; state.activeChapter = chapter.id; save(); renderArchives(); }, 'archive-folder');
+      card.dataset.chapter = chapter.id; card.disabled = !canOpen;
+      card.setAttribute('aria-label', '打开档案：' + chapter.title);
+      card.dataset.fileState = progress.solved ? 'restored' : canOpen ? 'available' : 'locked';
+      node('span', String(index + 1).padStart(2, '0'), 'archive-file-number', card);
+      const body = node('span', null, 'archive-file-body', card);
+      node('span', progress.solved ? '已复原' : canOpen ? '待核对' : '尚未送达', 'archive-file-status', body);
+      node('strong', chapter.title.split(' · ').at(-1), '', body);
+      node('small', canOpen ? chapter.subtitle : affection < chapter.threshold ? `好感度 ${chapter.threshold}% · 继续约会或赠礼` : '先复原上一份记录', '', body);
+      node('span', canOpen ? '↗' : '—', 'archive-file-arrow', card).setAttribute('aria-hidden', 'true');
+    }
     if (state.dates.includes('escape') && state.chapters.second.solved) {
       const journal = node('section', null, 'archive-journal', content);
       node('small', 'PRIVATE JOURNAL', 'archive-journal-label', journal);
@@ -99,14 +118,6 @@
         node('summary', `DAY ${entry.day} / ${entry.title}`, '', item);
         node('p', entry.text, '', item);
       }
-    }
-    for (const [index, chapter] of story.chapters.entries()) {
-      const progress = state.chapters[chapter.id], canOpen = accessible(chapter);
-      const card = button(content, '', () => { currentArchive = chapter.id; state.activeChapter = chapter.id; save(); renderArchives(); }, 'archive-folder');
-      card.dataset.chapter = chapter.id; card.disabled = !canOpen;
-      node('span', `0${index + 1} / ${progress.solved ? '已复原' : canOpen ? '待核对' : '尚未送达'}`, 'sequel-eyebrow', card);
-      node('strong', chapter.title, '', card);
-      node('small', canOpen ? chapter.subtitle : affection < chapter.threshold ? `好感度 ${chapter.threshold}% · 继续约会或赠礼` : '先复原上一份记录', '', card);
     }
     if (allSolved()) button(content, '去听听他的回答', renderFinalChoice, 'sequel-button', 'sequelFinale');
     if (state.endings.length) {
@@ -257,7 +268,7 @@
   }
   function showClosingLetter(endingId) {
     const letter = story.closingLetter;
-    const screen = document.getElementById('archives'); screen.replaceChildren(); currentArchive = null;
+    const screen = document.getElementById('archives'); screen.replaceChildren(); screen.classList.remove('archive-reading'); currentArchive = null;
     const shell = node('div', null, 'sequel-ending sequel-epilogue', screen);
     header(shell, 'Samsara', '最后一封信', () => renderEnding(endingId, false, true));
     const content = node('div', null, 'sequel-ending-content epilogue-content', shell);
@@ -292,7 +303,7 @@
     if (!endingIds.includes(id) || (record && !allSolved() && !vaultOverride)) return;
     if (record && !state.endings.includes(id)) state.endings.push(id);
     state.currentEnding = id; save();
-    const ending = story.endings[id], screen = document.getElementById('archives'); screen.replaceChildren();
+    const ending = story.endings[id], screen = document.getElementById('archives'); screen.replaceChildren(); screen.classList.remove('archive-reading');
     const shell = node('div', null, 'sequel-ending ending-' + id, screen);
     header(shell, 'Samsara', '我们抵达的地方', () => showClosingLetter(id));
     const content = node('div', null, 'sequel-ending-content', shell);
@@ -315,9 +326,14 @@
       screen.setAttribute('aria-label', id === 'archives' ? '秘密档案' : 'KakaoTalk 主线对话');
     }
     const app = button(document.querySelector('#home .grid'), '', () => openArchives(), 'app', 'archiveApp');
-    const icon = node('span', '01', 'appico sequel-app-icon', app); icon.setAttribute('aria-hidden', 'true'); node('span', '索引', '', app);
+    app.classList.add('archive-app');
+    const icon = node('span', null, 'appico sequel-app-icon', app); icon.setAttribute('aria-hidden', 'true');
+    const image = node('img', null, '', icon); image.src = archiveIconURL(); image.alt = ''; node('span', '索引', '', app);
     button(document.querySelector('#kakao .nav'), '私密对话', () => openChat(), 'sequel-chat-entry', 'sequelChatEntry');
-    button(document.getElementById('info'), '', () => openArchives(), 'sequel-secondary', 'archiveTeaser');
+    const teaser = button(document.getElementById('info'), '', () => openArchives(), 'sequel-secondary archive-teaser', 'archiveTeaser');
+    const thumbnail = node('img', null, '', teaser); thumbnail.src = archiveIconURL(); thumbnail.alt = '';
+    const copy = node('span', null, '', teaser); node('b', 'RECOVERY INDEX · 01', '', copy); node('small', '归档记录', '', copy);
+    node('span', '↗', 'archive-teaser-arrow', teaser).setAttribute('aria-hidden', 'true');
     initialized = true; sync();
     if (document.getElementById('instagram').classList.contains('active')) renderInstagram();
   }

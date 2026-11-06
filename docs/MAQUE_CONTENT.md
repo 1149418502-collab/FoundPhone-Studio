@@ -3,6 +3,25 @@
 The independent game is `maque/index.html`; its date and gift content is separate
 from the general FoundPhone runtime and `stories/template/story.json`.
 
+## Nine Room progression and archive design · 2026.11.06.1
+
+- The room introduction offers an explicit start from day one and, when present,
+  a separate continuation labelled with the saved day. Existing date completions,
+  affection, gifts, likes and comments survive restarting the room. A saved day
+  cursor is reconciled with contiguous recorded decisions; an unsupported cursor
+  cannot jump to day five. Stale intro, choice and continue controls cannot act on
+  another day.
+- On days 2, 3, 5, 6 and 7 (haircut, slap, blood draw, wound and nail), attempting
+  the self option removes it without recording a choice or advancing. Only the
+  Sungchan option can commit those days. Day 8 (ear piercing) permits the self
+  choice. Non-injury days 1, 4 and 9 retain both choices. Each day's memory option
+  still grays out on its first attempt. Both rejected states survive reloading,
+  and reset independently on advancing to the next day.
+- The archive has a small original graphite folder icon, an embossed document
+  cover, numbered file rows, restrained status labels and matching document pages.
+  The archive remains hidden below 60%; its story, puzzles, journal gate and ending
+  IDs are unchanged. Author-supplied photographs are retained untouched.
+
 ## Player knowledge correction · 2026.11.05.5
 
 Nine Room shows only the current date: its introduction, nine daily tasks, three

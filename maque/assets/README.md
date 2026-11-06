@@ -45,3 +45,7 @@ The three custom SVGs use a shared matte-black ground, white symbol and rose acc
 The nine `launcher-*` app images are reused unchanged from the existing repository `assets/app-icons/` bundle. The source filenames and SHA-256 hashes are recorded in `launcher-sources.json`; existing repository license and attribution notices remain applicable. No new remote image source is used for launcher icons.
 
 The Samsara infinity outline adapts the Lucide infinity symbol under ISC; its complete notice is bundled as `LUCIDE-LICENSE.txt`.
+
+`archive-index-icon.svg` is original vector interface artwork created for the
+project: a graphite file folder, inset paper and a faded red seal. It uses no
+external image, celebrity photograph or third-party icon paths.

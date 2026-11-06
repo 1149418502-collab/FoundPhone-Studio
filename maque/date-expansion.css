@@ -58,4 +58,7 @@
 #dates button.room-nine-choice.is-locked,#dates button.room-nine-choice:disabled{min-height:80px;background:#d8d1ca;border-color:#c6bdb5;color:#756d67;box-shadow:none;cursor:not-allowed;opacity:1}
 #dates .room-nine-lock-note{margin:14px 0 0;padding:0;color:#9f263d;text-align:center;font:600 16px/1.7 Georgia,'Songti SC',serif}
 #dates .room-nine-result{padding:16px 0;color:#625047;font-size:14px;line-height:1.9}
+#dates .room-nine-entry{display:grid;gap:12px;margin:24px 0 12px}
+#dates .room-nine-entry button{display:flex;justify-content:center;align-items:center;min-height:62px;width:100%;margin:0;text-align:center;font-size:15px}
+#dates .room-nine-saved-day{margin:0 0 2px;padding:13px 15px;border-left:2px solid #b79387;background:#fffaf260;color:#7b655b;font:12px/1.8 ui-monospace,monospace}
 @media(max-width:360px){#dates button.room-nine-choice{padding-inline:13px;font-size:16px}#dates .room-nine-task{font-size:19px}}

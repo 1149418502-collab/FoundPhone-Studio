@@ -15,7 +15,7 @@ const files = new Set([
     "date-baseball-couple-1.jpg", "date-baseball-couple-2.jpg",
     "date-idol-background.jpg", "date-idol-reference-1.jpg",
     "date-idol-reference-2.jpg", "dates-icon.svg", "gifts-icon.svg",
-    "samsara-icon.svg",
+    "samsara-icon.svg", "archive-index-icon.svg",
     "launcher-photos.png",
     "launcher-kakao.jpg",
     "launcher-camera.png",
@@ -84,11 +84,41 @@ async function phoneFits(page: Page, selector: string) {
 test("secret archive is unavailable below 60 percent without disturbing the phone", async ({ page }) => {
   const errors = await open(page, 59);
   await expect(page.locator("#archiveApp")).toBeHidden();
+  await expect(page.locator("#archiveTeaser")).toBeHidden();
   await page.getByRole("button", { name: /KaKaoTalk/ }).click();
   await expect(page.locator("#sequelChatEntry")).toBeHidden();
   await expect(page.locator("#kakao")).toHaveClass(/active/);
   expect(errors).toEqual([]);
 });
+
+for(const width of [320,390]) {
+  test(`archive icon, index and locked records remain readable within a ${width}px phone`,async({page})=>{
+    await page.setViewportSize({width,height:844});
+    const errors=await open(page,60);
+    const icon=page.locator('#archiveApp img');
+    await expect(icon).toHaveAttribute('src',/archive-index-icon\.svg\?v=/);
+    await expect.poll(()=>icon.evaluate((image:HTMLImageElement)=>image.complete&&image.naturalWidth>0)).toBe(true);
+    expect((await icon.boundingBox())!.width).toBeLessThanOrEqual(46);
+    await expect(page.locator('#featureNotice')).toBeHidden({timeout:5000});
+    await page.locator('#home').screenshot({path:`outputs/maque/archive-icon-${width}.png`});
+    await page.locator('#archiveApp').click();
+    await expect(page.locator('.archive-index')).toBeVisible();
+    await expect(page.locator('.archive-index .archive-title')).toContainText('未寄出的');
+    await expect(page.locator('.archive-folder')).toHaveCount(3);
+    await expect(page.locator('[data-chapter="echo"]')).toBeEnabled();
+    await expect(page.locator('[data-chapter="second"]')).toBeDisabled();
+    await expect(page.locator('#archives')).not.toContainText(/一周目|二周目|上一轮|玩家\s*[AB]/);
+    await phoneFits(page,'.archive-index');
+    await page.locator('#archives').evaluate(node=>{node.scrollTop=0});
+    await page.locator('#archives').screenshot({path:`outputs/maque/archive-index-${width}.png`});
+    await page.locator('[data-chapter="echo"]').click();
+    await expect(page.locator('#archiveAnswer')).toHaveAttribute('inputmode','numeric');
+    await phoneFits(page,'.archive-dossier');
+    await page.locator('#archives').evaluate(node=>{node.scrollTop=0});
+    await page.locator('#archives').screenshot({path:`outputs/maque/archive-file-${width}.png`});
+    expect(errors).toEqual([]);
+  });
+}
 
 test("the 60 percent archive unlocks on the phone and 01 is found through KakaoTalk and Instagram", async ({ page }) => {
   const errors = await open(page, 60);

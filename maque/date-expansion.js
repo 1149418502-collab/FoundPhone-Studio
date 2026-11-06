@@ -50,6 +50,30 @@
   };
 
   const emptyState = () => ({ version: 4, sessions: {}, completed: [], likes: [], comments: {} });
+  const freshSession = () => ({ step: 0, choices: {}, rehearsal: [], response: '', roomChoices: [], roomIndex: 0, eraseAttempted: false, selfAttempted: false, roomResponse: '', roomComplete: false, reward: 0 });
+  const restrictedRoomDays = new Set([2, 3, 5, 6, 7]);
+  function restoreRoomProgress(old, saved, version, completed) {
+    const choices = [];
+    if (version >= 2 && Array.isArray(old.roomChoices)) {
+      for (const entry of old.roomChoices.slice(0, 9)) {
+        if (!['self', 'other', 'shared', 'erase'].includes(entry?.id)) break;
+        if (entry.day !== undefined && entry.day !== choices.length + 1) break;
+        choices.push({ id: entry.id, day: choices.length + 1 });
+      }
+    }
+    const rawIndex = Number.isInteger(old.roomIndex) ? Math.max(0, Math.min(8, old.roomIndex)) : 0;
+    const confirmed = choices.length > 0 && (rawIndex === choices.length - 1 || choices.length === 9);
+    saved.roomChoices = choices;
+    saved.roomIndex = Math.min(8, confirmed ? choices.length - 1 : choices.length);
+    saved.roomComplete = old.roomComplete === true && (choices.length === 9 || completed);
+    saved.roomResponse = confirmed && !saved.roomComplete ? '选择已确认。' : '';
+    const sameDay = rawIndex === saved.roomIndex && !saved.roomResponse;
+    saved.eraseAttempted = sameDay && version >= 4 && old.eraseAttempted === true;
+    saved.selfAttempted = sameDay && restrictedRoomDays.has(saved.roomIndex + 1) && old.selfAttempted === true;
+    if (saved.roomComplete) saved.step = 2;
+    if (saved.step === 2 && !saved.roomComplete && !completed) saved.step = choices.length ? 1 : 0;
+    if (saved.step === 0 && choices.length) saved.step = saved.roomComplete ? 2 : 1;
+  }
   function load() {
     try {
       const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
@@ -63,12 +87,10 @@
             choices: old.choices && typeof old.choices === 'object' ? old.choices : {},
             rehearsal: Array.isArray(old.rehearsal) ? old.rehearsal.filter(x => ['breathe', 'raise', 'turn'].includes(x)).slice(0, 3) : [],
             response: typeof old.response === 'string' ? old.response.slice(0, 250) : '',
-            roomChoices: parsed.version >= 2 && id === 'escape' && Array.isArray(old.roomChoices) ? old.roomChoices.slice(0, 9).map((x,index) => ({ id: ['self','other','shared','erase'].includes(x?.id) ? x.id : 'self', day: index + 1 })) : [],
-            roomIndex: parsed.version >= 2 && id === 'escape' ? Math.max(0, Math.min(8, Number(old.roomIndex) || 0)) : 0,
-            eraseAttempted: parsed.version >= 4 && id === 'escape' && old.eraseAttempted === true,
-            roomResponse: parsed.version >= 2 && id === 'escape' && Array.isArray(old.roomChoices) && old.roomChoices.length > Math.max(0, Math.min(8, Number(old.roomIndex) || 0)) ? '选择已确认。' : '', roomComplete: parsed.version >= 2 && id === 'escape' && old.roomComplete === true,
+            roomChoices: [], roomIndex: 0, eraseAttempted: false, selfAttempted: false, roomResponse: '', roomComplete: false,
             reward: Number.isInteger(old.reward) && old.reward >= 0 && old.reward <= (parsed.version >= 4 ? 20 : parsed.version < 3 && id === 'escape' ? 15 : 5) ? old.reward : 0
           };
+          if (id === 'escape') restoreRoomProgress(old, result.sessions[id], parsed.version, Array.isArray(parsed.completed) && parsed.completed.includes(id));
         }
         if (typeof parsed.comments?.[id] === 'string') result.comments[id] = parsed.comments[id].slice(0, 100);
       }
@@ -81,7 +103,7 @@
   let initialized = false;
   function persist() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {} }
   function session(id = activeId) {
-    if (!state.sessions[id]) state.sessions[id] = { step: 0, choices: {}, rehearsal: [], response: '', roomChoices: [], roomIndex: 0, eraseAttempted: false, roomResponse: '', roomComplete: false, reward: 0 };
+    if (!state.sessions[id]) state.sessions[id] = freshSession();
     return state.sessions[id];
   }
   function nodeText(text, s) { return typeof text === 'function' ? text(s) : text || ''; }
@@ -127,7 +149,7 @@
   }
   function render() {
     if (!activeId) return;
-    const id = activeId, story = stories[id], s = session(id), node = story.nodes[s.step];
+    const id = activeId, story = stories[id], s = session(id), step = s.step, node = story.nodes[step];
     const box = document.getElementById('dateDetailContent');
     const scene = dateScenes.find(item => item.id === id);
     box.replaceChildren(); box.className = 'immersive-story extra-date extra-date-' + id;
@@ -152,7 +174,7 @@
       if (node.ko) { const ko = element('p', node.ko, 'date-story-ko'); ko.lang = 'ko'; dialogue.append(ko); }
       dialogue.append(element('p', nodeText(node.text, s), 'date-story-cn'));
       if (node.reply) dialogue.append(element('p', node.reply, 'date-story-cn'));
-      box.append(dialogue, button('继续 →', 'extraDateNext', () => advance(id, s.step)));
+      box.append(dialogue, button('继续 →', 'extraDateNext', () => advance(id, step)));
     } else if (node.type === 'choice') renderChoice(box, id, s, node);
     else if (node.type === 'roomNine') renderRoomNine(box, id, s, node);
     else if (node.type === 'ball') renderBall(box, id, s, node);
@@ -203,16 +225,17 @@
   ];
   function renderRoomNine(box, id, s, node) {
     const round = Math.min(s.roomIndex, 8), day = round + 1;
+    const isDay = () => session(id) === s && isCurrent(id, 1) && s.roomIndex === round;
     box.append(element('p', `第 ${String(day).padStart(2,'0')} / 09 天`, 'room-nine-day'));
     box.append(element('h3', roomTasks[round], 'room-nine-task'));
     if (s.roomResponse) {
       const result = element('div', '', 'room-nine-result');
       result.append(element('p', s.roomResponse));
       const next = button(day === 9 ? '走出房间 →' : '继续下一天 →', 'roomNineContinue', () => {
-        if (!isCurrent(id, s.step) || !s.roomResponse) return;
+        if (!isDay() || !s.roomResponse) return;
         s.roomResponse = '';
         if (s.roomIndex >= 8) { s.roomComplete = true; advance(id, s.step); return; }
-        s.roomIndex += 1; s.eraseAttempted = false; persist(); render();
+        s.roomIndex = s.roomChoices.length; s.eraseAttempted = false; s.selfAttempted = false; persist(); render();
       });
       result.append(next); box.append(result); return;
     }
@@ -223,9 +246,15 @@
       ['erase', '二人都失去一段共同的记忆']
     ];
     for (const [choice, label] of options) {
+      if (choice === 'self' && restrictedRoomDays.has(day) && s.selfAttempted) continue;
       const control = button(label, '', () => {
-        if (!isCurrent(id, s.step) || s.roomResponse) return;
+        if (!isDay() || s.roomResponse || s.roomChoices.length !== round) return;
         if (choice === 'erase') { s.eraseAttempted = true; persist(); render(); return; }
+        if (choice === 'self' && restrictedRoomDays.has(day)) {
+          s.selfAttempted = true; persist(); render();
+          requestAnimationFrame(() => box.querySelector('[data-choice="other"]')?.focus({ preventScroll: true }));
+          return;
+        }
         s.roomChoices.push({ id: choice, day });
         s.roomResponse = '选择已确认。';
         persist(); render();
@@ -316,14 +345,27 @@
     result.append(element('p', s.reward ? `♡ +${s.reward}% · 这次约会已珍藏` : '♡ 这份回忆已经珍藏，重温不重复增加好感', 'date-reward'));
     result.append(button('看看他的 Instagram 日记 ↗', '', () => openApp('instagram')));
     result.append(button('重温这次约会', 'extraDateRestart', () => {
-      state.sessions[id] = { step: 0, choices: {}, rehearsal: [], response: '', roomChoices: [], roomIndex: 0, eraseAttempted: false, roomResponse: '', roomComplete: false, reward: 0 }; persist(); render();
+      state.sessions[id] = freshSession(); persist(); render();
     }, 'date-inline-link'));
     result.append(button('回到约会邀请', '', showDateCatalog, 'date-inline-link')); box.append(result);
   }
   function canStart(id) { return id !== 'escape' || ['baseball','football','idol'].every(key => completedDates.has(key)); }
-  function start(id) {
+  function renderEntryControls(box, id) {
+    if (id !== 'escape') return false;
+    const saved = state.sessions[id];
+    const hasSavedDay = saved && saved.step > 0;
+    const entry = element('div', '', 'room-nine-entry');
+    if (hasSavedDay) {
+      entry.append(element('p', saved.step === 2 ? '九天的记录已珍藏。' : `已保存至第 ${String(saved.roomIndex + 1).padStart(2, '0')} / 09 天${saved.roomResponse ? ' · 选择已确认' : ''}`, 'room-nine-saved-day'));
+    }
+    entry.append(button('从第一天开始', 'roomNineStart', () => start(id, true)));
+    if (hasSavedDay) entry.append(button(saved.step === 2 ? '查看已珍藏的记录' : `继续第 ${String(saved.roomIndex + 1).padStart(2, '0')} 天`, 'roomNineResume', () => start(id), 'date-secondary'));
+    box.append(entry); return true;
+  }
+  function start(id, restart = false) {
     if (!chapterIds.includes(id) || !canStart(id)) return false;
     if (affection < 5 || !hasDatePhoto()) return false;
+    if (restart) state.sessions[id] = freshSession();
     activeId = id; activeDateId = id; dateSession++; session(id); persist(); render(); return true;
   }
   function renderInstagram() {
@@ -368,5 +410,5 @@
     }
     persist();
   }
-  window.MaqueExtraDates = { init, start, canStart, renderInstagram, hasProgress: id => Boolean(state.sessions[id]?.step), isComplete: id => state.completed.includes(id) };
+  window.MaqueExtraDates = { init, start, canStart, renderEntryControls, renderInstagram, hasProgress: id => Boolean(state.sessions[id]?.step), isComplete: id => state.completed.includes(id) };
 })();
