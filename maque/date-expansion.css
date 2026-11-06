@@ -46,3 +46,16 @@
 .extra-date button:focus-visible,.extra-date-post button:focus-visible{outline:2px solid #a46e7c;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.extra-football-ball{transition:none}}
 @media(max-width:350px){.extra-date .extra-date-visual{height:150px}.extra-rehearsal-controls{gap:6px}.extra-date-result h2{font-size:22px}}
+
+/* Room choices must remain full-size before and after the unavailable option is tapped. */
+#dates .extra-date-escape[data-extra-type="roomNine"] .extra-date-visual{height:132px}
+#dates .room-nine-day{margin:20px 0 10px;color:#8b7165;font:12px/1.7 ui-monospace,monospace;letter-spacing:1px}
+#dates .room-nine-task{margin:0 0 24px;color:#362d29;font:600 21px/1.65 Georgia,'Songti SC',serif;overflow-wrap:anywhere}
+#dates .room-nine-options{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;width:100%;margin:0;padding:0}
+#dates button.room-nine-choice{appearance:none;display:flex;align-items:center;justify-content:center;width:100%;min-height:80px;margin:0;padding:19px 17px;border:1px solid #baaa9c;border-radius:14px;background:#fffcf7;color:#3f342e;box-shadow:0 3px 10px #5a3f2d0a;white-space:normal;overflow-wrap:anywhere;text-align:center;font-family:inherit;font-size:16px;font-weight:600;line-height:1.65;cursor:pointer;touch-action:manipulation}
+#dates button.room-nine-choice:focus-visible{outline:2px solid #895f64;outline-offset:3px}
+#dates button.room-nine-choice:active{background:#eee5dc}
+#dates button.room-nine-choice.is-locked,#dates button.room-nine-choice:disabled{min-height:80px;background:#d8d1ca;border-color:#c6bdb5;color:#756d67;box-shadow:none;cursor:not-allowed;opacity:1}
+#dates .room-nine-lock-note{margin:14px 0 0;padding:0;color:#9f263d;text-align:center;font:600 16px/1.7 Georgia,'Songti SC',serif}
+#dates .room-nine-result{padding:16px 0;color:#625047;font-size:14px;line-height:1.9}
+@media(max-width:360px){#dates button.room-nine-choice{padding-inline:13px;font-size:16px}#dates .room-nine-task{font-size:19px}}

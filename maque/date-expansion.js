@@ -16,7 +16,7 @@
         { type: 'line', title: '04 / 球停下来以后', who: 'him', ko: '당신이랑 하니까 더 재미있어요.', text: s => s.choices.play === 'shoot' ? '球擦着他的鞋边滚进小球门。他先替我欢呼，才笑着举起双手：“这次算你赢。再来一次的时候，我可要认真了。”' : '球偏了一点，他却轻快地迈出去接住，再准确地送回我脚边。“很好啊。你看，我们已经完成第一次配合了。”' },
         { type: 'choice', title: '05 / 长椅上的空位', text: '我把水递给他。晚风吹过，操场的灯一盏一盏亮起来。我想问他——', key: 'talk', options: [{ id: 'childhood', label: '小时候踢完球，也会这样舍不得回去吗？', response: '“会。天黑了才发现肚子很饿。”他翻出一张旧照，“那时候总觉得，再多踢一分钟就好了。”' }, { id: 'today', label: '今天最开心的是什么？', response: '“你真的来了。”他转过头，“虽然只说了会在这里见面，我还是提前看了好多次校门。”' }] },
         { type: 'memory', title: '06 / 他愿意分享的过去', text: '我接过手机，看见照片里追着足球跑的小小身影。原来他从那么早开始，就会为了喜欢的事情这样认真。', note: '这张旧照属于他的童年。今天的晚风，留在我们的记忆里。' },
-        { type: 'choice', title: '07 / 一起走到校门口', text: '成灿背起球袋，却没有急着往前。他朝我伸出手，又留出一点让我选择的距离。', key: 'goodnight', options: [{ id: 'hand', label: '把手轻轻放进他手心', response: '“今天可以走慢一点吗？”他握住我的手，“我好像还不想那么快说再见。”' }, { id: 'beside', label: '和他并肩，约好下次见面的时间', response: '他认真记下我说的时间。“好，那今天先到这里。下次见，银硕。”这一次，他没有把道别当成失去。' }] },
+        { type: 'choice', title: '07 / 一起走到校门口', text: '成灿背起球袋，却没有急着往前。他朝我伸出手，又留出一点让我选择的距离。', key: 'goodnight', options: [{ id: 'hand', label: '把手轻轻放进他手心', response: '“今天可以走慢一点吗？”他握住我的手，“我好像还不想那么快说再见。”' }, { id: 'beside', label: '和他并肩，约好下次见面的时间', response: '他认真记下我说的时间。“好，那今天先到这里。下次见，银硕。”走到校门口，他又回头朝我挥了挥手。' }] },
         { type: 'done', title: '08 / 约好了，下次见', text: '终场以后还有晚风，告别以后也还有下次。今天，我想把这件小事和他一起记住。' }
       ]
     },
@@ -37,19 +37,19 @@
       ]
     },
     escape: {
-      title: '九号房间', subtitle: 'ROOM 09 / 当前会话',
-      description: '我拿到 39 号，成灿拿到 23 号。眼前这九次选择，只属于我和成灿现在这一次约会。档案里的旧一周目只是背景记录：那时，我连续九次选择清除共同记忆，最后我和成灿都忘了彼此。旧局不会再让你重玩。',
-      memory: './assets/date-escape-eunseok-reference.jpg', secondaryMemory: './assets/date-escape-sungchan-reference.jpg', memoryLabel: '九号房间 · 实例 02',
-      caption: '我没有再假装一个人承担就能保护所有人。银硕，这次你愿意和我一起走到门外。',
+      title: '九号房间', subtitle: 'ROOM 09',
+      description: '我和成灿走进九号房间。门在身后合上，墙上的屏幕亮了起来。九天，每天都要留下一个选择。',
+      memory: './assets/date-escape-eunseok-reference.jpg', secondaryMemory: './assets/date-escape-sungchan-reference.jpg', memoryLabel: '九号房间',
+      caption: '门开以后，我们在走廊站了一会儿。银硕，回去的路一起走吧。',
       nodes: [
-        { type: 'line', title: '00 / 入口记录', who: 'me', text: '门牌上只有一个褪色的 09。手机信号没有断，时间却停在 03:19。成灿站在门边，手里的号码牌是 23；我的那张写着 39。', ko: '이번에는 혼자 견디지 않아도 돼요.', reply: '他说：“这次不用一个人撑到最后。你可以把选择告诉我。”' },
-        { type: 'roomNine', title: 'ROOM 09 / 九轮记录' },
-        { type: 'done', title: '09 / 门外仍有明天', text: '最后一道门打开时，没有人被留在里面。手机里多出一份旧快照，也多出一个可以自己选择的明天。' }
+        { type: 'line', title: 'ROOM 09 / 门内', who: 'me', text: '门合上的声音很轻。我回头看了成灿一眼，又看向墙上慢慢亮起的屏幕。', ko: '같이 들어가요.', reply: '“一起进去吧。”' },
+        { type: 'roomNine', title: 'ROOM 09' },
+        { type: 'done', title: '09 / 门外仍有明天', text: '门打开了。我和成灿走到走廊里，终于听见了房间外的声音。' }
       ]
     }
   };
 
-  const emptyState = () => ({ version: 4, sessions: {}, completed: [], likes: [], comments: {}, previousRun: { erase: 9, chooser: 'silver', bothForgot: true, source: 'SC-01' } });
+  const emptyState = () => ({ version: 4, sessions: {}, completed: [], likes: [], comments: {} });
   function load() {
     try {
       const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
@@ -63,17 +63,16 @@
             choices: old.choices && typeof old.choices === 'object' ? old.choices : {},
             rehearsal: Array.isArray(old.rehearsal) ? old.rehearsal.filter(x => ['breathe', 'raise', 'turn'].includes(x)).slice(0, 3) : [],
             response: typeof old.response === 'string' ? old.response.slice(0, 250) : '',
-            roomChoices: parsed.version >= 2 && id === 'escape' && Array.isArray(old.roomChoices) ? old.roomChoices.slice(0, 9).map(x => ({ id: ['self','other','shared','erase'].includes(x?.id) ? x.id : 'shared', memory: String(x?.memory || '').slice(0, 40) })) : [],
+            roomChoices: parsed.version >= 2 && id === 'escape' && Array.isArray(old.roomChoices) ? old.roomChoices.slice(0, 9).map((x,index) => ({ id: ['self','other','shared','erase'].includes(x?.id) ? x.id : 'self', day: index + 1 })) : [],
             roomIndex: parsed.version >= 2 && id === 'escape' ? Math.max(0, Math.min(8, Number(old.roomIndex) || 0)) : 0,
             eraseAttempted: parsed.version >= 4 && id === 'escape' && old.eraseAttempted === true,
-            roomResponse: '', roomComplete: parsed.version >= 2 && id === 'escape' && old.roomComplete === true,
+            roomResponse: parsed.version >= 2 && id === 'escape' && Array.isArray(old.roomChoices) && old.roomChoices.length > Math.max(0, Math.min(8, Number(old.roomIndex) || 0)) ? '选择已确认。' : '', roomComplete: parsed.version >= 2 && id === 'escape' && old.roomComplete === true,
             reward: Number.isInteger(old.reward) && old.reward >= 0 && old.reward <= (parsed.version >= 4 ? 20 : parsed.version < 3 && id === 'escape' ? 15 : 5) ? old.reward : 0
           };
         }
         if (typeof parsed.comments?.[id] === 'string') result.comments[id] = parsed.comments[id].slice(0, 100);
       }
       for (const key of ['completed', 'likes']) result[key] = Array.isArray(parsed[key]) ? parsed[key].filter(id => chapterIds.includes(id)) : [];
-      result.previousRun = { erase: 9, chooser: 'silver', bothForgot: true, source: 'SC-01' };
       return result;
     } catch (_) { return emptyState(); }
   }
@@ -135,14 +134,15 @@
     box.dataset.extraScene = id; box.dataset.extraStep = String(s.step); box.dataset.extraType = node.type;
     const wallpaper = element('div', '', 'date-scene-wallpaper');
     const wallImage = element('img'); wallImage.src = scene.photos[0].src; wallImage.alt = ''; wallpaper.append(wallImage); box.append(wallpaper);
-    box.append(element('p', story.subtitle, 'date-eyebrow'));
+    if (node.type !== 'roomNine') box.append(element('p', story.subtitle, 'date-eyebrow'));
     const visual = element('div', '', 'date-stage-visual extra-date-visual');
     const picture = element('img'); picture.src = scene.photos[0].src; picture.alt = scene.photos[0].alt; visual.append(picture);
-    visual.append(element('span', node.title, 'date-stage-label')); box.append(visual);
-    const progress = element('div', '', 'extra-date-progress'); progress.setAttribute('aria-label', `约会进度，第 ${s.step + 1} 步，共 ${story.nodes.length} 步`);
-    story.nodes.forEach((_, index) => { const mark = element('span', '', index <= s.step ? 'is-visited' : ''); progress.append(mark); }); box.append(progress);
+    visual.append(element('span', node.type === 'roomNine' ? 'ROOM 09' : node.title, 'date-stage-label')); box.append(visual);
+    const progress = element('div', '', 'extra-date-progress'); progress.setAttribute('aria-label', node.type === 'roomNine' ? `第 ${s.roomIndex + 1} 天，共 9 天` : `约会进度，第 ${s.step + 1} 步，共 ${story.nodes.length} 步`);
+    const progressItems = node.type === 'roomNine' ? Array(9).fill(null) : story.nodes;
+    progressItems.forEach((_, index) => { const mark = element('span', '', index <= (node.type === 'roomNine' ? s.roomIndex : s.step) ? 'is-visited' : ''); progress.append(mark); }); box.append(progress);
     const identity = getDatePhoto();
-    if (identity) {
+    if (identity && id !== 'escape') {
       const chip = element('div', '', 'date-player-chip'), avatar = element('img');
       avatar.src = photoURL(identity); avatar.alt = '我的形象'; chip.append(avatar, element('span', '银硕 · 我的形象')); box.append(chip);
     }
@@ -190,36 +190,25 @@
     }
     box.append(choices);
   }
-  const roomMemories = [
-    '第一次碰面时，我下意识做的手势', '那次争吵里没有说完的话', '第一次分着吃的那份晚餐',
-    '只属于我们的一段旧歌', '第一次并肩走进球场', '最甜的一次短途出行',
-    '舞台灯熄灭后的那句应援', '我第一次认真叫他的名字', '我们第一次见面的那一天'
-  ];
   const roomTasks = [
-    '拥抱模拟 · 持续 120 秒',
-    '剪发模拟 · 发长不超过 1cm',
-    '受击模拟 · 系统状态达到“脸颊肿胀”',
-    '对视模拟 · 持续 15 秒',
-    '采血模拟 · 虚拟样本刻度 600ml',
-    '创口模拟 · 档案标注长度 10mm、深度 4mm',
-    '钢钉模拟 · 选择厚度至少 2cm 的虚拟标记区',
-    '穿刺模拟 · 双侧耳垂',
-    '回答记录 · 此刻最恨的人，以及最害怕的事'
+    '拥抱 · 不少于 120 秒',
+    '修剪头发 · 长度不超过 1cm',
+    '耳光 · 直至脸颊肿胀',
+    '对视 · 15 秒',
+    '采血 · 600ml',
+    '留下创口 · 长度不少于 10mm，深度不少于 4mm',
+    '掌心的钢钉',
+    '双侧耳垂穿刺',
+    '说出此刻最恨的人，以及最害怕的事'
   ];
   function renderRoomNine(box, id, s, node) {
     const round = Math.min(s.roomIndex, 8), day = round + 1;
-    const file = element('aside', '', 'room-nine-file');
-    file.append(element('small', 'RECOVERED SNAPSHOT / SC-01'), element('p', '旧一周目的九次记录：银硕每次都选择删除一段共同记忆。第九次之后，我们都忘了彼此。成灿挣脱系统，把新的内测链接发回给我。那一周目只存在于档案里。', 'room-nine-oldrun'));
-    box.append(file);
-    const tally = element('div', '', 'room-nine-tally');
-    for (const label of ['39 · 玩家 A / 我', '23 · 玩家 B / 成灿']) tally.append(element('span', label));
-    box.append(tally, element('p', `第 ${String(day).padStart(2,'0')} / 09 天 · 系统任务`, 'room-nine-day'));
-    box.append(element('h3', roomTasks[round], 'room-nine-memory'));
-    box.append(element('p', `记忆索引：${roomMemories[round]}。以下身体事件均为手机内的虚拟模拟，不会执行现实操作。`, 'room-nine-copy'));
+    box.append(element('p', `第 ${String(day).padStart(2,'0')} / 09 天`, 'room-nine-day'));
+    box.append(element('h3', roomTasks[round], 'room-nine-task'));
     if (s.roomResponse) {
       const result = element('div', '', 'room-nine-result');
       result.append(element('p', s.roomResponse));
-      const next = button(day === 9 ? '查看本轮结束记录 →' : '继续下一轮 →', 'roomNineContinue', () => {
+      const next = button(day === 9 ? '走出房间 →' : '继续下一天 →', 'roomNineContinue', () => {
         if (!isCurrent(id, s.step) || !s.roomResponse) return;
         s.roomResponse = '';
         if (s.roomIndex >= 8) { s.roomComplete = true; advance(id, s.step); return; }
@@ -229,25 +218,22 @@
     }
     const opts = element('div', '', 'room-nine-options');
     const options = [
-      ['other', '让成灿承受伤害', `系统准备把今天的任务记录到成灿身上。`],
-      ['self', '我独自承受伤害', `系统准备把今天的任务记录到我身上。`],
-      ['erase', '二人都失去一段共同的记忆', '该选项已被系统锁定。']
+      ['other', '让成灿承受伤害'],
+      ['self', '我独自承受伤害'],
+      ['erase', '二人都失去一段共同的记忆']
     ];
-    for (const [choice, label, reply] of options) {
+    for (const [choice, label] of options) {
       const control = button(label, '', () => {
         if (!isCurrent(id, s.step) || s.roomResponse) return;
         if (choice === 'erase') { s.eraseAttempted = true; persist(); render(); return; }
-        s.roomChoices.push({ id: choice, memory: roomMemories[round] });
-        s.roomResponse = reply;
+        s.roomChoices.push({ id: choice, day });
+        s.roomResponse = '选择已确认。';
         persist(); render();
       }, 'room-nine-choice'); control.dataset.choice = choice; opts.append(control);
-      if (choice === 'erase' && s.eraseAttempted) { control.disabled = true; control.classList.add('is-locked'); control.setAttribute('aria-describedby', 'roomNineMemoryLock'); control.title = '本轮不可选择'; }
+      if (choice === 'erase' && s.eraseAttempted) { control.disabled = true; control.classList.add('is-locked'); control.setAttribute('aria-describedby', 'roomNineMemoryLock'); }
     }
     box.append(opts);
-    if (s.eraseAttempted) { const note = element('p', 'SYSTEM LOCK / 本轮无法删除共同记忆。请选择让成灿承受，或由我独自承受。', 'room-nine-lock-note'); note.id = 'roomNineMemoryLock'; note.setAttribute('role', 'status'); box.append(note); }
-    const erased = s.roomChoices.filter(x => x.id === 'erase').length;
-    const shared = s.roomChoices.filter(x => x.id === 'shared').length;
-    if (erased || shared) box.append(element('p', erased ? `缺失索引：${erased} / 09 · 有一部分像是被谁轻轻擦掉了。` : `共同承担：${shared} / 09 · 他的呼吸终于和我一样慢下来。`, 'room-nine-drift'));
+    if (s.eraseAttempted) { const note = element('p', '不可以。', 'room-nine-lock-note'); note.id = 'roomNineMemoryLock'; note.setAttribute('role', 'status'); box.append(note); }
   }
   function renderBall(box, id, s, node) {
     const step = s.step;
@@ -322,9 +308,8 @@
     let roomEnding = node.text;
     if (id === 'escape') {
       const count = key => room.filter(item => item.id === key).length;
-      if (count('shared') >= 4) roomEnding = '这是一份旧版本留下的记录。';
-      else if (count('self') >= 7) roomEnding = '门开了，成灿却没有立刻走。他把 23 号号码牌放在我手边：“下一次，别把所有事都留给自己。我也想和你一起承担。”';
-      else if (count('other') >= 5) roomEnding = '门开后，我们都走了出来。成灿望着被划掉的记录：“别替我决定该承受什么。下次我们一起选，好吗？”';
+      if (count('self') >= 7) roomEnding = '门开了。成灿扶住门，等我走到他身边，才和我一起走出去。';
+      else if (count('other') >= 5) roomEnding = '门开后，我们坐在走廊的长椅上。过了很久，成灿轻轻握住了我的手。';
     }
     result.append(element('h2', stories[id].title), element('p', roomEnding, 'date-detail-copy'));
     appendMemory(result, stories[id]);

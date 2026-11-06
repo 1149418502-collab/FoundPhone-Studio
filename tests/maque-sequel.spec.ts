@@ -116,3 +116,35 @@ test("the 60 percent archive unlocks on the phone and 01 is found through KakaoT
   await expect(page.locator("#archives")).toContainText("01 号日志");
   expect(errors).toEqual([]);
 });
+
+test("a completed room date reveals no diary until its related archive is actually decrypted",async({page})=>{
+  await page.addInitScript(()=>{
+    localStorage.setItem("maque_sequel_v1",JSON.stringify({version:1,dates:["escape"],chapters:{},endings:[],currentEnding:null}));
+  });
+  const errors=await open(page,80);
+  await page.locator("#archiveApp").click();
+  await expect(page.locator(".archive-journal")).toHaveCount(0);
+  for(const [chapter,answer] of [["echo","01"],["second","02"]]) {
+    await page.locator(`[data-chapter="${chapter}"]`).click();
+    await expect(page.locator("#archives")).not.toContainText(/一周目|二周目|上一轮|实例|第二个成灿/);
+    await page.getByRole("button",{name:/KakaoTalk · 和成灿确认/}).click();
+    for(let i=0;i<11;i++) {
+      await expect(page.locator("#sequelNext")).toBeEnabled();
+      await page.locator("#sequelNext").click();
+    }
+    await page.locator('[data-sequel-choice="trust"]').click();
+    await page.locator("#sequelBackToArchive").click();
+    await page.getByRole("button",{name:/Instagram · 查看他的快拍/}).click();
+    await page.getByRole("button",{name:"关闭快拍"}).click();
+    await page.locator(`[data-sequel-post="${chapter}"]`).getByRole("button",{name:"回到秘密档案"}).click();
+    await page.locator("#archiveAnswer").fill(answer);
+    await page.locator("#archiveSubmit").click();
+    await expect(page.locator(".archive-success")).toBeVisible();
+    await page.locator("#archives .sequel-back").click();
+    await expect(page.locator(".archive-journal-day")).toHaveCount(chapter==="second"?10:0);
+  }
+  await expect(page.locator("#archives")).not.toContainText(/一周目|二周目|上一轮|日记模板|稍后补充|第十天是成灿离开房间后的私人回忆/);
+  await page.locator('[data-room-journal-day="10"] summary').click();
+  await expect(page.locator('[data-room-journal-day="10"]')).toContainText("最后一个字后面");
+  expect(errors).toEqual([]);
+});

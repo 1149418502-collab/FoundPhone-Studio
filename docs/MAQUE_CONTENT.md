@@ -3,6 +3,24 @@
 The independent game is `maque/index.html`; its date and gift content is separate
 from the general FoundPhone runtime and `stories/template/story.json`.
 
+## Player knowledge correction · 2026.11.05.5
+
+Nine Room shows only the current date: its introduction, nine daily tasks, three
+choices, current-day response and exit. No recovered snapshot, prior-playthrough
+summary, A/B identity mapping, unconscious-recognition narration, memory index or
+simulation explanation is shown. Choices are full-width stacked buttons at least
+80px tall with 16px centered text and retain their size when disabled. Each day
+allows one memory-option attempt before it grays out; a confirmed choice survives
+reloading without accepting a duplicate decision. Affection rewards and existing
+saves are preserved.
+
+Social posts, gift confirmations and all three archive chapters no longer explain
+playthrough numbers or character-instance succession. The ten-day private journal
+appears only after both completing the room and decrypting its related file.
+Author-only background and the boundary between it and player knowledge are in
+`docs/SAMSARA_AUTHOR_CANON.md`, outside the deployed game bundle. The following
+entries record historical builds; current behavior follows this correction.
+
 ## Preview 2026.11.02.2
 
 - Ordinary gifts have at least seven bilingual lines. Football and hamburger

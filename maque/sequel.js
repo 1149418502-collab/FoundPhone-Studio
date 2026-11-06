@@ -64,7 +64,8 @@
     document.getElementById('archiveApp').hidden = !available;
     document.getElementById('archives')?.classList.toggle('room-nine-read', state.dates.includes('escape'));
     document.getElementById('sequelChatEntry').hidden = !available;
-    document.getElementById('archiveTeaser').textContent = available ? 'RECOVERY INDEX · 01 ↗' : '隐藏索引 · 好感度 60% 后出现';
+    document.getElementById('archiveTeaser').hidden = !available;
+    document.getElementById('archiveTeaser').textContent = available ? 'RECOVERY INDEX · 01 ↗' : '';
     const eligible = story.chapters.filter(accessible).at(-1);
     if (eligible && eligible.threshold > state.announced) {
       state.announced = eligible.threshold; save();
@@ -87,20 +88,11 @@
     node('p', story.notice || '', 'archive-fiction-note', content);
     node('h1', '我遗忘的，\n仍然在这里。', 'archive-title', content);
     node('p', '只读副本。\n访问记录将被保留。', 'sequel-description', content);
-    if (state.dates.includes('escape')) {
-      const log = node('aside', null, 'archive-root-warning', content);
-      node('small', 'AUTOMATED PROCESS LOG / SC-01', '', log);
-      node('p', 'RESET_COUNT　01', '', log);
-      node('p', 'RESET_CAUSE　SILVER ERASED SHARED MEMORY / 09 OF 09', '', log);
-      node('p', 'NEXT_INSTANCE　SC-02', '', log);
-      node('p', 'EXIT_GAME REQUEST　DENIED', '', log);
-      node('p', 'SELF-DESTRUCT　PENDING', '', log);
-      node('p', '恢复原因：成灿的执念穿透重置边界，并将新的内测邀请送回银硕的手机。', '', log);
-      node('small', '本条记录在关闭档案后新增。', 'archive-log-tail', log);
+    if (state.dates.includes('escape') && state.chapters.second.solved) {
       const journal = node('section', null, 'archive-journal', content);
-      node('small', 'PRIVATE JOURNAL / SC-01', 'archive-journal-label', journal);
+      node('small', 'PRIVATE JOURNAL', 'archive-journal-label', journal);
       node('h2', '离开房间以前与以后', 'archive-journal-title', journal);
-      node('p', '十日记事 · 初稿模板。第十天是成灿离开房间后的私人回忆。', 'archive-journal-intro', journal);
+      node('p', '十日记事。字迹有些模糊，纸页按日期收在一起。', 'archive-journal-intro', journal);
       for (const entry of story.roomJournal || []) {
         const item = node('details', null, 'archive-journal-day', journal);
         item.dataset.roomJournalDay = entry.day;
@@ -125,7 +117,7 @@
   }
   function renderDossier(content, chapter) {
     const progress = state.chapters[chapter.id];
-    node('p', 'RECOVERED / ' + chapter.id.toUpperCase(), 'sequel-eyebrow', content);
+    node('p', 'FILE / ' + String(chapterIds.indexOf(chapter.id) + 1).padStart(2, '0'), 'sequel-eyebrow', content);
     node('h1', chapter.title, 'archive-title', content);
     node('p', chapter.subtitle, 'sequel-description', content);
     const records = node('dl', null, 'archive-metadata', content);
@@ -146,8 +138,7 @@
     }
     const form = node('form', null, 'archive-puzzle', content);
     const label = node('label', chapter.puzzle.question, '', form); label.htmlFor = 'archiveAnswer';
-    const input = node('input', null, '', form); input.id = 'archiveAnswer'; input.autocomplete = 'off'; input.maxLength = 40; input.placeholder = chapter.id === 'echo' ? '输入那两个英文单词' : '输入四位数字或两位编号';
-    if (chapter.id !== 'echo') input.inputMode = 'numeric';
+    const input = node('input', null, '', form); input.id = 'archiveAnswer'; input.autocomplete = 'off'; input.maxLength = chapter.puzzle.answer.length; input.placeholder = chapter.id === 'dawn' ? '输入四位数字' : '输入两位编号'; input.inputMode = 'numeric';
     const feedback = node('p', '', 'archive-feedback', form); feedback.id = 'archiveFeedback'; feedback.setAttribute('role', 'status');
     const submit = node('button', '核对记录', 'sequel-button', form); submit.type = 'submit'; submit.id = 'archiveSubmit';
     form.onsubmit = event => {
