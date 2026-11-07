@@ -103,3 +103,24 @@ fallbacks. These are illustrations of gifts, not authenticated product photos.
 The diary tile uses a heart-shaped padlock; the special heart uses the same
 lighting and backdrop as the other items. No author-supplied photograph was
 edited or used to generate this sheet.
+
+## True-heart ending photographs · 2026.11.07.2
+
+The author supplied seventeen JPEG originals in `20261107-201534.zip`, named
+`IMG_9920.JPG` through `IMG_9936.JPG`. All are used by the true-heart ending.
+Fourteen are bundled as `true-heart-memory-NN.jpg`. Three uploads match existing
+files byte for byte and reuse their original asset paths:
+
+| Supplied file | Reused original |
+| --- | --- |
+| `IMG_9921.JPG` | `date-escape-background.jpg` |
+| `IMG_9922.JPG` | `date-baseball-background.jpg` |
+| `IMG_9924.JPG` | `date-football-background.jpg` |
+
+The full filename-to-asset mapping, dimensions and SHA-256 values are in
+`../true-heart-story.js` and `media-sources.json`. Reused records retain their
+earlier provenance and add the new upload as an additional reference. The eye
+close-up is also framed by the ending's final overlay; no altered bitmap is
+generated. All original markings are retained. The two existing baseball couple
+images remain in the ending, for nineteen distinct images in total. None of the
+new photographs are assigned capture dates or added to the identity album.

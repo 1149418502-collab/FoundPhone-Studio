@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 
 const html = readFileSync("maque/index.html", "utf8");
 const localModules = new Set([
-  "gift-collection.css",
+  "gift-collection.css", "true-heart-ending.css", "true-heart-story.js",
   "silver-instagram-story.js", "silver-instagram.js", "silver-instagram.css",
   "sequel-story.js",
   "sequel.js",
@@ -16,6 +16,7 @@ const localModules = new Set([
 ]);
 const localAssets = new Set([
   "sungchan-instagram-avatar.jpg",
+  ...[1,4,6,7,8,9,10,11,12,13,14,15,16,17].map(index => "true-heart-memory-" + String(index).padStart(2,"0") + ".jpg"),
   "gift-collection.png","date-football-background.jpg","eunseok-instagram-avatar.jpg","eunseok-instagram-20261020-1.jpg","eunseok-instagram-20261006-1.jpg","eunseok-instagram-20261006-2.jpg","eunseok-instagram-20250709-1.jpg","sungchan-instagram-20250817-1.jpg",
   ...["20240510-1","20240621-1","20240621-2","20240903-1","20240918-1","20240918-2","20240921-1"].map(id => "eunseok-instagram-" + id + ".jpg"),
   "locked-heart-vault.png",
@@ -519,7 +520,7 @@ test("special gift needs two warnings, cancellation resets confirmation, and bot
     .getByRole("button", { name: "我当然会全心全意爱你", exact: true })
     .click();
   await expect(page.locator("#loveEnding")).toHaveClass(/show/);
-  await expect(page.locator("#lovePhotoStorm .love-memory-photo")).toHaveCount(28);
+  await expect(page.locator("#lovePhotoStorm .love-memory-photo")).toHaveCount(38);
   await expect(page.locator("#loveEndingRedline")).toContainText("这些你都忘了吗");
   await expect(page.locator("#loveTypingScreen")).toBeVisible({ timeout: 5000 });
   await expect(page.locator("#loveTypedRows .love-typed-row")).toHaveCount(34, { timeout: 6000 });

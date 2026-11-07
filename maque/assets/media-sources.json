@@ -28,7 +28,14 @@
         679,
         453
       ],
-      "sha256": "1d1108ac9e807bd051a2a95a623a626903bcb04d0a1bf164a00a460d987ccc0b"
+      "sha256": "1d1108ac9e807bd051a2a95a623a626903bcb04d0a1bf164a00a460d987ccc0b",
+      "additionalReferences": [
+        {
+          "source": "Author-uploaded 20261107-201534.zip",
+          "reference": "IMG_9921.JPG",
+          "role": "true-heart photo-storm memory"
+        }
+      ]
     },
     {
       "file": "date-baseball-background.jpg",
@@ -39,7 +46,14 @@
         1536,
         2048
       ],
-      "sha256": "5eaf2f698e1e91dbd56465c963f4fafb4609c644db732d673c707513c7720337"
+      "sha256": "5eaf2f698e1e91dbd56465c963f4fafb4609c644db732d673c707513c7720337",
+      "additionalReferences": [
+        {
+          "source": "Author-uploaded 20261107-201534.zip",
+          "reference": "IMG_9922.JPG",
+          "role": "true-heart photo-storm memory"
+        }
+      ]
     },
     {
       "file": "date-idol-background.jpg",
@@ -218,7 +232,14 @@
         1536,
         2048
       ],
-      "sha256": "a26f7fa83cda35eb03122af211139dea8ab93fdf41f488973169789116a640af"
+      "sha256": "a26f7fa83cda35eb03122af211139dea8ab93fdf41f488973169789116a640af",
+      "additionalReferences": [
+        {
+          "source": "Author-uploaded 20261107-201534.zip",
+          "reference": "IMG_9924.JPG",
+          "role": "true-heart photo-storm memory"
+        }
+      ]
     },
     {
       "file": "eunseok-instagram-avatar.jpg",
@@ -312,6 +333,160 @@
         "「真心」",
         "上锁的旧日记"
       ]
+    },
+    {
+      "file": "true-heart-memory-01.jpg",
+      "reference": "IMG_9920.JPG",
+      "source": "Author-uploaded 20261107-201534.zip",
+      "role": "true-heart photo-storm memory",
+      "dimensions": [
+        900,
+        1200
+      ],
+      "sha256": "f9f36f626214432744c4bddf7c57e67a3d4affd89681c8d7e515fc684cb1a623"
+    },
+    {
+      "file": "true-heart-memory-04.jpg",
+      "reference": "IMG_9923.JPG",
+      "source": "Author-uploaded 20261107-201534.zip",
+      "role": "true-heart photo-storm memory",
+      "dimensions": [
+        1080,
+        1440
+      ],
+      "sha256": "49404b55632c6eccb7eda689802b69c19f066c6f766a53725dae054ea09d4431"
+    },
+    {
+      "file": "true-heart-memory-06.jpg",
+      "reference": "IMG_9925.JPG",
+      "source": "Author-uploaded 20261107-201534.zip",
+      "role": "true-heart photo-storm memory",
+      "dimensions": [
+        1629,
+        1080
+      ],
+      "sha256": "b1ba5e2a52833ff04cd90ed019e6dd46f9c07fc21c72dfc24f2a8966c924be6b"
+    },
+    {
+      "file": "true-heart-memory-07.jpg",
+      "reference": "IMG_9926.JPG",
+      "source": "Author-uploaded 20261107-201534.zip",
+      "role": "true-heart photo-storm memory",
+      "dimensions": [
+        1933,
+        1080
+      ],
+      "sha256": "e241495e61aed6049c1d40e3940552a76984ade76dda5b1619480dee2d3b6607"
+    },
+    {
+      "file": "true-heart-memory-08.jpg",
+      "reference": "IMG_9927.JPG",
+      "source": "Author-uploaded 20261107-201534.zip",
+      "role": "true-heart photo-storm memory",
+      "dimensions": [
+        1023,
+        652
+      ],
+      "sha256": "21dc709a5723d4f4e0e156639b47170ccd8dcfa7b4ff73f4346467b3d20f62a1"
+    },
+    {
+      "file": "true-heart-memory-09.jpg",
+      "reference": "IMG_9928.JPG",
+      "source": "Author-uploaded 20261107-201534.zip",
+      "role": "true-heart photo-storm memory",
+      "dimensions": [
+        1080,
+        1440
+      ],
+      "sha256": "8a5bf9f8437bb5f999dfe127b06b39c88a66e4ca556882bea424faae70ca7b0f"
+    },
+    {
+      "file": "true-heart-memory-10.jpg",
+      "reference": "IMG_9929.JPG",
+      "source": "Author-uploaded 20261107-201534.zip",
+      "role": "true-heart photo-storm memory",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "sha256": "5ede0cb42f846ee141fd855ede91fd7f7e5449f7002991a197bc0d70874c0bd3"
+    },
+    {
+      "file": "true-heart-memory-11.jpg",
+      "reference": "IMG_9930.JPG",
+      "source": "Author-uploaded 20261107-201534.zip",
+      "role": "true-heart photo-storm memory",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "sha256": "ba3783907fdd7174ad9f1dc83ed56071b01bf0d91dc6d3405c4f5478742c2d09"
+    },
+    {
+      "file": "true-heart-memory-12.jpg",
+      "reference": "IMG_9931.JPG",
+      "source": "Author-uploaded 20261107-201534.zip",
+      "role": "true-heart photo-storm memory",
+      "dimensions": [
+        651,
+        651
+      ],
+      "sha256": "b798f12e0e29b4416521af08206a4cd971cd829c020be21df8ff0acc325ce16c"
+    },
+    {
+      "file": "true-heart-memory-13.jpg",
+      "reference": "IMG_9932.JPG",
+      "source": "Author-uploaded 20261107-201534.zip",
+      "role": "true-heart photo-storm memory",
+      "dimensions": [
+        960,
+        1280
+      ],
+      "sha256": "6f957ce2abd7981814b25437e46ac9b5b3e24503663ab0ef99bdcc3d247d765c"
+    },
+    {
+      "file": "true-heart-memory-14.jpg",
+      "reference": "IMG_9933.JPG",
+      "source": "Author-uploaded 20261107-201534.zip",
+      "role": "true-heart photo-storm memory",
+      "dimensions": [
+        960,
+        1280
+      ],
+      "sha256": "e94cc4460caf368c015641761d71e525a21620c6d1453a4f51925e051a6ded85"
+    },
+    {
+      "file": "true-heart-memory-15.jpg",
+      "reference": "IMG_9934.JPG",
+      "source": "Author-uploaded 20261107-201534.zip",
+      "role": "true-heart photo-storm memory",
+      "dimensions": [
+        667,
+        1090
+      ],
+      "sha256": "8af8540a3afb5125a20f63c7e44a0fddf655d21a348a0dc3e360eda3e1b28dfb"
+    },
+    {
+      "file": "true-heart-memory-16.jpg",
+      "reference": "IMG_9935.JPG",
+      "source": "Author-uploaded 20261107-201534.zip",
+      "role": "true-heart photo-storm memory",
+      "dimensions": [
+        1080,
+        1440
+      ],
+      "sha256": "ef3e434d6a8a84b4cb9cd1b077cdd1c3a8c93b1a479020e62f07b029d221937e"
+    },
+    {
+      "file": "true-heart-memory-17.jpg",
+      "reference": "IMG_9936.JPG",
+      "source": "Author-uploaded 20261107-201534.zip",
+      "role": "true-heart photo-storm memory",
+      "dimensions": [
+        1080,
+        1440
+      ],
+      "sha256": "4993c62f7427ce21932fb6d80c21a41fe109fc79a0fcb991a112a9138f2950be"
     }
   ]
 }

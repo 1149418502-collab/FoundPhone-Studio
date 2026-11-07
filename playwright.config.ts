@@ -7,6 +7,7 @@ export default defineConfig({
     "maque-sequel.spec.ts",
     "maque-instagram-history.spec.ts",
     "maque-materials.spec.ts",
+    "maque-true-heart.spec.ts",
     "runtime.spec.ts",
     "release.spec.ts",
     "launcher.spec.ts",
