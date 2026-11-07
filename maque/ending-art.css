@@ -1,0 +1,61 @@
+/* Four finite ending tableaux, and the shared letter after every ending. */
+.ending-art{position:relative;height:225px;width:100%;margin:8px 0 24px;overflow:hidden;isolation:isolate}
+.ending-art svg{width:100%;height:100%;stroke:#a98565;stroke-width:1.3}
+.ending-infinity{stroke-dasharray:650;stroke-dashoffset:650;animation:endingTrace 4s ease-in-out forwards}
+@keyframes endingTrace{to{stroke-dashoffset:0}}
+.ending-art-reunion{background:radial-gradient(ellipse at 50% 90%,#e8b38b44,transparent 68%)}
+.ending-dawn{fill:#f8d0a6;stroke:none;animation:endingDawn 5s ease-out both}
+@keyframes endingDawn{from{transform:translateY(80px);opacity:0}to{transform:translateY(0);opacity:.8}}
+.ending-horizon{stroke:#c2a995}.ending-sunray{stroke:#cda77f;animation:endingDawn 4s .5s both}
+.ending-orbit{fill:#fff6dc;stroke:#b78f64;filter:drop-shadow(0 0 5px #e9b05d)}
+.ending-orbit-left{animation:endingMeetLeft 4.2s ease-in-out both}.ending-orbit-right{animation:endingMeetRight 4.2s ease-in-out both}
+@keyframes endingMeetLeft{0%{transform:translate(-30px,15px)}55%{transform:translate(20px,-30px)}100%{transform:translate(60px,0)}}
+@keyframes endingMeetRight{0%{transform:translate(30px,15px)}55%{transform:translate(-20px,30px)}100%{transform:translate(-60px,0)}}
+.ending-branch{stroke:#7b776b;stroke-linecap:round}.ending-petal{fill:#d9a29c;stroke:#b8817e;transform-box:fill-box;transform-origin:center}
+.ending-petal-one{animation:endingBlossom 3s both}.ending-petal-two{animation:endingPetal 5s .2s both}.ending-petal-three{animation:endingPetal 5s .6s both}.ending-petal-four{animation:endingPetal 5s 1s both}
+@keyframes endingBlossom{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+@keyframes endingPetal{from{opacity:0;transform:translate(-75px,-40px) rotate(-55deg)}25%{opacity:1}to{opacity:.7;transform:translate(15px,20px) rotate(40deg)}}
+.ending-wind{stroke:#c6c4b8;stroke-dasharray:7 12;animation:endingTrace 5s both}
+.ending-art-suspense{background:radial-gradient(ellipse at 55% 90%,#beaa8533,transparent 62%)}
+.ending-door-frame{stroke:#9b968e}.ending-door{fill:#292a2a;stroke:#71736d}.ending-door-light{fill:#f2dcb4;stroke:none;animation:endingDoorLight 5s both}.ending-door-handle{fill:#d7cba9;stroke:none}.ending-light-floor{fill:#bfa980;opacity:.19;stroke:none;animation:endingDoorLight 5s both}.ending-waiting-star{fill:#fff6d3;stroke:none;animation:endingStar 4s ease-in-out 2}
+@keyframes endingDoorLight{from{opacity:0;transform:scaleX(.1);transform-origin:176px 110px}to{opacity:.8;transform:scaleX(1);transform-origin:176px 110px}}
+@keyframes endingStar{50%{opacity:.15}}
+.ending-art-loop svg{stroke:#a14758}.ending-clock-face{stroke-dasharray:1 8;opacity:.7}.ending-clock-hand{transform-origin:180px 111px;animation:endingReverse 6s cubic-bezier(.5,0,.4,1) both}.ending-clock-center{fill:#c9909a}
+@keyframes endingReverse{from{transform:rotate(360deg)}to{transform:rotate(-360deg)}}
+.ending-art.is-calm *{animation:none!important}.ending-art.is-calm .ending-infinity{stroke-dashoffset:0}
+.sequel-epilogue{background:radial-gradient(ellipse at 50% 12%,#314047 0,#111b25 44%,#0c131d 100%);color:#e3d5c1;min-height:100%}
+.sequel-epilogue .sequel-header{background:#111b25f5;border-color:#bfac8a30;color:#d2c1a3}.sequel-epilogue .sequel-header small{color:#a59989}.sequel-epilogue .sequel-back,.sequel-epilogue .sequel-home{color:#cdbb9b}
+.sequel-epilogue .epilogue-content{padding:28px 20px 42px;max-width:590px;margin:auto;text-align:center;overflow:hidden}
+.letter-for-you{font:400 13px/1.8 'Songti SC',serif;letter-spacing:.32em;color:#c5b59b;margin:10px 0 0}
+.letter-formation{position:relative;height:325px;perspective:1200px;margin:0 -20px;isolation:isolate}
+.letter-light-particles{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+.letter-light-particles i{position:absolute;left:50%;top:45%;width:var(--particle-size);height:var(--particle-size);border-radius:50%;background:#fff2cb;box-shadow:0 0 7px #f5cf88,0 0 15px #deb87990;animation:letterGather 2.45s cubic-bezier(.3,.05,.25,1) var(--particle-delay) both}
+@keyframes letterGather{0%{opacity:0;transform:translate(var(--start-x),var(--start-y)) scale(.4)}20%{opacity:.8}72%{opacity:1}100%{opacity:0;transform:translate(var(--end-x),var(--end-y)) scale(.4)}}
+.sequel-epilogue .epilogue-envelope{position:absolute;top:45%;left:50%;width:260px;height:156px;margin:0;transform:translate(-50%,-50%);border:0;border-radius:3px;padding:0;background:transparent;box-shadow:none;appearance:none;overflow:visible;cursor:pointer;isolation:isolate;animation:letterMaterialize 2.7s ease-out both;transition:transform .8s ease}
+.sequel-epilogue .epilogue-envelope:before,.sequel-epilogue .epilogue-envelope:after{content:none}
+@keyframes letterMaterialize{0%,35%{opacity:0;filter:blur(8px)}80%{opacity:.7;filter:blur(0)}100%{opacity:1;filter:none}}
+.epilogue-envelope:focus-visible{outline:1px solid #f1d39a!important;outline-offset:20px}
+.letter-envelope-back{position:absolute;inset:0;background:linear-gradient(140deg,#bfb19a,#ddd1bb);border:1px solid #e6d8bc;border-radius:3px;box-shadow:0 16px 48px #0007,0 0 50px #e6c18410;z-index:0}
+.letter-envelope-front{position:absolute;inset:0;z-index:3;background:linear-gradient(33deg,#e7ddc7 49.6%,transparent 50%) left/50.1% 100% no-repeat,linear-gradient(-33deg,#e7ddc7 49.6%,transparent 50%) right/50.1% 100% no-repeat;filter:drop-shadow(0 -1px 0 #c9bca3)}
+.letter-envelope-front:after{content:'';position:absolute;inset:0;background:linear-gradient(145deg,#ddd0b7 49.5%,transparent 50%) left/50.1% 100% no-repeat,linear-gradient(-145deg,#e7dbc2 49.5%,transparent 50%) right/50.1% 100% no-repeat;opacity:.8}
+.letter-envelope-flap{position:absolute;inset:0;z-index:4;background:linear-gradient(#f4ead5,#d8c9a9);clip-path:polygon(0 0,100% 0,50% 66%);transform-origin:50% 0;backface-visibility:visible;transition:transform .75s cubic-bezier(.25,.6,.4,1),filter .75s}
+.letter-wax-seal{position:absolute;z-index:5;left:calc(50% - 22px);top:70px;width:44px;height:44px;border-radius:46% 49% 44% 48%;background:radial-gradient(circle at 35% 30%,#884653,#4a1c2c);border:1px solid #a37171;box-shadow:inset 0 0 0 3px #5b2935,0 3px 5px #382b2338;transition:opacity .3s,transform .7s}
+.letter-wax-seal svg{width:100%;height:100%;stroke:#d1a28c;stroke-width:1.4}
+.letter-paper-preview{position:absolute;inset:9px 11px 5px;background:#fff9e9;z-index:1;padding:15px;box-shadow:0 2px 5px #0002;transition:transform 1s .25s;display:flex;flex-direction:column;align-items:center;gap:8px}
+.letter-paper-preview span{font:italic 18px Georgia,serif;color:#827156}.letter-paper-preview i{width:75%;height:1px;background:#cbbb9e80}.letter-paper-preview i:last-child{width:48%}
+.letter-formation[data-phase=opening] .epilogue-envelope,.letter-formation[data-phase=opened] .epilogue-envelope{transform:translate(-50%,-20%) scale(.94);opacity:1}
+.letter-formation[data-phase=opening] .letter-envelope-flap,.letter-formation[data-phase=opened] .letter-envelope-flap{transform:rotateX(-178deg);filter:brightness(.76);z-index:0}
+.letter-formation[data-phase=opening] .letter-paper-preview,.letter-formation[data-phase=opened] .letter-paper-preview{transform:translateY(-70px)}
+.letter-formation[data-phase=opening] .letter-wax-seal,.letter-formation[data-phase=opened] .letter-wax-seal{opacity:0;transform:translateY(20px) rotate(15deg)}
+.letter-touch-hint{position:absolute;left:10px;right:10px;bottom:12px;color:#aa9b85;font:12px/1.8 'Songti SC',serif;letter-spacing:.14em}
+.sequel-epilogue .epilogue-note{position:relative;margin:4px auto 26px;padding:36px 25px 32px;text-align:left;line-height:2.15;background:#f6f0e2;color:#51493f;border:1px solid #d1c29d;border-radius:2px;box-shadow:0 16px 48px #0005,0 0 0 6px #e0d4b20c;animation:letterRead .9s ease-out both;font-family:'Songti SC','Noto Serif CJK SC',Georgia,serif}
+.epilogue-note:before{content:'';pointer-events:none;position:absolute;inset:9px;border:1px solid #c6b38a50}
+.sequel-epilogue .epilogue-note{scroll-margin-top:110px}
+@keyframes letterRead{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+.sequel-epilogue .epilogue-word{font:italic 38px Georgia,serif;color:#9e7d50;text-align:center;margin:0 0 24px}.sequel-epilogue .epilogue-definition{color:#7f7566;font-size:12px;line-height:1.95}.sequel-epilogue .epilogue-game-meaning{color:#7b6f5e;font-size:12px;padding-bottom:22px;border-bottom:1px solid #bfac8744}
+.sequel-epilogue .epilogue-salutation{margin-top:28px;font-size:14px;letter-spacing:.08em}.sequel-epilogue .epilogue-letter-body{font-size:14px;line-height:2.2;margin:16px 0}.sequel-epilogue .epilogue-signature{text-align:right;font-size:13px;margin-top:32px;color:#8d7656}
+.sequel-epilogue .sequel-secondary{color:#bbaa8e;border-color:#ac9b7f44;background:transparent}.sequel-ending-paragraph{white-space:pre-line}
+.letter-formation.is-calm *{animation:none!important;transition:none!important}.letter-formation.is-calm .letter-light-particles{display:none}
+.phone-calm-motion .ending-art *,.phone-calm-motion .letter-formation *,.phone-calm-motion .epilogue-note{animation:none!important;transition:none!important}.phone-calm-motion .ending-infinity{stroke-dashoffset:0}
+@media(prefers-reduced-motion:reduce){.ending-art *,.letter-formation *,.sequel-epilogue .epilogue-note{animation:none!important;transition:none!important}.ending-infinity{stroke-dashoffset:0}}
+@media(max-width:340px){.sequel-epilogue .epilogue-content{padding-inline:14px}.sequel-epilogue .epilogue-note{padding:30px 20px}.letter-formation{margin-inline:-14px}.ending-art{height:190px}}

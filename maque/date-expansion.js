@@ -49,8 +49,8 @@
     }
   };
 
-  const emptyState = () => ({ version: 5, sessions: {}, completed: [], likes: [], comments: {} });
-  const freshSession = () => ({ step: 0, choices: {}, rehearsal: [], response: '', roomChoices: [], roomIndex: 0, eraseAttempted: false, selfAttempted: false, roomTarget: null, roomResponse: '', roomComplete: false, reward: 0 });
+  const emptyState = () => ({ version: 6, sessions: {}, completed: [], likes: [], comments: {} });
+  const freshSession = () => ({ step: 0, choices: {}, rehearsal: [], response: '', roomChoices: [], roomIndex: 0, eraseAttempted: false, selfAttempted: false, roomTarget: null, piercingNotice: 0, roomSpeechCursor: 1, roomResponse: '', roomComplete: false, reward: 0 });
   const restrictedRoomDays = new Set([2, 3, 5, 6, 7]);
   function restoreRoomProgress(old, saved, version, completed) {
     const choices = [];
@@ -70,7 +70,9 @@
     const sameDay = rawIndex === saved.roomIndex && !saved.roomResponse;
     saved.eraseAttempted = sameDay && version >= 4 && old.eraseAttempted === true;
     saved.selfAttempted = sameDay && restrictedRoomDays.has(saved.roomIndex + 1) && old.selfAttempted === true;
-    saved.roomTarget = sameDay && saved.roomIndex === 7 && ['self', 'other'].includes(old.roomTarget) ? old.roomTarget : null;
+    saved.roomTarget = sameDay && saved.roomIndex === 7 && old.roomTarget === 'self' ? 'self' : null;
+    saved.piercingNotice = sameDay && saved.roomIndex === 7 && version >= 6 && [1, 2, 3].includes(old.piercingNotice) ? old.piercingNotice : 0;
+    saved.roomSpeechCursor = saved.roomIndex === 8 && version >= 6 && Number.isInteger(old.roomSpeechCursor) ? Math.max(1, Math.min(5, old.roomSpeechCursor)) : 1;
     if (saved.roomComplete) saved.step = 2;
     if (saved.step === 2 && !saved.roomComplete && !completed) saved.step = choices.length ? 1 : 0;
     if (saved.step === 0 && choices.length) saved.step = saved.roomComplete ? 2 : 1;
@@ -78,7 +80,7 @@
   function load() {
     try {
       const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-      if (!parsed || ![1, 2, 3, 4, 5].includes(parsed.version)) return emptyState();
+      if (!parsed || ![1, 2, 3, 4, 5, 6].includes(parsed.version)) return emptyState();
       const result = emptyState();
       for (const id of chapterIds) {
         const old = parsed.sessions?.[id];
@@ -217,22 +219,11 @@
     }
     box.append(choices);
   }
-  const roomTasks = [
-    '拥抱 · 不少于 120 秒',
-    '修剪头发 · 长度不超过 1cm',
-    '耳光 · 直至脸颊肿胀',
-    '对视 · 15 秒',
-    '采血 · 600ml',
-    '留下创口 · 长度不少于 10mm，深度不少于 4mm',
-    '掌心的钢钉',
-    '双侧耳垂穿刺',
-    '说出此刻最恨的人，以及最害怕的事'
-  ];
+  const roomTasks = window.MaqueRoomNineStory.tasks;
   const roomInteractions = {
     1: { type: 'embrace', label: '轻触屏幕，让我们拥抱', playing: '我们慢慢靠近。', result: '拥抱已记录。' },
     4: { type: 'gaze', label: '轻触屏幕，与成灿对视', playing: '这一次，我没有移开目光。', result: '对视已记录。' },
     8: { type: 'piercing', label: '轻触屏幕，完成耳垂穿刺', playing: '他的手停了一下，又轻轻靠近。', result: '穿刺已记录。' },
-    9: { type: 'confession', label: '轻触屏幕，听他说完', playing: '我安静地等他说下去。', result: '声音已记录。' }
   };
   function renderRoomInteraction(box, id, s, day, isDay) {
     const action = roomInteractions[day], target = day === 8 ? s.roomTarget : 'shared';
@@ -266,11 +257,41 @@
       if (!isDay() || stage.disabled) return; s.roomTarget = null; persist(); render();
     }, 'date-inline-link'));
   }
+  function renderRoomConfession(box, id, s, isDay) {
+    const lines = window.MaqueRoomNineStory.confession;
+    const cursor = s.roomResponse ? lines.length : Math.max(1, Math.min(lines.length, s.roomSpeechCursor || 1));
+    const transcript = element('div', '', 'room-confession'); transcript.setAttribute('aria-live', 'polite');
+    for (const line of lines.slice(0, cursor)) {
+      const bubble = element('div', '', 'room-confession-line is-' + line.who);
+      bubble.append(element('small', line.who === 'him' ? '成灿' : '我'), element('p', line.text)); transcript.append(bubble);
+    }
+    box.append(transcript);
+    if (cursor < lines.length) {
+      box.append(button('继续', 'roomNineSpeechNext', () => {
+        if (!isDay() || !transcript.isConnected || s.roomResponse) return;
+        s.roomSpeechCursor = cursor + 1; persist(); render();
+      })); return;
+    }
+    const corruption = element('p', '▒▒ ̷̷……▰ 0̸̜̕1̷̛ ̷̶▓▒▒ / ▒̸̛̲ ▰▰▰', 'room-confession-corruption');
+    corruption.setAttribute('aria-label', '语句被乱码中断'); corruption.hidden = !s.roomResponse; box.append(corruption);
+    const exit = button('走出房间 →', 'roomNineContinue', () => {
+      if (!isDay() || !exit.isConnected || !s.roomResponse || s.roomChoices.length !== 9) return;
+      s.roomComplete = true; s.roomResponse = ''; advance(id, s.step);
+    }); exit.disabled = !s.roomResponse; box.append(exit);
+    if (!s.roomResponse) {
+      const token = ++roomActionToken;
+      roomActionTimer = setTimeout(() => {
+        if (token !== roomActionToken || !isDay() || !transcript.isConnected || s.roomChoices.length !== 8) return;
+        roomActionTimer = null; s.roomChoices.push({ id: 'shared', day: 9 }); s.roomResponse = '声音中断。'; persist(); render();
+      }, 1100);
+    }
+  }
   function renderRoomNine(box, id, s, node) {
     const round = Math.min(s.roomIndex, 8), day = round + 1;
     const isDay = () => session(id) === s && isCurrent(id, 1) && s.roomIndex === round;
     box.append(element('p', `第 ${String(day).padStart(2,'0')} / 09 天`, 'room-nine-day'));
     box.append(element('h3', roomTasks[round], 'room-nine-task'));
+    if (day === 9) { renderRoomConfession(box, id, s, isDay); return; }
     if (s.roomResponse) {
       const result = element('div', '', 'room-nine-result');
       result.append(element('p', s.roomResponse));
@@ -282,7 +303,7 @@
       });
       result.append(next); box.append(result); return;
     }
-    if ([1, 4, 9].includes(day) || (day === 8 && s.roomTarget)) {
+    if ([1, 4].includes(day) || (day === 8 && s.roomTarget)) {
       renderRoomInteraction(box, id, s, day, isDay); return;
     }
     box.append(element('p', '请选择承受者：', 'room-nine-recipient-label'));
@@ -294,15 +315,17 @@
     ];
     for (const [choice, label] of options) {
       if (choice === 'self' && restrictedRoomDays.has(day) && s.selfAttempted) continue;
+      if (day === 8 && choice === 'other' && s.piercingNotice === 3) continue;
       const control = button(label, '', () => {
-        if (!isDay() || s.roomResponse || s.roomChoices.length !== round) return;
+        if (!isDay() || !control.isConnected || s.roomResponse || s.roomChoices.length !== round || (day === 8 && [1, 2].includes(s.piercingNotice))) return;
         if (choice === 'erase') { s.eraseAttempted = true; persist(); render(); return; }
         if (choice === 'self' && restrictedRoomDays.has(day)) {
           s.selfAttempted = true; persist(); render();
           requestAnimationFrame(() => box.querySelector('[data-choice="other"]')?.focus({ preventScroll: true }));
           return;
         }
-        if (day === 8) { s.roomTarget = choice; persist(); render(); return; }
+        if (day === 8 && choice === 'other') { s.piercingNotice = 1; persist(); render(); return; }
+        if (day === 8) { s.roomTarget = 'self'; persist(); render(); return; }
         s.roomChoices.push({ id: choice, day });
         s.roomResponse = '选择已确认。';
         persist(); render();
@@ -310,6 +333,16 @@
       if (choice === 'erase' && s.eraseAttempted) { control.disabled = true; control.classList.add('is-locked'); control.setAttribute('aria-describedby', 'roomNineMemoryLock'); }
     }
     box.append(opts);
+    if (day === 8 && [1, 2].includes(s.piercingNotice)) {
+      const notice = element('div', '', 'room-piercing-notice'); notice.setAttribute('role', 'dialog'); notice.setAttribute('aria-modal', 'true'); notice.setAttribute('aria-label', '成灿的回应');
+      const panel = element('div', '', 'room-piercing-notice-card');
+      panel.append(element('small', '成灿'), element('p', window.MaqueRoomNineStory.piercingRefusal[s.piercingNotice - 1]));
+      const next = button(s.piercingNotice === 1 ? '继续' : '……', 'roomPiercingNoticeNext', () => {
+        if (!isDay() || !notice.isConnected) return;
+        s.piercingNotice++; persist(); render();
+      }); panel.append(next); notice.append(panel); box.append(notice); next.focus({ preventScroll: true });
+      notice.onkeydown = event => { if (event.key === 'Tab') { event.preventDefault(); next.focus(); } };
+    }
     if (s.eraseAttempted) { const note = element('p', '不可以。', 'room-nine-lock-note'); note.id = 'roomNineMemoryLock'; note.setAttribute('role', 'status'); box.append(note); }
   }
   function renderBall(box, id, s, node) {

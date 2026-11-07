@@ -66,14 +66,23 @@ for(const [width,height] of [[320,844],[390,844],[1440,900]]) {
     await page.locator('#loveEnding').screenshot({path:`outputs/maque/true-heart-type-flood-${width}.png`,animations:'disabled'});
     await page.clock.runFor(170);await expect(page.locator('#loveEnding')).toHaveAttribute('data-phase','silence');
     await expect(page.locator('#loveFinalFlash')).toBeHidden();
-    await page.clock.runFor(400);await expect(page.locator('#loveEnding')).toHaveAttribute('data-phase','impact');
+    await page.clock.runFor(400);await expect(page.locator('#loveEnding')).toHaveAttribute('data-phase','obsession');
+    await expect(page.locator('.love-thread-poem p').first()).toHaveText(story.redThreadPoem[0]);
+    await page.clock.runFor(5000);
+    await expect(page.locator('.love-thread-poem p')).toHaveText([...story.redThreadPoem,story.obsession]);
+    await page.locator('#loveEnding').screenshot({path:`outputs/maque/true-heart-roses-time-${width}.png`,animations:'disabled'});
+    await page.clock.runFor(1800);await expect(page.locator('#loveEnding')).toHaveAttribute('data-phase','impact');
     await expect(page.locator('#loveFinalFlash')).toBeVisible();await expect(page.locator('#loveEndingReturn')).toBeHidden();
     await expect(page.locator('.love-final-vow')).toHaveText('我们生生世世不分离');
     await expect.poll(()=>page.locator('#loveFinalEyes').evaluate((image:HTMLImageElement)=>image.complete&&image.naturalWidth>0)).toBe(true);
     await page.locator('#loveEnding').screenshot({path:`outputs/maque/true-heart-final-impact-${width}.png`,animations:'disabled'});
     await page.clock.runFor(1700);await expect(page.locator('#loveEndingReturn')).toBeVisible();
     await page.locator('#loveEndingReturn').click();
-    await expect(page.locator('.sequel-ending h1')).toHaveText('结局 · 「真心」');
+    await expect(page.locator('.sequel-epilogue .letter-for-you')).toHaveText('写给你的信件');
+    await expect(page.locator('.letter-light-particles i')).toHaveCount(128);
+    await page.clock.runFor(2800);await page.locator('#openClosingLetter').click();await page.clock.runFor(1200);
+    await expect(page.locator('.epilogue-note')).toBeVisible();
+    await expect(page.locator('.epilogue-salutation')).toHaveText('给看到这里的你：');
     expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('maque_sequel_v1')!).endings)).toEqual(['trueHeart']);
     await page.clock.runFor(10000);await expect(page.locator('#loveEnding')).not.toHaveClass(/show/);
     expect(errors).toEqual([]);
@@ -88,10 +97,10 @@ for(const mode of ['device','setting']) {
     await play(page);await expect(page.locator('.love-memory-photo')).toHaveCount(19);
     const sources=await page.locator('.love-memory-photo').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('src')));
     expect(sources).toEqual(story.photos.map((photo:any)=>photo.src));
-    await page.clock.runFor(6400);await expect(page.locator('#loveFinalFlash')).toBeVisible();
+    await page.clock.runFor(13200);await expect(page.locator('#loveFinalFlash')).toBeVisible();
     for(const selector of ['#loveFinalFlash','.love-final-eye-slit'])await expect(page.locator(selector)).toHaveCSS('animation-name','none');
     await page.clock.runFor(1500);await page.locator('#loveEndingReturn').click();
-    await expect(page.locator('.sequel-ending h1')).toContainText('「真心」');expect(errors).toEqual([]);
+    await expect(page.locator('.letter-for-you')).toHaveText('写给你的信件');expect(errors).toEqual([]);
   });
 }
 
@@ -102,6 +111,26 @@ test('restarting the performance clears earlier timers and cannot skip the final
   await expect(page.locator('.love-memory-photo')).toHaveCount(38);
   await page.evaluate('finishLoveEnding()');await expect(page.locator('#loveEnding')).toHaveClass(/show/);
   await expect(page.locator('.sequel-ending')).toHaveCount(0);
-  await page.clock.runFor(6000);await page.locator('#loveEndingReturn').click();
+  await page.clock.runFor(13000);await page.locator('#loveEndingReturn').click();
   expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('maque_sequel_v1')!).endings)).toEqual(['trueHeart']);
+});
+
+test('the letter gathers light before it opens and shows the complete author letter at phone width',async({page})=>{
+  await page.setViewportSize({width:390,height:844});await open(page);await page.clock.runFor(5000);
+  await page.evaluate('MaqueSequel.finishDiaryEnding()');
+  await expect(page.locator('[data-ending-animation]')).toHaveAttribute('data-ending-animation','reunion');
+  await page.locator('#sequelClosingLetter').click();
+  await expect(page.locator('.letter-light-particles i')).toHaveCount(128);
+  await expect(page.locator('#openClosingLetter')).toBeDisabled();
+  await expect(page.locator('.epilogue-note')).toBeHidden();
+  await page.clock.runFor(2800);await expect(page.locator('#openClosingLetter')).toBeEnabled();
+  await page.locator('#archives').screenshot({path:'outputs/maque/closing-letter-envelope-390.png',animations:'disabled'});
+  await page.locator('#openClosingLetter').click();await expect(page.locator('.letter-formation')).toHaveAttribute('data-phase','opening');
+  await expect(page.locator('.epilogue-note')).toBeHidden();await page.clock.runFor(1200);
+  await expect(page.locator('.letter-formation')).toHaveAttribute('data-phase','opened');await expect(page.locator('.epilogue-note')).toBeVisible();
+  await expect(page.locator('.epilogue-salutation')).toHaveText('给看到这里的你：');
+  await expect(page.locator('.epilogue-letter-body')).toHaveText(['谢谢你花时间读完这个故事。','爱和记忆本身就是无解的莫比乌斯环，向前还是向后，都可以开展新的故事和结局。','我一直相信，爱会创造奇迹，无论结局如何，爱都真实存在过。']);
+  await expect(page.locator('.epilogue-signature')).toHaveText('----再次，与你');
+  await page.locator('.epilogue-note').screenshot({path:'outputs/maque/closing-letter-open-390.png',animations:'disabled'});
+  expect(await page.locator('#archives').evaluate(node=>node.scrollWidth<=node.clientWidth)).toBe(true);
 });

@@ -339,22 +339,19 @@
     const shell = node('div', null, 'sequel-ending sequel-epilogue', screen);
     header(shell, 'Samsara', '最后一封信', () => renderEnding(endingId, false, true));
     const content = node('div', null, 'sequel-ending-content epilogue-content', shell);
-    node('p', 'A LETTER FOR THE END OF THIS LOOP', 'sequel-eyebrow', content);
-    const envelope = node('div', null, 'epilogue-envelope', content);
-    const flap = node('span', '♡', 'epilogue-seal', envelope); flap.setAttribute('aria-hidden', 'true');
-    const openButton = button(content, '拆开这封信', () => {
-      envelope.classList.add('is-open'); openButton.disabled = true;
-      window.setTimeout(() => { note.hidden = false; note.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 650);
-    }, 'sequel-button', 'openClosingLetter');
-    openButton.setAttribute('aria-label', '拆开最后的情书');
+    node('p', '写给你的信件', 'letter-for-you', content);
+    window.MaqueEndingArt.letter(content, () => {
+      note.hidden = false;
+      if (screen.classList.contains('active')) note.scrollIntoView({ behavior: window.MaquePhoneExtras?.prefersCalmMotion() ? 'auto' : 'smooth', block: 'start' });
+    });
     const note = node('article', null, 'epilogue-note', content); note.hidden = true;
     node('p', letter.word, 'epilogue-word', note);
     node('p', letter.transliteration, 'epilogue-definition', note);
     node('p', letter.definition, 'epilogue-definition', note);
     node('p', letter.gameMeaning, 'epilogue-game-meaning', note);
     node('p', letter.salutation, 'epilogue-salutation', note);
-    node('p', letter.body, 'epilogue-letter-body', note);
-    node('p', '—— ' + letter.signature, 'epilogue-signature', note);
+    for (const paragraph of Array.isArray(letter.body) ? letter.body : [letter.body]) node('p', paragraph, 'epilogue-letter-body', note);
+    node('p', letter.signature, 'epilogue-signature', note);
     button(content, '重新看一遍这个结局', () => renderEnding(endingId, false, true), 'sequel-secondary');
     button(content, '合上信，回到手机', () => view('home'), 'sequel-secondary');
     view('archives'); screen.scrollTop = 0;
@@ -368,7 +365,8 @@
     const shell = node('div', null, 'sequel-ending ending-' + id, screen);
     header(shell, 'Samsara', '我们抵达的地方', () => showClosingLetter(id));
     const content = node('div', null, 'sequel-ending-content', shell);
-    node('p', 'ENDING / ' + id.toUpperCase(), 'sequel-eyebrow', content); node('h1', ending.title, '', content); node('p', ending.subtitle, 'sequel-ending-subtitle', content);
+    window.MaqueEndingArt.ending(content, id);
+    node('h1', ending.title, '', content); node('p', ending.subtitle, 'sequel-ending-subtitle', content);
     for (const paragraph of ending.paragraphs) node('p', paragraph, 'sequel-ending-paragraph', content);
     const last = node('div', null, 'sequel-ending-message', content); node('small', 'KakaoTalk · 成灿', '', last); node('p', ending.lastMessage, '', last);
     node('p', '已收录结局 ' + state.endings.length + ' / 5', 'sequel-ending-count', content);
@@ -399,7 +397,7 @@
     if (document.getElementById('instagram').classList.contains('active')) renderInstagram();
   }
   function finishDiaryEnding() { renderEnding('reunion', true, true); }
-  function finishTrueHeartEnding() { renderEnding('trueHeart', true, true); }
+  function finishTrueHeartEnding() { renderEnding('trueHeart', true, true); showClosingLetter('trueHeart'); }
   window.MaqueSequel = { init, sync, renderInstagram, onDateComplete, openArchives, openChat, finishDiaryEnding, finishTrueHeartEnding };
   init();
 })();

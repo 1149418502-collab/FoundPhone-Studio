@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 const html = readFileSync("maque/index.html", "utf8");
 const files = new Set([
   "gift-collection.css", "true-heart-ending.css", "true-heart-story.js",
+  "room-nine-story.js", "ending-art.js", "ending-art.css",
   "silver-instagram-story.js", "silver-instagram.js", "silver-instagram.css",
   "sequel-story.js", "sequel.js", "sequel.css",
   "date-expansion.js", "date-expansion.css",
@@ -188,7 +189,7 @@ test('old solved files and collected endings survive, but the new database still
     localStorage.setItem('maque_sequel_v1',JSON.stringify({version:1,dates:['escape'],endings:['reunion','loop'],chapters:{echo:{solved:true,choice:'trust',cursor:12,storySeen:true},second:{solved:true,choice:'distance',cursor:12,storySeen:true}},announced:60}));
   });
   await open(page,80);await enterArchive(page);
-  await expect(page.locator('.archive-ending-link')).toHaveText(['结局 · 明天见','结局 · ∞']);
+  await expect(page.locator('.archive-ending-link')).toHaveText(['明天见','∞']);
   await page.locator('[data-chapter="second"]').click();await expect(page.locator('.archive-log-stream')).toContainText('选项强制修改');
   await expect(page.locator('.archive-log-stream')).toContainText('target: Eunseok → null');
   await page.reload();await page.evaluate('MaqueSequel.openArchives()');await expect(page.locator('#archiveAnswer')).toBeVisible();
@@ -206,19 +207,23 @@ test('a completed room date reveals no ten-day journal until its related databas
 });
 
 for(const route of [
-  {id:'reunion',choice:'trust',final:'reunion',title:'结局 · 明天见'},
-  {id:'farewell',choice:'trust',final:'farewell',title:'结局 · 把春天还给你'},
-  {id:'suspense',choice:'distance',final:'reunion',title:'结局 · 明日或不再'},
-  {id:'loop',choice:'trust',final:'loop',title:'结局 · ∞'}
+  {id:'reunion',choice:'trust',final:'reunion',title:'明天见'},
+  {id:'farewell',choice:'trust',final:'farewell',title:'把春天还给你'},
+  {id:'suspense',choice:'distance',final:'reunion',title:'明日或不再'},
+  {id:'loop',choice:'trust',final:'loop',title:'∞'}
 ]) {
   test(`database and social records still reach ${route.id} with the renamed ending`,async({page})=>{
     test.setTimeout(60000);const errors=await open(page,80);await enterArchive(page);
     for(const id of ['echo','second','dawn'])await readChapter(page,id,route.choice);
     await page.locator('#sequelFinale').click();await page.locator(`[data-ending-choice="${route.final}"]`).click();
     await expect(page.locator('.sequel-ending h1')).toHaveText(route.title);
+    await expect(page.locator('[data-ending-animation]')).toHaveAttribute('data-ending-animation',route.id);
+    await page.locator('.sequel-ending').screenshot({path:`outputs/maque/ending-${route.id}-animation.png`,animations:'disabled'});
     expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('maque_sequel_v1')!).endings)).toContain(route.id);
     await page.locator('#sequelClosingLetter').click();await page.getByRole('button',{name:'拆开最后的情书'}).click();
     await expect(page.locator('.epilogue-note')).toBeVisible();await expect(page.locator('.epilogue-word')).toHaveText('Samsara');
+    await expect(page.locator('.epilogue-signature')).toHaveText('----再次，与你');
+    await expect(page.locator('.epilogue-letter-body')).toHaveText(['谢谢你花时间读完这个故事。','爱和记忆本身就是无解的莫比乌斯环，向前还是向后，都可以开展新的故事和结局。','我一直相信，爱会创造奇迹，无论结局如何，爱都真实存在过。']);
     expect(errors).toEqual([]);
   });
 }

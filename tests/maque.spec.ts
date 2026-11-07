@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 const html = readFileSync("maque/index.html", "utf8");
 const localModules = new Set([
   "gift-collection.css", "true-heart-ending.css", "true-heart-story.js",
+  "room-nine-story.js", "ending-art.js", "ending-art.css",
   "silver-instagram-story.js", "silver-instagram.js", "silver-instagram.css",
   "sequel-story.js",
   "sequel.js",
@@ -525,10 +526,10 @@ test("special gift needs two warnings, cancellation resets confirmation, and bot
   await expect(page.locator("#loveTypingScreen")).toBeVisible({ timeout: 5000 });
   await expect(page.locator("#loveTypedRows .love-typed-row")).toHaveCount(34, { timeout: 6000 });
   await expect(page.locator("#loveFinalFlash")).toContainText("我们生生世世不分离");
-  await page.getByRole("button", { name: "继续", exact: true }).click();
-  await expect(page.locator(".sequel-ending h1")).toContainText("「真心」");
-  await expect(page.locator(".sequel-ending-count")).toContainText("/ 5");
-  await page.getByRole("button", { name: "打开片尾的信" }).click();
+  await expect(page.locator("#loveEndingReturn")).toBeVisible({timeout:12000});
+  await page.locator("#loveEndingReturn").click();
+  await expect(page.locator(".letter-for-you")).toHaveText("写给你的信件");
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_sequel_v1")!).endings)).toContain("trueHeart");
   await page.getByRole("button", { name: "拆开最后的情书" }).click();
   await expect(page.locator(".epilogue-note")).toBeVisible();
   await expect(page.locator(".epilogue-note")).toContainText("梵语 saṃsāra");
@@ -1178,10 +1179,12 @@ test("room nine completes nine present-day tasks with shared animations and name
   await page.getByRole("button",{name:/选择约会场景：九号房间/}).click();
   await page.locator("#roomNineStart").click();await page.locator("#extraDateNext").click();
   for(let day=1;day<=9;day++) {
-    await expect(page.locator("#dateDetailContent")).not.toContainText(/一周目|二周目|上一轮|玩家\s*[AB]|下意识|记忆索引|RECOVERED SNAPSHOT|重置次数/);
+    await expect(page.locator("#dateDetailContent")).not.toContainText(/一周目|二周目|上一轮|下意识|记忆索引|RECOVERED SNAPSHOT|重置次数/);
     await expect(page.locator(".extra-date-progress span")).toHaveCount(9);
     await expect(page.locator(".room-nine-day")).toContainText(`${String(day).padStart(2,"0")} / 09`);
-    if([1,4,9].includes(day)) {
+    if(day===9) {
+      await completeRoomConfession(page);
+    } else if([1,4].includes(day)) {
       await expect(page.locator(".room-nine-choice,.room-nine-recipient-label")).toHaveCount(0);
       await completeRoomInteraction(page);
     } else {
@@ -1213,6 +1216,12 @@ test("room nine completes nine present-day tasks with shared animations and name
   await expect(page.locator(".archive-journal-day,.archive-log-entry")).toHaveCount(0);
 });
 
+async function completeRoomConfession(page:Page) {
+  await expect(page.locator(".room-nine-choice,#roomNineAction")).toHaveCount(0);
+  for(let i=0;i<4;i++)await page.locator("#roomNineSpeechNext").click();
+  await expect(page.locator(".room-confession-corruption")).toBeVisible({timeout:5000});
+}
+
 async function completeRoomInteraction(page:Page) {
   const action=page.locator('#roomNineAction');
   await expect(action).toBeVisible();await action.click();await expect(action).toBeDisabled();
@@ -1225,7 +1234,7 @@ async function enterRoomNine(page: Page, mode: 'start' | 'resume' | 'preview' = 
     return savePhoto(identity).then(()=>{dateSelectedPhotoId=identity.id;dateJourneyAccepted=true;localStorage.setItem("maque_date_photo_id",identity.id);view("dates");showDateCatalog()});
   });
   await page.getByRole("button",{name:/选择约会场景：九号房间/}).click();
-  await expect(page.locator("#dateDetailContent")).not.toContainText(/一周目|二周目|上一轮|玩家\s*[AB]|下意识|记忆索引|虚拟模拟|RECOVERED SNAPSHOT/);
+  await expect(page.locator("#dateDetailContent")).not.toContainText(/一周目|二周目|上一轮|下意识|记忆索引|虚拟模拟|RECOVERED SNAPSHOT/);
   if(mode !== 'preview') await page.locator(mode === 'resume' ? "#roomNineResume" : "#roomNineStart").click();
 }
 
@@ -1364,7 +1373,9 @@ test("a rejected self choice and a grey memory choice persist independently with
 });
 
 test("deployed game copy contains no playthrough exposition, role mapping or author diary template",()=>{
-  const deployedCopy=[html,...[...localModules].filter(file=>file.endsWith(".js")).map(file=>readFileSync("maque/"+file,"utf8"))].join("\n");
+  const roomCopy=JSON.parse(readFileSync("maque/room-nine-story.js","utf8").split(" = ")[1].replace(/;\s*$/, ""));
+  let deployedCopy=[html,...[...localModules].filter(file=>file.endsWith(".js")).map(file=>readFileSync("maque/"+file,"utf8"))].join("\n");
+  for(const task of roomCopy.tasks)deployedCopy=deployedCopy.replaceAll(task, "");
   expect(deployedCopy).not.toMatch(/一周目|二周目|上一轮|二代目|第二个成灿|玩家\s*[ABＡＢ]|下意识|RECOVERED SNAPSHOT|INSTANCE\s*0[12]|旧一周目的九次记录|第十天是成灿离开房间后的私人回忆/);
 });
 
@@ -1391,7 +1402,49 @@ test('leaving a room animation cannot commit a day or advance another session',a
   await expect(page.locator('#roomNineAction')).toBeEnabled();await expect(page.locator('.room-nine-choice')).toHaveCount(0);
 });
 
-for(const target of ['self','other']) {
+test('piercing refuses Sungchan in two authored messages, survives reload, and only accepts Eunseok',async({page})=>{
+  await page.addInitScript(()=>{
+    if(localStorage.getItem('ear-refusal-seeded'))return;localStorage.setItem('ear-refusal-seeded','yes');
+    localStorage.setItem('maque_extra_dates_v1',JSON.stringify({version:5,sessions:{escape:{step:1,roomIndex:7,roomTarget:'other',roomChoices:Array.from({length:7},(_,i)=>({id:[0,3].includes(i)?'shared':'other',day:i+1}))}},completed:[],likes:[],comments:{}}));
+  });
+  await open(page,60,[],['baseball','football','idol']);await enterRoomNine(page,'resume');
+  await expect(page.locator('#roomNineAction')).toHaveCount(0);
+  await page.locator('[data-choice="other"]').click();
+  await expect(page.getByRole('dialog',{name:'成灿的回应'})).toContainText('我也想 在他身上留下我的痕迹');
+  await page.locator('#roomPiercingNoticeNext').click();
+  await expect(page.getByRole('dialog',{name:'成灿的回应'})).toContainText('对不起 原谅我的自私吧');
+  await page.reload();await page.evaluate("view('home')");await enterRoomNine(page,'resume');
+  await expect(page.getByRole('dialog',{name:'成灿的回应'})).toContainText('对不起 原谅我的自私吧');
+  await page.locator('#roomPiercingNoticeNext').click();
+  await expect(page.locator('[data-choice="other"]')).toHaveCount(0);
+  await page.locator('[data-choice="erase"]').click();await expect(page.locator('[data-choice="erase"]')).toBeDisabled();
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('maque_extra_dates_v1')!).sessions.escape.roomChoices.length)).toBe(7);
+  await page.locator('[data-choice="self"]').click();await expect(page.locator('#roomNineAction')).toHaveAttribute('data-target','Eunseok');
+  await completeRoomInteraction(page);
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('maque_extra_dates_v1')!).sessions.escape.roomChoices[7])).toEqual({id:'self',day:8});
+});
+
+test('day nine preserves the unfinished dialogue on reload and only records after corruption',async({page})=>{
+  await page.addInitScript(()=>{
+    if(localStorage.getItem('confession-seeded'))return;localStorage.setItem('confession-seeded','yes');
+    localStorage.setItem('maque_extra_dates_v1',JSON.stringify({version:6,sessions:{escape:{step:1,roomIndex:8,roomChoices:Array.from({length:8},(_,i)=>({id:[0,3].includes(i)?'shared':i===7?'self':'other',day:i+1}))}},completed:[],likes:[],comments:{}}));
+  });
+  await open(page,60,[],['baseball','football','idol']);await enterRoomNine(page,'resume');
+  await expect(page.locator('.room-nine-task')).toHaveText('玩家A向玩家B说出此时此刻最恨的人以及最害怕的事情');
+  await expect(page.locator('.room-nine-choice,#roomNineAction')).toHaveCount(0);
+  await page.locator('#roomNineSpeechNext').click();await page.locator('#roomNineSpeechNext').click();
+  await page.reload();await page.evaluate("view('home')");await enterRoomNine(page,'resume');await page.clock.install();
+  await expect(page.locator('.room-confession-line p')).toHaveText(['……对不起','如果是为了刚才的事','不用道歉']);
+  await page.locator('#roomNineSpeechNext').click();await page.locator('#roomNineSpeechNext').click();
+  await expect(page.locator('.room-confession-line p')).toHaveText(['……对不起','如果是为了刚才的事','不用道歉','毕竟，受伤最多的是你。不是吗？','我最害怕的事情，是……']);
+  await expect(page.locator('#roomNineContinue')).toBeDisabled();
+  await page.clock.runFor(1200);await expect(page.locator('.room-confession-corruption')).toBeVisible();
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('maque_extra_dates_v1')!).sessions.escape.roomChoices.length)).toBe(9);
+  await page.clock.runFor(3000);expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('maque_extra_dates_v1')!).sessions.escape.roomChoices.length)).toBe(9);
+  expect(await page.evaluate(()=>localStorage.getItem('maque_affection'))).toBe('60');
+});
+
+for(const target of ['self']) {
   test(`ear piercing preserves the ${target} recipient on reload and commits only after touch`,async({page})=>{
     await page.setViewportSize({width:390,height:844});
     await page.addInitScript(()=>{
@@ -1440,7 +1493,7 @@ test(`an existing completed room save at step ${savedStep} preserves progress an
   },savedStep);
   await open(page,80,[],["baseball","football","idol","escape"]);
   const save=await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!));
-  expect(save.version).toBe(5);
+  expect(save.version).toBe(6);
   expect(save.sessions.escape.step).toBe(2);
   expect(save.sessions.escape.reward).toBe(15);
   expect(save.sessions.escape.roomChoices).toHaveLength(9);

@@ -40,3 +40,24 @@
 @media(min-width:900px){#loveEnding .love-memory-photo{width:clamp(180px,22vw,390px)}.love-final-eye-slit{top:6%;height:35%}.love-final-message{top:26%}.love-final-vow{font-size:min(14vh,175px)}.love-final-vow strong{font-size:min(17vh,210px)}}
 @media(max-height:600px){.love-final-eye-slit{top:4%;height:32%}.love-final-message{top:21%}.love-final-question{margin-bottom:9px}.love-final-vow{font-size:clamp(32px,13vh,65px)}.love-final-vow strong{font-size:clamp(42px,16vh,85px)}}
 @media(prefers-reduced-motion:reduce){#loveEnding *,#loveEnding *:before,#loveEnding *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}#loveEnding .love-memory-photo{opacity:1;transform:translate(-50%,-50%) rotate(var(--r))}.love-final-vow:before,.love-final-vow:after{display:none}}
+.love-obsession{position:absolute;inset:0;z-index:5;overflow:hidden;background:radial-gradient(ellipse at 50% 25%,#2d0915,#060105 70%)}
+.love-time-garden{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.love-rose-garden{position:absolute;width:100%;height:100%;inset:0;stroke:#7c2037;stroke-width:1.6;opacity:.85}
+.love-rose-stem{stroke:#49413c;stroke-width:1.1}.love-rose-bloom{fill:#290713;stroke:#94223f;transform-box:fill-box;transform-origin:center;animation:loveRoseWither 8s ease-in both}
+@keyframes loveRoseWither{from{transform:scale(1.15);opacity:1}to{transform:scale(.76) rotate(-12deg);opacity:.4}}
+.love-red-thread{stroke:#d72e50;stroke-width:1.1;stroke-dasharray:1000;stroke-dashoffset:1000;filter:drop-shadow(0 0 3px #d72e5066);animation:loveThreadBind 6.5s ease-in-out both}
+@keyframes loveThreadBind{to{stroke-dashoffset:0}}
+.love-clock-dial{position:absolute;width:min(65vw,360px);aspect-ratio:1;left:50%;top:9%;transform:translateX(-50%);border:1px solid #a0787840;border-radius:50%;background:radial-gradient(circle,transparent 65%,#9c707012 66%,transparent 68%);opacity:.6}
+.love-clock-dial:after{content:'';position:absolute;inset:9px;border:1px solid #95647844;border-radius:50%}
+.love-clock-dial i{position:absolute;left:50%;top:16%;width:1px;height:34%;background:#a07878;transform-origin:bottom;animation:loveClockReverse 6.8s cubic-bezier(.6,.02,.8,.8) both}
+.love-clock-dial i:nth-child(2){top:27%;height:23%;animation-duration:5s;background:#b3455d}
+@keyframes loveClockReverse{from{transform:rotate(720deg)}to{transform:rotate(-2500deg)}}
+.love-time-digits{position:absolute;top:13%;left:0;right:0;font:clamp(25px,8vw,70px)/1 Georgia,serif;color:#ab6a7855;letter-spacing:.2em;text-align:center}
+.love-thread-poem{position:absolute;left:6%;right:6%;top:32%;z-index:2;text-align:center;color:#e1bec3;text-shadow:0 2px 10px #000;font:500 clamp(17px,4.3vw,30px)/2 'Songti SC',serif;letter-spacing:.05em}
+.love-thread-poem>p{margin:8px 0;animation:lovePoemAppear .7s ease-out both}
+@keyframes lovePoemAppear{from{opacity:0;transform:translateY(8px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+.love-thread-poem .love-obsession-declaration{margin:38px auto 0;max-width:620px;color:#e34d65;font-weight:700;font-size:clamp(16px,4.4vw,27px);line-height:1.9;letter-spacing:.02em}
+.love-final-flash .love-time-garden{z-index:2;opacity:.45}.love-final-flash .love-time-digits{top:4%;color:#c15c7377}.love-final-flash .love-clock-dial{top:5%}
+#loveEnding.is-calm .love-red-thread{stroke-dashoffset:0}.phone-calm-motion .room-confession-corruption{animation:none}
+@media(prefers-reduced-motion:reduce){.love-red-thread{stroke-dashoffset:0}}
+@media(max-height:600px){.love-thread-poem{top:23%;font-size:17px;line-height:1.6}.love-thread-poem .love-obsession-declaration{margin-top:20px;font-size:15px}.love-time-digits{top:7%}}

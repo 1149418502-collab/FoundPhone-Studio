@@ -112,8 +112,8 @@ test('calm motion keeps the true-heart ending while slowing and reducing its ani
   await page.getByRole('checkbox', { name: '减少动态效果' }).check();
   await page.evaluate('showLoveEnding()');
   await expect(page.locator('.love-memory-photo')).toHaveCount(19);
-  await expect(page.locator('#loveFinalFlash')).toBeVisible({ timeout: 10000 });
+  await expect(page.locator('#loveFinalFlash')).toBeVisible({ timeout: 20000 });
   expect(await page.locator('#loveFinalFlash').evaluate(el => getComputedStyle(el).animationName)).toBe('none');
   await page.locator('#loveEndingReturn').click();
-  await expect(page.locator('.sequel-ending h1')).toContainText('「真心」');
+  await expect(page.locator('.letter-for-you')).toHaveText('写给你的信件');
 });
