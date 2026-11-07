@@ -10,6 +10,7 @@
   const state = { version: 1, chapters: {}, endings: [], currentEnding: null, activeChapter: chapterIds[0], announced: 0, dates: [] };
   let initialized = false, busy = false, chatToken = 0, currentArchive = null;
   let storyOverlay = null;
+  let archiveAccessGranted = false, archiveLoadToken = 0, archiveLoadTimer = null, afterArchiveAccess = null;
   try {
     const stored = JSON.parse(localStorage.getItem(KEY) || 'null');
     if (stored && stored.version === 1 && typeof stored === 'object') {
@@ -71,29 +72,90 @@
       state.announced = eligible.threshold; save();
       announceFeature('KakaoTalk · 成灿', eligible.id === 'echo' ? '有一件小事，想和你确认。' : '银硕，那份记录又多了一页。');
     }
-    if (document.getElementById('archives').classList.contains('active')) renderArchives();
+    if (archiveAccessGranted && document.getElementById('archives').classList.contains('active')) renderArchives();
+  }
+  function cancelArchiveLoad() { archiveLoadToken++; clearTimeout(archiveLoadTimer); archiveLoadTimer = null; }
+  function renderAccessGate() {
+    cancelArchiveLoad();
+    const screen = document.getElementById('archives'); screen.replaceChildren();
+    screen.classList.add('archive-reading', 'archive-system');
+    const leave = () => { cancelArchiveLoad(); afterArchiveAccess = null; view('home'); };
+    header(screen, '受限数据库', 'ACCESS / CLASSIFIED', leave);
+    screen.querySelector('.sequel-home').onclick = leave;
+    const content = node('div', null, 'archive-content archive-access', screen);
+    node('p', 'SAMSARA / PRIVATE STORAGE', 'sequel-eyebrow', content);
+    node('div', 'RESTRICTED', 'archive-access-stamp', content);
+    node('h1', '绝密档案', 'archive-title', content);
+    node('p', '外部读取已关闭。\n请输入四位访问口令。', 'sequel-description', content);
+    const form = node('form', null, 'archive-puzzle archive-access-form', content);
+    const label = node('label', '档案读取密码', '', form); label.htmlFor = 'archiveAnswer';
+    const input = node('input', null, '', form);
+    input.id = 'archiveAnswer'; input.type = 'password'; input.inputMode = 'numeric'; input.maxLength = 4;
+    input.autocomplete = 'off'; input.placeholder = '输入四位数字'; input.setAttribute('aria-describedby', 'archiveFeedback');
+    const feedback = node('p', '', 'archive-feedback', form); feedback.id = 'archiveFeedback'; feedback.setAttribute('role', 'status');
+    const submit = node('button', '提交访问请求', 'sequel-button', form); submit.id = 'archiveSubmit'; submit.type = 'submit';
+    form.onsubmit = event => {
+      event.preventDefault();
+      if (!screen.classList.contains('active') || !form.isConnected || submit.disabled) return;
+      if (input.value.normalize('NFKC').trim() !== story.archiveAccess.password) {
+        feedback.textContent = '口令不匹配。读取请求已拒绝。'; input.setAttribute('aria-invalid', 'true'); return;
+      }
+      input.removeAttribute('aria-invalid'); submit.disabled = true; renderArchiveLoading();
+    };
+    const hint = node('p', story.archiveAccess.hint, 'archive-hint', form); hint.id = 'archiveHintText'; hint.hidden = true;
+    button(form, '查看文件头残片', () => { hint.hidden = !hint.hidden; }, 'sequel-link', 'archiveHint');
+    node('p', 'session / locked\nread permission / denied', 'archive-access-footer', content);
+    view('archives'); screen.scrollTop = 0;
+  }
+  function renderArchiveLoading() {
+    cancelArchiveLoad(); const token = archiveLoadToken;
+    const screen = document.getElementById('archives'); screen.replaceChildren();
+    screen.classList.add('archive-reading', 'archive-system');
+    const leave = () => { cancelArchiveLoad(); afterArchiveAccess = null; view('home'); };
+    header(screen, '受限数据库', 'ACCESS / VERIFYING', leave);
+    screen.querySelector('.sequel-home').onclick = leave;
+    const content = node('div', null, 'archive-content archive-access archive-loader', screen);
+    content.id = 'archiveLoading'; content.setAttribute('role', 'status'); content.setAttribute('aria-live', 'polite'); content.setAttribute('aria-busy', 'true');
+    node('span', '', 'archive-loading-ring', content).setAttribute('aria-hidden', 'true');
+    node('h1', story.archiveAccess.loadingText, 'archive-title', content);
+    node('p', 'VERIFYING KEY\nMOUNTING READ-ONLY STORAGE\nRECOVERING INTERRUPTED BLOCKS', 'archive-loading-lines', content);
+    const track = node('div', null, 'archive-loading-track', content); node('span', '', '', track);
+    archiveLoadTimer = setTimeout(() => {
+      if (token !== archiveLoadToken || !screen.classList.contains('active') || !content.isConnected) return;
+      archiveLoadTimer = null; archiveAccessGranted = true;
+      const action = afterArchiveAccess; afterArchiveAccess = null;
+      if (action?.type === 'chat') openChat(action.id);
+      else renderArchives();
+    }, story.archiveAccess.loadingMs);
   }
   function openArchives(id) {
     if (affection < 60) { explain('档案还没有准备好', '好感度达到 60% 后，成灿会把秘密档案的入口交给我。'); return; }
     currentArchive = id && accessible(chapterById(id) || {}) ? id : null;
     state.currentEnding = null; save();
+    if (!archiveAccessGranted) { renderAccessGate(); return; }
     renderArchives(); view('archives');
   }
   function renderArchives() {
-    const screen = document.getElementById('archives'); screen.replaceChildren(); screen.classList.add('archive-reading');
-    header(screen, '档案', 'SAMSARA / 01' , () => { if (currentArchive) { currentArchive = null; renderArchives(); } else view('home'); });
+    if (!archiveAccessGranted) { renderAccessGate(); return; }
+    const screen = document.getElementById('archives'); screen.replaceChildren(); screen.classList.add('archive-reading', 'archive-system');
+    header(screen, '受限数据库', 'SAMSARA / READ-ONLY' , () => { if (currentArchive) { currentArchive = null; renderArchives(); } else view('home'); });
     const content = node('div', null, 'archive-content' + (currentArchive ? ' archive-dossier' : ' archive-index'), screen);
     if (currentArchive) { renderDossier(content, chapterById(currentArchive)); return; }
     const cover = node('section', null, 'archive-index-cover', content);
     const top = node('div', null, 'archive-cover-top', cover);
-    node('span', 'PRIVATE ARCHIVE / 01', '', top);
-    node('span', '只读', 'archive-readonly-seal', top);
-    node('h1', '未寄出的\n记录', 'archive-title', cover);
-    node('p', '归档副本。访问记录将被保留。', 'archive-cover-note', cover);
-    const coverIcon = node('img', null, 'archive-cover-icon', cover); coverIcon.src = archiveIconURL(); coverIcon.alt = '';
+    node('span', 'DATABASE / SC-01', '', top);
+    node('span', '完整性异常', 'archive-readonly-seal', top);
+    node('h1', '运行记录\n校验失败', 'archive-title', cover);
+    node('p', '原始进程仍在运行。自动修复已停止。', 'archive-cover-note', cover);
+    const statuses = node('dl', null, 'archive-system-status', cover);
+    for (const status of story.systemStatus) {
+      node('dt', status.label, '', statuses);
+      node('dd', status.value, 'is-' + status.status, statuses);
+    }
+    node('p', 'SC-01 / write_lock = █▒∅\nERR_RECORD_MISMATCH · READ ONLY', 'archive-corrupt-line', cover);
     const catalogue = node('div', null, 'archive-catalogue-heading', content);
-    node('h2', '归档目录', '', catalogue);
-    node('span', String(story.chapters.length).padStart(2, '0') + ' FILES', '', catalogue);
+    node('h2', '异常数据段', '', catalogue);
+    node('span', String(story.chapters.length).padStart(2, '0') + ' BLOCKS', '', catalogue);
     for (const [index, chapter] of story.chapters.entries()) {
       const progress = state.chapters[chapter.id], canOpen = accessible(chapter);
       const card = button(content, '', () => { currentArchive = chapter.id; state.activeChapter = chapter.id; save(); renderArchives(); }, 'archive-folder');
@@ -102,16 +164,16 @@
       card.dataset.fileState = progress.solved ? 'restored' : canOpen ? 'available' : 'locked';
       node('span', String(index + 1).padStart(2, '0'), 'archive-file-number', card);
       const body = node('span', null, 'archive-file-body', card);
-      node('span', progress.solved ? '已复原' : canOpen ? '待核对' : '尚未送达', 'archive-file-status', body);
+      node('span', progress.solved ? '已读取 / 错误未关闭' : canOpen ? '可读取 / 校验失败' : '访问依赖未满足', 'archive-file-status', body);
       node('strong', chapter.title.split(' · ').at(-1), '', body);
-      node('small', canOpen ? chapter.subtitle : affection < chapter.threshold ? `好感度 ${chapter.threshold}% · 继续约会或赠礼` : '先复原上一份记录', '', body);
+      node('small', canOpen ? chapter.subtitle : affection < chapter.threshold ? `好感度 ${chapter.threshold}%` : '先读取前一数据段', '', body);
       node('span', canOpen ? '↗' : '—', 'archive-file-arrow', card).setAttribute('aria-hidden', 'true');
     }
     if (state.dates.includes('escape') && state.chapters.second.solved) {
       const journal = node('section', null, 'archive-journal', content);
       node('small', 'PRIVATE JOURNAL', 'archive-journal-label', journal);
-      node('h2', '离开房间以前与以后', 'archive-journal-title', journal);
-      node('p', '十日记事。字迹有些模糊，纸页按日期收在一起。', 'archive-journal-intro', journal);
+      node('h2', '个人记录 / 损坏附件', 'archive-journal-title', journal);
+      node('p', '恢复项目：10 条。部分正文缺失，原始顺序已保留。', 'archive-journal-intro', journal);
       for (const entry of story.roomJournal || []) {
         const item = node('details', null, 'archive-journal-day', journal);
         item.dataset.roomJournalDay = entry.day;
@@ -124,7 +186,7 @@
       node('h2', '我们抵达过的地方', 'archive-section-title', content);
       for (const id of state.endings) button(content, story.endings[id].title, () => renderEnding(id, false), 'archive-ending-link');
     }
-    node('p', '读取不会删除我的照片或约会记录。', 'archive-footnote', content);
+    node('p', 'END OF INDEX / ERROR STATE RETAINED', 'archive-footnote', content);
   }
   function renderDossier(content, chapter) {
     const progress = state.chapters[chapter.id];
@@ -139,32 +201,34 @@
     if (chapter.id === 'echo') button(clues, '信息 · 重读那封邀请短信', () => openSms(), 'archive-clue-link');
     if (progress.solved) {
       node('p', chapter.puzzle.success, 'archive-success', content);
-      const letter = node('div', null, 'archive-letter', content);
-      for (const text of chapter.reveal) node('p', text, '', letter);
+      const logs = node('div', null, 'archive-log-stream', content); logs.setAttribute('aria-label', '后台数据库报错日志');
+      for (const [index, log] of chapter.logs.entries()) {
+        const entry = node('section', null, 'archive-log-entry is-' + log.level.toLowerCase(), logs);
+        entry.dataset.logLevel = log.level;
+        const meta = node('div', null, 'archive-log-meta', entry);
+        node('span', String(index + 1).padStart(3, '0'), 'archive-log-number', meta);
+        node('time', log.time, '', meta); node('b', log.level, 'archive-log-level', meta);
+        node('p', log.source, 'archive-log-source', entry); node('p', log.text, 'archive-log-text', entry);
+      }
       button(content, '重新回应这段对话', () => { progress.choice = null; save(); openChat(chapter.id); }, 'sequel-secondary');
       const next = story.chapters[chapterIds.indexOf(chapter.id) + 1];
       if (next) button(content, accessible(next) ? '翻开下一份记录 →' : `下一份记录 · 好感度 ${next.threshold}%`, () => { currentArchive = null; renderArchives(); }, 'sequel-button');
       else if (allSolved()) button(content, '去听听他的回答', renderFinalChoice, 'sequel-button', 'sequelFinale');
       return;
     }
-    const form = node('form', null, 'archive-puzzle', content);
-    const label = node('label', chapter.puzzle.question, '', form); label.htmlFor = 'archiveAnswer';
-    const input = node('input', null, '', form); input.id = 'archiveAnswer'; input.autocomplete = 'off'; input.maxLength = chapter.puzzle.answer.length; input.placeholder = chapter.id === 'dawn' ? '输入四位数字' : '输入两位编号'; input.inputMode = 'numeric';
+    const form = node('div', null, 'archive-puzzle', content);
+    node('p', '访问口令已验证。核对关联记录后，可读取该数据段。', 'archive-read-description', form);
     const feedback = node('p', '', 'archive-feedback', form); feedback.id = 'archiveFeedback'; feedback.setAttribute('role', 'status');
-    const submit = node('button', '核对记录', 'sequel-button', form); submit.type = 'submit'; submit.id = 'archiveSubmit';
-    form.onsubmit = event => {
-      event.preventDefault();
-      if (!progress.choice || !progress.storySeen) { feedback.textContent = '先听完成灿的话，再看一眼他的快拍。两处线索都可以随时重读。'; return; }
-      const normalize = value => String(value).normalize('NFKC').trim().toLowerCase().replace(/\s+/g, ' ');
-      if (normalize(input.value) !== normalize(chapter.puzzle.answer)) { feedback.textContent = '还没有对上。记录不会消失，慢慢来。'; input.setAttribute('aria-invalid', 'true'); return; }
-      progress.solved = true; input.removeAttribute('aria-invalid'); save(); sync(); renderArchives();
-    };
-    const hint = node('p', '', 'archive-hint', form); hint.id = 'archiveHintText'; hint.hidden = true;
-    button(form, '需要一点提示', () => { hint.hidden = !hint.hidden; hint.textContent = chapter.puzzle.hint; }, 'sequel-link', 'archiveHint');
+    button(form, '读取数据段', () => {
+      if (!archiveAccessGranted || !form.isConnected || !document.getElementById('archives').classList.contains('active')) return;
+      if (!progress.choice || !progress.storySeen) { feedback.textContent = '关联记录未核对：KakaoTalk / Instagram。'; return; }
+      progress.solved = true; save(); sync(); renderArchives();
+    }, 'sequel-button', 'archiveRead');
   }
   function openChat(id) {
     const chapter = chapterById(id) || nextChapter();
     if (!chapter || !accessible(chapter)) { openArchives(); return; }
+    if (!archiveAccessGranted) { afterArchiveAccess = { type: 'chat', id: chapter.id }; openArchives(chapter.id); return; }
     state.activeChapter = chapter.id;
     if (!state.chapters[chapter.id].cursor) state.chapters[chapter.id].cursor = 1;
     busy = false; chatToken++; save(); renderChat(); view('sequelChat');
@@ -247,7 +311,8 @@
   }
   function renderFinalChoice() {
     if (!allSolved()) { openArchives(); return; }
-    const screen = document.getElementById('archives'); screen.replaceChildren(); currentArchive = null; state.currentEnding = null; save();
+    if (!archiveAccessGranted) { openArchives(); return; }
+    const screen = document.getElementById('archives'); screen.replaceChildren(); screen.classList.remove('archive-reading', 'archive-system'); currentArchive = null; state.currentEnding = null; save();
     header(screen, '天亮之前', '最后一段对话', () => openArchives());
     const content = node('div', null, 'archive-content sequel-final-choice', screen);
     node('p', 'CHAPTER 03 / THE CHOICE IS OURS', 'sequel-eyebrow', content);
@@ -269,7 +334,8 @@
   }
   function showClosingLetter(endingId) {
     const letter = story.closingLetter;
-    const screen = document.getElementById('archives'); screen.replaceChildren(); screen.classList.remove('archive-reading'); currentArchive = null;
+    cancelArchiveLoad();
+    const screen = document.getElementById('archives'); screen.replaceChildren(); screen.classList.remove('archive-reading', 'archive-system'); currentArchive = null;
     const shell = node('div', null, 'sequel-ending sequel-epilogue', screen);
     header(shell, 'Samsara', '最后一封信', () => renderEnding(endingId, false, true));
     const content = node('div', null, 'sequel-ending-content epilogue-content', shell);
@@ -295,9 +361,10 @@
   }
   function renderEnding(id, record = true, vaultOverride = false) {
     if (!endingIds.includes(id) || (record && !allSolved() && !vaultOverride)) return;
+    cancelArchiveLoad();
     if (record && !state.endings.includes(id)) state.endings.push(id);
     state.currentEnding = id; save();
-    const ending = story.endings[id], screen = document.getElementById('archives'); screen.replaceChildren(); screen.classList.remove('archive-reading');
+    const ending = story.endings[id], screen = document.getElementById('archives'); screen.replaceChildren(); screen.classList.remove('archive-reading', 'archive-system');
     const shell = node('div', null, 'sequel-ending ending-' + id, screen);
     header(shell, 'Samsara', '我们抵达的地方', () => showClosingLetter(id));
     const content = node('div', null, 'sequel-ending-content', shell);

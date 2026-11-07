@@ -49,8 +49,8 @@
     }
   };
 
-  const emptyState = () => ({ version: 4, sessions: {}, completed: [], likes: [], comments: {} });
-  const freshSession = () => ({ step: 0, choices: {}, rehearsal: [], response: '', roomChoices: [], roomIndex: 0, eraseAttempted: false, selfAttempted: false, roomResponse: '', roomComplete: false, reward: 0 });
+  const emptyState = () => ({ version: 5, sessions: {}, completed: [], likes: [], comments: {} });
+  const freshSession = () => ({ step: 0, choices: {}, rehearsal: [], response: '', roomChoices: [], roomIndex: 0, eraseAttempted: false, selfAttempted: false, roomTarget: null, roomResponse: '', roomComplete: false, reward: 0 });
   const restrictedRoomDays = new Set([2, 3, 5, 6, 7]);
   function restoreRoomProgress(old, saved, version, completed) {
     const choices = [];
@@ -70,6 +70,7 @@
     const sameDay = rawIndex === saved.roomIndex && !saved.roomResponse;
     saved.eraseAttempted = sameDay && version >= 4 && old.eraseAttempted === true;
     saved.selfAttempted = sameDay && restrictedRoomDays.has(saved.roomIndex + 1) && old.selfAttempted === true;
+    saved.roomTarget = sameDay && saved.roomIndex === 7 && ['self', 'other'].includes(old.roomTarget) ? old.roomTarget : null;
     if (saved.roomComplete) saved.step = 2;
     if (saved.step === 2 && !saved.roomComplete && !completed) saved.step = choices.length ? 1 : 0;
     if (saved.step === 0 && choices.length) saved.step = saved.roomComplete ? 2 : 1;
@@ -77,7 +78,7 @@
   function load() {
     try {
       const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-      if (!parsed || ![1, 2, 3, 4].includes(parsed.version)) return emptyState();
+      if (!parsed || ![1, 2, 3, 4, 5].includes(parsed.version)) return emptyState();
       const result = emptyState();
       for (const id of chapterIds) {
         const old = parsed.sessions?.[id];
@@ -87,7 +88,7 @@
             choices: old.choices && typeof old.choices === 'object' ? old.choices : {},
             rehearsal: Array.isArray(old.rehearsal) ? old.rehearsal.filter(x => ['breathe', 'raise', 'turn'].includes(x)).slice(0, 3) : [],
             response: typeof old.response === 'string' ? old.response.slice(0, 250) : '',
-            roomChoices: [], roomIndex: 0, eraseAttempted: false, selfAttempted: false, roomResponse: '', roomComplete: false,
+            roomChoices: [], roomIndex: 0, eraseAttempted: false, selfAttempted: false, roomTarget: null, roomResponse: '', roomComplete: false,
             reward: Number.isInteger(old.reward) && old.reward >= 0 && old.reward <= (parsed.version >= 4 ? 20 : parsed.version < 3 && id === 'escape' ? 15 : 5) ? old.reward : 0
           };
           if (id === 'escape') restoreRoomProgress(old, result.sessions[id], parsed.version, Array.isArray(parsed.completed) && parsed.completed.includes(id));
@@ -101,6 +102,7 @@
   const state = load();
   let activeId = null;
   let initialized = false;
+  let roomActionTimer = null, roomActionToken = 0;
   function persist() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {} }
   function session(id = activeId) {
     if (!state.sessions[id]) state.sessions[id] = freshSession();
@@ -149,6 +151,7 @@
     window.MaqueSequel?.onDateComplete?.(id);
   }
   function render() {
+    clearTimeout(roomActionTimer); roomActionTimer = null; roomActionToken++;
     if (!activeId) return;
     const id = activeId, story = stories[id], s = session(id), step = s.step, node = story.nodes[step];
     const box = document.getElementById('dateDetailContent');
@@ -225,6 +228,44 @@
     '双侧耳垂穿刺',
     '说出此刻最恨的人，以及最害怕的事'
   ];
+  const roomInteractions = {
+    1: { type: 'embrace', label: '轻触屏幕，让我们拥抱', playing: '我们慢慢靠近。', result: '拥抱已记录。' },
+    4: { type: 'gaze', label: '轻触屏幕，与成灿对视', playing: '这一次，我没有移开目光。', result: '对视已记录。' },
+    8: { type: 'piercing', label: '轻触屏幕，完成耳垂穿刺', playing: '他的手停了一下，又轻轻靠近。', result: '穿刺已记录。' },
+    9: { type: 'confession', label: '轻触屏幕，听他说完', playing: '我安静地等他说下去。', result: '声音已记录。' }
+  };
+  function renderRoomInteraction(box, id, s, day, isDay) {
+    const action = roomInteractions[day], target = day === 8 ? s.roomTarget : 'shared';
+    const stage = button('', 'roomNineAction', () => {
+      if (!isDay() || !stage.isConnected || stage.disabled || s.roomResponse || s.roomChoices.length !== day - 1) return;
+      stage.disabled = true; stage.classList.add('is-playing'); stage.setAttribute('aria-busy', 'true');
+      caption.textContent = day === 8 && target === 'other' ? '我把手放稳。他没有躲开。' : action.playing;
+      const token = ++roomActionToken;
+      roomActionTimer = setTimeout(() => {
+        if (token !== roomActionToken || !isDay() || !stage.isConnected || s.roomResponse || s.roomChoices.length !== day - 1) return;
+        roomActionTimer = null; s.roomChoices.push({ id: target, day }); s.roomTarget = null;
+        s.roomResponse = action.result; persist(); render();
+      }, 1900);
+    }, 'room-nine-interaction');
+    stage.dataset.interaction = action.type;
+    stage.setAttribute('aria-label', action.label); stage.setAttribute('aria-busy', 'false');
+    if (day === 8) stage.dataset.target = target === 'self' ? 'Eunseok' : 'Sungchan';
+    const art = element('span', '', 'room-interaction-art'); art.setAttribute('aria-hidden', 'true');
+    if (day === 8) {
+      art.innerHTML = '<svg class="room-ear-art" viewBox="0 0 280 190" fill="none"><path class="room-ear-outline" d="M137 142c-23-1-25-18-19-36 3-10-4-15-4-32 0-25 15-42 37-42 25 0 40 19 39 45-1 19-10 28-18 38-7 9-8 26-19 32-6 3-11 2-16-5Z"/><path class="room-ear-inner" d="M134 101c-16-28 7-55 27-45 20 10 8 28-2 35-9 6-10 15-7 24"/><circle class="room-piercing-point" cx="146" cy="138" r="3"/><circle class="room-earring" cx="146" cy="150" r="13"/><path class="room-piercing-touch" d="M205 137h-47"/><circle class="room-touch-halo" cx="146" cy="138" r="24"/></svg>';
+      art.append(element('span', target === 'self' ? 'Eunseok' : 'Sungchan', 'room-target-name'));
+    } else {
+      art.innerHTML = '<svg class="room-figures-art" viewBox="0 0 300 200" fill="none"><path class="room-floor" d="M30 178h240"/><g class="room-person room-person-left"><circle cx="92" cy="63" r="20"/><path class="room-body" d="M57 161v-29c0-29 13-43 35-43s35 14 35 43v29"/><path class="room-arm" d="M68 114c9 13 24 19 47 17"/></g><g class="room-person room-person-right"><circle cx="208" cy="63" r="20"/><path class="room-body" d="M173 161v-29c0-29 13-43 35-43s35 14 35 43v29"/><path class="room-arm" d="M232 114c-9 13-24 19-47 17"/></g><path class="room-gaze-line" d="M114 64h72"/><path class="room-embrace-trace" d="M111 108q39-28 78 0"/><g class="room-speech"><rect x="111" y="18" width="78" height="32" rx="13"/><path d="m136 50-6 9 19-9"/><circle cx="136" cy="34" r="2"/><circle cx="150" cy="34" r="2"/><circle cx="164" cy="34" r="2"/></g></svg>';
+      const names = element('span', '', 'room-person-names'); names.append(element('span', 'Sungchan'), element('span', 'Eunseok')); art.append(names);
+    }
+    stage.append(art);
+    const caption = element('span', action.label, 'room-interaction-caption'); caption.setAttribute('aria-live', 'polite');
+    stage.append(caption, element('span', 'TOUCH TO CONTINUE', 'room-interaction-kicker'));
+    box.append(stage);
+    if (day === 8) box.append(button('重新选择承受者', 'roomNineChangeTarget', () => {
+      if (!isDay() || stage.disabled) return; s.roomTarget = null; persist(); render();
+    }, 'date-inline-link'));
+  }
   function renderRoomNine(box, id, s, node) {
     const round = Math.min(s.roomIndex, 8), day = round + 1;
     const isDay = () => session(id) === s && isCurrent(id, 1) && s.roomIndex === round;
@@ -237,14 +278,18 @@
         if (!isDay() || !s.roomResponse) return;
         s.roomResponse = '';
         if (s.roomIndex >= 8) { s.roomComplete = true; advance(id, s.step); return; }
-        s.roomIndex = s.roomChoices.length; s.eraseAttempted = false; s.selfAttempted = false; persist(); render();
+        s.roomIndex = s.roomChoices.length; s.eraseAttempted = false; s.selfAttempted = false; s.roomTarget = null; persist(); render();
       });
       result.append(next); box.append(result); return;
     }
+    if ([1, 4, 9].includes(day) || (day === 8 && s.roomTarget)) {
+      renderRoomInteraction(box, id, s, day, isDay); return;
+    }
+    box.append(element('p', '请选择承受者：', 'room-nine-recipient-label'));
     const opts = element('div', '', 'room-nine-options');
     const options = [
-      ['other', '让成灿承受伤害'],
-      ['self', '我独自承受伤害'],
+      ['other', 'Sungchan'],
+      ['self', 'Eunseok'],
       ['erase', '二人都失去一段共同的记忆']
     ];
     for (const [choice, label] of options) {
@@ -257,6 +302,7 @@
           requestAnimationFrame(() => box.querySelector('[data-choice="other"]')?.focus({ preventScroll: true }));
           return;
         }
+        if (day === 8) { s.roomTarget = choice; persist(); render(); return; }
         s.roomChoices.push({ id: choice, day });
         s.roomResponse = '选择已确认。';
         persist(); render();

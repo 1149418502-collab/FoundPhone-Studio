@@ -94,90 +94,130 @@ test("secret archive is unavailable below 60 percent without disturbing the phon
   expect(errors).toEqual([]);
 });
 
+async function enterArchive(page:Page) {
+  await page.evaluate('MaqueSequel.openArchives()');
+  if(await page.locator('#archiveAnswer').isVisible()) {
+    await page.locator('#archiveAnswer').fill('2001');await page.locator('#archiveSubmit').click();
+    await expect(page.locator('#archiveLoading')).toContainText('绝密档案开启中');
+  }
+  await expect(page.locator('.archive-index')).toBeVisible({timeout:5000});
+}
+async function readChapter(page:Page,id:string,choice='trust') {
+  if(!await page.locator('.archive-index').isVisible())await page.locator('#archives .sequel-back').click();
+  await page.locator(`[data-chapter="${id}"]`).click();
+  await page.getByRole('button',{name:/KakaoTalk · 和成灿确认/}).click();
+  const length=await page.evaluate(id=>window.MaqueSequelStory.chapters.find(chapter=>chapter.id===id)!.chat.length,id);
+  for(let index=1;index<length;index++) {
+    await expect(page.locator('#sequelNext')).toBeEnabled();await page.locator('#sequelNext').click();
+  }
+  await page.locator(`[data-sequel-choice="${choice}"]`).click();await page.locator('#sequelBackToArchive').click();
+  await page.getByRole('button',{name:/Instagram · 查看他的快拍/}).click();
+  await page.getByRole('button',{name:'关闭快拍'}).click();
+  await page.locator(`[data-sequel-post="${id}"]`).getByRole('button',{name:'回到秘密档案'}).click();
+  await page.locator('#archiveRead').click();await expect(page.locator('.archive-success')).toBeVisible();
+}
+
 for(const width of [320,390]) {
-  test(`archive icon, index and locked records remain readable within a ${width}px phone`,async({page})=>{
-    await page.setViewportSize({width,height:844});
-    const errors=await open(page,60);
-    const icon=page.locator('#archiveApp img');
-    await expect(icon).toHaveAttribute('src',/archive-index-icon\.svg\?v=/);
-    await expect.poll(()=>icon.evaluate((image:HTMLImageElement)=>image.complete&&image.naturalWidth>0)).toBe(true);
+  test(`classified access, loading, index and database logs fit a ${width}px phone`,async({page})=>{
+    await page.setViewportSize({width,height:844});const errors=await open(page,60);
+    const icon=page.locator('#archiveApp img');await expect(icon).toHaveAttribute('src',/archive-index-icon\.svg\?v=/);
     expect((await icon.boundingBox())!.width).toBeLessThanOrEqual(46);
-    await expect(page.locator('#featureNotice')).toBeHidden({timeout:5000});
-    await page.locator('#home').screenshot({path:`outputs/maque/archive-icon-${width}.png`});
-    await page.locator('#archiveApp').click();
-    await expect(page.locator('.archive-index')).toBeVisible();
-    await expect(page.locator('.archive-index .archive-title')).toContainText('未寄出的');
-    await expect(page.locator('.archive-folder')).toHaveCount(3);
-    await expect(page.locator('[data-chapter="echo"]')).toBeEnabled();
-    await expect(page.locator('[data-chapter="second"]')).toBeDisabled();
-    await expect(page.locator('#archives')).not.toContainText(/一周目|二周目|上一轮|玩家\s*[AB]/);
-    await phoneFits(page,'.archive-index');
-    await page.locator('#archives').evaluate(node=>{node.scrollTop=0});
-    await page.locator('#archives').screenshot({path:`outputs/maque/archive-index-${width}.png`});
-    await page.locator('[data-chapter="echo"]').click();
+    await expect(page.locator('#featureNotice')).toBeHidden({timeout:5000});await page.locator('#archiveApp').click();
     await expect(page.locator('#archiveAnswer')).toHaveAttribute('inputmode','numeric');
-    await phoneFits(page,'.archive-dossier');
+    await expect(page.locator('#archiveAnswer')).toHaveAttribute('type','password');
+    await expect(page.locator('.archive-index,.archive-log-entry')).toHaveCount(0);
+    await phoneFits(page,'.archive-access');
+    await page.locator('#archives').screenshot({path:`outputs/maque/archive-access-${width}.png`});
+    await page.locator('#archiveAnswer').fill('2001');await page.locator('#archiveSubmit').click();
+    await expect(page.locator('#archiveLoading')).toContainText('绝密档案开启中');
+    await page.locator('#archives').screenshot({path:`outputs/maque/archive-loading-${width}.png`});
+    await expect(page.locator('.archive-index')).toBeVisible({timeout:5000});
+    await expect(page.locator('#archives')).toHaveCSS('background-color','rgb(9, 11, 15)');
+    await expect(page.locator('.archive-system-status')).toContainText('游戏重置次数');
+    await expect(page.locator('.archive-system-status dd')).toHaveText(['2','数据异常','无法修复']);
+    await expect(page.locator('.archive-folder')).toHaveCount(3);
+    await expect(page.locator('[data-chapter="echo"]')).toBeEnabled();await expect(page.locator('[data-chapter="second"]')).toBeDisabled();
+    await phoneFits(page,'.archive-index');await page.locator('#archives').screenshot({path:`outputs/maque/archive-index-${width}.png`});
+    await readChapter(page,'echo');await expect(page.locator('.archive-log-entry')).toHaveCount(7);
+    await expect(page.locator('.archive-log-stream')).toContainText('进程拒绝结束');
+    await expect(page.locator('.archive-log-stream')).toContainText('无法修复');
+    await expect(page.locator('.archive-log-stream')).toContainText('█▒∅');
+    await phoneFits(page,'.archive-dossier');await phoneFits(page,'.archive-log-stream');
     await page.locator('#archives').evaluate(node=>{node.scrollTop=0});
-    await page.locator('#archives').screenshot({path:`outputs/maque/archive-file-${width}.png`});
-    expect(errors).toEqual([]);
+    await page.locator('#archives').screenshot({path:`outputs/maque/archive-log-${width}.png`});expect(errors).toEqual([]);
   });
 }
 
-test("the 60 percent archive unlocks on the phone and 01 is found through KakaoTalk and Instagram", async ({ page }) => {
-  const errors = await open(page, 60);
-  const app = page.locator("#archiveApp");
-  await expect(app).toBeVisible();
-  await expect(page.locator("#archiveTeaser")).toContainText("RECOVERY INDEX");
-  await app.click();
-  await page.locator('[data-chapter="echo"]').click();
-  await page.getByRole("button", { name: /KakaoTalk · 和成灿确认/ }).click();
-  for (let i = 0; i < 11; i++) {
-    await expect(page.locator("#sequelNext")).toBeEnabled();
-    await page.locator("#sequelNext").click();
+test('only 2001 opens the archive, and loading does not reveal the database early',async({page})=>{
+  const errors=await open(page,60);await page.clock.install();
+  await page.evaluate('MaqueSequel.openArchives()');
+  for(const wrong of ['01','02','0319','2002']) {
+    await page.locator('#archiveAnswer').fill(wrong);await page.locator('#archiveSubmit').click();
+    await expect(page.locator('#archiveFeedback')).toContainText('口令不匹配');
+    await expect(page.locator('.archive-system-status,.archive-folder,.archive-log-entry')).toHaveCount(0);
   }
-  await page.locator('[data-sequel-choice="trust"]').click();
-  await page.locator("#sequelBackToArchive").click();
-  await page.getByRole("button", { name: /Instagram · 查看他的快拍/ }).click();
-  await expect(page.locator(".sequel-story-overlay")).toContainText("01");
-  await page.getByRole("button", { name: "关闭快拍" }).click();
-  await page.getByRole("button", { name: "回到秘密档案" }).click();
-  await page.locator("#archiveAnswer").fill("Black Shadow");
-  await page.locator("#archiveSubmit").click();
-  await expect(page.locator("#archiveFeedback")).toContainText("还没有对上");
-  await page.locator("#archiveAnswer").fill("01");
-  await page.locator("#archiveSubmit").click();
-  await expect(page.locator("#archives")).toContainText("01 号日志");
-  expect(errors).toEqual([]);
+  await page.locator('#archiveAnswer').fill('2001');await page.locator('#archiveSubmit').click();
+  await expect(page.locator('#archiveLoading')).toHaveAttribute('aria-busy','true');
+  await page.clock.runFor(1200);await expect(page.locator('.archive-index')).toHaveCount(0);
+  await page.clock.runFor(650);await expect(page.locator('.archive-index')).toBeVisible();
+  await page.locator('[data-chapter="echo"]').click();await expect(page.locator('#archiveAnswer')).toHaveCount(0);
+  await page.locator('#archiveRead').click();await expect(page.locator('#archiveFeedback')).toContainText('关联记录未核对');
+  await expect(page.locator('.archive-log-entry')).toHaveCount(0);expect(errors).toEqual([]);
 });
 
-test("a completed room date reveals no diary until its related archive is actually decrypted",async({page})=>{
-  await page.addInitScript(()=>{
-    localStorage.setItem("maque_sequel_v1",JSON.stringify({version:1,dates:["escape"],chapters:{},endings:[],currentEnding:null}));
-  });
-  const errors=await open(page,80);
-  await page.locator("#archiveApp").click();
-  await expect(page.locator(".archive-journal")).toHaveCount(0);
-  for(const [chapter,answer] of [["echo","01"],["second","02"]]) {
-    await page.locator(`[data-chapter="${chapter}"]`).click();
-    await expect(page.locator("#archives")).not.toContainText(/一周目|二周目|上一轮|实例|第二个成灿/);
-    await page.getByRole("button",{name:/KakaoTalk · 和成灿确认/}).click();
-    for(let i=0;i<11;i++) {
-      await expect(page.locator("#sequelNext")).toBeEnabled();
-      await page.locator("#sequelNext").click();
-    }
-    await page.locator('[data-sequel-choice="trust"]').click();
-    await page.locator("#sequelBackToArchive").click();
-    await page.getByRole("button",{name:/Instagram · 查看他的快拍/}).click();
-    await page.getByRole("button",{name:"关闭快拍"}).click();
-    await page.locator(`[data-sequel-post="${chapter}"]`).getByRole("button",{name:"回到秘密档案"}).click();
-    await page.locator("#archiveAnswer").fill(answer);
-    await page.locator("#archiveSubmit").click();
-    await expect(page.locator(".archive-success")).toBeVisible();
-    await page.locator("#archives .sequel-back").click();
-    await expect(page.locator(".archive-journal-day")).toHaveCount(chapter==="second"?10:0);
-  }
-  await expect(page.locator("#archives")).not.toContainText(/一周目|二周目|上一轮|日记模板|稍后补充|第十天是成灿离开房间后的私人回忆/);
-  await page.locator('[data-room-journal-day="10"] summary').click();
-  await expect(page.locator('[data-room-journal-day="10"]')).toContainText("最后一个字后面");
-  expect(errors).toEqual([]);
+test('leaving an archive load cannot reopen the app or authenticate a later visit',async({page})=>{
+  await open(page,60);await page.clock.install();await page.evaluate('MaqueSequel.openArchives()');
+  await page.locator('#archiveAnswer').fill('2001');await page.locator('#archiveSubmit').click();
+  await page.locator('#archives .sequel-home').click();await page.clock.runFor(2500);
+  await expect(page.locator('#home')).toHaveClass(/active/);await page.evaluate('MaqueSequel.openArchives()');
+  await expect(page.locator('#archiveAnswer')).toBeVisible();await expect(page.locator('.archive-index')).toHaveCount(0);
 });
+
+test('private KakaoTalk access uses the same archive key and returns to the requested conversation',async({page})=>{
+  await open(page,60);await page.evaluate('MaqueSequel.openChat("echo")');
+  await expect(page.locator('#archiveAnswer')).toBeVisible();await expect(page.locator('#sequelChat')).not.toHaveClass(/active/);
+  await page.locator('#archiveAnswer').fill('2001');await page.locator('#archiveSubmit').click();
+  await expect(page.locator('#sequelChat')).toHaveClass(/active/,{timeout:5000});
+  await expect(page.locator('#sequelChatLog')).toContainText('没发到你那里');
+});
+
+test('old solved files and collected endings survive, but the new database still requires the key after reload',async({page})=>{
+  await page.addInitScript(()=>{
+    if(localStorage.getItem('archive-old-save'))return;localStorage.setItem('archive-old-save','yes');
+    localStorage.setItem('maque_sequel_v1',JSON.stringify({version:1,dates:['escape'],endings:['reunion','loop'],chapters:{echo:{solved:true,choice:'trust',cursor:12,storySeen:true},second:{solved:true,choice:'distance',cursor:12,storySeen:true}},announced:60}));
+  });
+  await open(page,80);await enterArchive(page);
+  await expect(page.locator('.archive-ending-link')).toHaveText(['结局 · 明天见','结局 · ∞']);
+  await page.locator('[data-chapter="second"]').click();await expect(page.locator('.archive-log-stream')).toContainText('选项强制修改');
+  await expect(page.locator('.archive-log-stream')).toContainText('target: Eunseok → null');
+  await page.reload();await page.evaluate('MaqueSequel.openArchives()');await expect(page.locator('#archiveAnswer')).toBeVisible();
+  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('maque_sequel_v1')!));
+  expect(saved.chapters.second.choice).toBe('distance');expect(saved.chapters.second.solved).toBe(true);expect(saved.endings).toEqual(['reunion','loop']);
+});
+
+test('a completed room date reveals no ten-day journal until its related database block is read',async({page})=>{
+  await page.addInitScript(()=>localStorage.setItem('maque_sequel_v1',JSON.stringify({version:1,dates:['escape'],chapters:{},endings:[],currentEnding:null})));
+  const errors=await open(page,80);await enterArchive(page);await expect(page.locator('.archive-journal')).toHaveCount(0);
+  await readChapter(page,'echo');await page.locator('#archives .sequel-back').click();await expect(page.locator('.archive-journal')).toHaveCount(0);
+  await readChapter(page,'second');await page.locator('#archives .sequel-back').click();await expect(page.locator('.archive-journal-day')).toHaveCount(10);
+  await page.locator('[data-room-journal-day="10"] summary').click();await expect(page.locator('[data-room-journal-day="10"]')).toContainText('最后一个字后面');
+  await expect(page.locator('#archives')).not.toContainText(/一周目|二周目|上一轮|日记模板|稍后补充/);expect(errors).toEqual([]);
+});
+
+for(const route of [
+  {id:'reunion',choice:'trust',final:'reunion',title:'结局 · 明天见'},
+  {id:'farewell',choice:'trust',final:'farewell',title:'结局 · 把春天还给你'},
+  {id:'suspense',choice:'distance',final:'reunion',title:'结局 · 明日或不再'},
+  {id:'loop',choice:'trust',final:'loop',title:'结局 · ∞'}
+]) {
+  test(`database and social records still reach ${route.id} with the renamed ending`,async({page})=>{
+    test.setTimeout(60000);const errors=await open(page,80);await enterArchive(page);
+    for(const id of ['echo','second','dawn'])await readChapter(page,id,route.choice);
+    await page.locator('#sequelFinale').click();await page.locator(`[data-ending-choice="${route.final}"]`).click();
+    await expect(page.locator('.sequel-ending h1')).toHaveText(route.title);
+    expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('maque_sequel_v1')!).endings)).toContain(route.id);
+    await page.locator('#sequelClosingLetter').click();await page.getByRole('button',{name:'拆开最后的情书'}).click();
+    await expect(page.locator('.epilogue-note')).toBeVisible();await expect(page.locator('.epilogue-word')).toHaveText('Samsara');
+    expect(errors).toEqual([]);
+  });
+}

@@ -1162,58 +1162,61 @@ test("provided image 2 is the decoded IG story and post portrait", async ({
 });
 
 
-test("room nine keeps all nine choices in the present, without exposing hidden background", async ({ page }) => {
+test("room nine completes nine present-day tasks with shared animations and named recipients", async ({ page }) => {
+  test.setTimeout(60000);
   await page.setViewportSize({width:390,height:844});
-  await open(page, 50);
+  await open(page,50);
   await page.evaluate(() => {
     const identity={id:"identity-test",src:"./assets/date-baseball-couple-1.jpg",alt:"我的形象"};
     return savePhoto(identity).then(()=>{dateSelectedPhotoId=identity.id;dateJourneyAccepted=true;localStorage.setItem("maque_date_photo_id",identity.id);view("dates");showDateCatalog()});
   });
-  const locked=page.getByRole("button",{name:/选择约会场景：九号房间/});
-  await expect(locked).toBeVisible();
-  await locked.click();
+  await page.getByRole("button",{name:/选择约会场景：九号房间/}).click();
   await expect(page.locator("#modalbody")).toContainText("先完成棒球、校园足球和一日爱豆");
   await page.locator("#modal button").click();
-  await page.evaluate(()=>{completedDates.add("baseball");completedDates.add("football");completedDates.add("idol");storeDateList("maque_dates_completed",completedDates);showDateCatalog()});
+  await page.evaluate(()=>{for(const id of ["baseball","football","idol"])completedDates.add(id);storeDateList("maque_dates_completed",completedDates);showDateCatalog()});
   await page.getByRole("button",{name:/选择约会场景：九号房间/}).click();
-  await page.locator("#roomNineStart").click();
-  await page.locator("#extraDateNext").click();
+  await page.locator("#roomNineStart").click();await page.locator("#extraDateNext").click();
   for(let day=1;day<=9;day++) {
-    await expect(page.locator(".room-nine-oldrun, .room-nine-file, .room-nine-tally")).toHaveCount(0);
-    await expect(page.locator("#dateDetailContent")).not.toContainText(/一周目|二周目|上一轮|玩家\s*[AB]|下意识|记忆索引|虚拟模拟|RECOVERED SNAPSHOT/);
+    await expect(page.locator("#dateDetailContent")).not.toContainText(/一周目|二周目|上一轮|玩家\s*[AB]|下意识|记忆索引|RECOVERED SNAPSHOT|重置次数/);
     await expect(page.locator(".extra-date-progress span")).toHaveCount(9);
     await expect(page.locator(".room-nine-day")).toContainText(`${String(day).padStart(2,"0")} / 09`);
-    await expect(page.locator(".room-nine-choice")).toHaveCount(3);
-    await expect(page.locator('.room-nine-choice[data-choice="other"]')).toHaveText("让成灿承受伤害");
-    await expect(page.locator('.room-nine-choice[data-choice="self"]')).toHaveText("我独自承受伤害");
-    const erase = page.locator('.room-nine-choice[data-choice="erase"]');
-    await expect(erase).toHaveText("二人都失去一段共同的记忆");
-    await erase.click();
-    await expect(erase).toBeDisabled();
-    await expect(page.locator("#roomNineMemoryLock")).toHaveText("不可以。");
-    await expect(page.locator('.room-nine-choice[data-choice="other"]')).toBeEnabled();
-    await expect(page.locator('.room-nine-choice[data-choice="self"]')).toBeEnabled();
-    const self = page.locator('.room-nine-choice[data-choice="self"]');
-    await self.click();
-    if([2,3,5,6,7].includes(day)) {
-      await expect(self).toHaveCount(0);
-      await expect(erase).toBeDisabled();
-      await expect(page.locator(".room-nine-day")).toContainText(`${String(day).padStart(2,"0")} / 09`);
-      expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!).sessions.escape.roomChoices.length)).toBe(day-1);
-      await page.locator('.room-nine-choice[data-choice="other"]').click();
+    if([1,4,9].includes(day)) {
+      await expect(page.locator(".room-nine-choice,.room-nine-recipient-label")).toHaveCount(0);
+      await completeRoomInteraction(page);
+    } else {
+      await expect(page.locator(".room-nine-recipient-label")).toHaveText("请选择承受者：");
+      await expect(page.locator(".room-nine-choice")).toHaveCount(3);
+      await expect(page.locator('[data-choice="other"]')).toHaveText("Sungchan");
+      await expect(page.locator('[data-choice="self"]')).toHaveText("Eunseok");
+      const erase=page.locator('[data-choice="erase"]');await erase.click();await expect(erase).toBeDisabled();
+      await expect(page.locator("#roomNineMemoryLock")).toHaveText("不可以。");
+      await page.locator('[data-choice="self"]').click();
+      if(day===8) {
+        await expect(page.locator('#roomNineAction')).toHaveAttribute('data-target','Eunseok');
+        await completeRoomInteraction(page);
+      } else {
+        await expect(page.locator('[data-choice="self"]')).toHaveCount(0);
+        await expect(erase).toBeDisabled();
+        expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!).sessions.escape.roomChoices.length)).toBe(day-1);
+        await page.locator('[data-choice="other"]').click();
+      }
     }
     await page.locator("#roomNineContinue").click();
   }
   await expect(page.locator("#extraDateResult")).toContainText("轻轻握住了我的手");
-  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!).sessions.escape.roomChoices)).toHaveLength(9);
-  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!).sessions.escape.roomChoices.map((choice:any)=>choice.id))).toEqual(["self","other","other","self","other","other","other","self","self"]);
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!).sessions.escape.roomChoices.map((choice:any)=>choice.id))).toEqual(["shared","other","other","shared","other","other","other","self","shared"]);
   await expect(page.locator("#affectionValue")).toHaveText("♥ 70%");
   await expect(page.locator("#pureLoveBuy")).toBeDisabled();
-  await page.evaluate("view('home')");
-  await page.locator("#archiveApp").click();
-  await expect(page.locator(".archive-journal-day")).toHaveCount(0);
-  await expect(page.locator("#archives")).not.toContainText(/一周目|二周目|上一轮|银硕每次都选择删除/);
+  await page.evaluate("view('home')");await page.locator("#archiveApp").click();
+  await expect(page.locator("#archiveAnswer")).toBeVisible();
+  await expect(page.locator(".archive-journal-day,.archive-log-entry")).toHaveCount(0);
 });
+
+async function completeRoomInteraction(page:Page) {
+  const action=page.locator('#roomNineAction');
+  await expect(action).toBeVisible();await action.click();await expect(action).toBeDisabled();
+  await expect(page.locator('#roomNineContinue')).toBeVisible({timeout:5000});
+}
 
 async function enterRoomNine(page: Page, mode: 'start' | 'resume' | 'preview' = 'start') {
   await page.evaluate(() => {
@@ -1231,6 +1234,7 @@ for (const width of [320,390]) {
     await open(page,60,[],["baseball","football","idol"]);
     await enterRoomNine(page);
     await page.locator("#extraDateNext").click();
+    await completeRoomInteraction(page);await page.locator("#roomNineContinue").click();
     await expect(page.locator("#featureNotice")).toBeHidden({timeout:5000});
     await expect(page.locator(".date-player-chip")).toHaveCount(0);
     const controls=page.locator(".room-nine-choice");
@@ -1264,25 +1268,18 @@ for (const width of [320,390]) {
   });
 }
 
-test("room nine resumes a confirmed day without accepting a duplicate choice or showing saved background",async({page})=>{
-  await open(page,60,[],["baseball","football","idol"]);
-  await enterRoomNine(page);
-  await page.locator("#extraDateNext").click();
-  await page.locator('.room-nine-choice[data-choice="erase"]').click();
-  await page.reload();
-  await page.evaluate("view('home')");
-  await enterRoomNine(page,'resume');
-  await expect(page.locator('.room-nine-choice[data-choice="erase"]')).toBeDisabled();
-  await page.locator('.room-nine-choice[data-choice="other"]').click();
-  await page.reload();
-  await page.evaluate("view('home')");
-  await enterRoomNine(page,'resume');
+test("room nine resumes a confirmed day without duplicating a decision",async({page})=>{
+  await open(page,60,[],["baseball","football","idol"]);await enterRoomNine(page);
+  await page.locator("#extraDateNext").click();await completeRoomInteraction(page);await page.locator('#roomNineContinue').click();
+  await page.locator('[data-choice="erase"]').click();
+  await page.reload();await page.evaluate("view('home')");await enterRoomNine(page,'resume');
+  await expect(page.locator('[data-choice="erase"]')).toBeDisabled();await page.locator('[data-choice="other"]').click();
+  await page.reload();await page.evaluate("view('home')");await enterRoomNine(page,'resume');
   await expect(page.locator(".room-nine-choice")).toHaveCount(0);
   await expect(page.locator(".room-nine-result")).toContainText("选择已确认");
-  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!).sessions.escape.roomChoices)).toEqual([{id:"other",day:1}]);
-  await page.locator("#roomNineContinue").click();
-  await expect(page.locator(".room-nine-day")).toContainText("02 / 09");
-  await expect(page.locator('.room-nine-choice[data-choice="erase"]')).toBeEnabled();
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!).sessions.escape.roomChoices)).toEqual([{id:"shared",day:1},{id:"other",day:2}]);
+  await page.locator("#roomNineContinue").click();await expect(page.locator(".room-nine-day")).toContainText("03 / 09");
+  await expect(page.locator('[data-choice="erase"]')).toBeEnabled();
 });
 
 test("a saved fifth day is labelled before entering, and starting from day one preserves other game progress",async({page})=>{
@@ -1325,21 +1322,14 @@ test("an unverified fifth-day cursor cannot skip four days when no choices were 
   await expect(page.locator('.room-nine-day')).toContainText('01 / 09');
 });
 
-test("detached intro and day controls cannot skip days or commit a choice to a later task",async({page})=>{
-  await open(page,60,[],['baseball','football','idol']);
-  await enterRoomNine(page);
-  await page.evaluate(()=>{
-    const intro=document.querySelector<HTMLButtonElement>('#extraDateNext')!;
-    intro.click();intro.click();
-    const choice=document.querySelector<HTMLButtonElement>('.room-nine-choice[data-choice="other"]')!;
-    choice.click();
-    const next=document.querySelector<HTMLButtonElement>('#roomNineContinue')!;
-    next.click();
-    for(let i=0;i<6;i++){choice.click();next.click();}
-  });
-  await expect(page.locator('.room-nine-day')).toContainText('02 / 09');
-  await expect(page.locator('.room-nine-choice')).toHaveCount(3);
-  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('maque_extra_dates_v1')!).sessions.escape.roomChoices)).toEqual([{id:'other',day:1}]);
+test("detached intro and animation controls cannot skip days or commit to a later task",async({page})=>{
+  await open(page,60,[],['baseball','football','idol']);await enterRoomNine(page);
+  await page.evaluate(()=>{const intro=document.querySelector<HTMLButtonElement>('#extraDateNext')!;intro.click();intro.click();});
+  await page.evaluate(()=>{const action=document.querySelector<HTMLButtonElement>('#roomNineAction')!;(window as any).oldRoomAction=action;action.click();action.click();});
+  await expect(page.locator('#roomNineContinue')).toBeVisible({timeout:5000});
+  await page.evaluate(()=>{const next=document.querySelector<HTMLButtonElement>('#roomNineContinue')!;next.click();for(let i=0;i<6;i++){(window as any).oldRoomAction.disabled=false;(window as any).oldRoomAction.click();next.click();}});
+  await expect(page.locator('.room-nine-day')).toContainText('02 / 09');await expect(page.locator('.room-nine-choice')).toHaveCount(3);
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('maque_extra_dates_v1')!).sessions.escape.roomChoices)).toEqual([{id:'shared',day:1}]);
 });
 
 test("a rejected self choice and a grey memory choice persist independently without completing the day",async({page})=>{
@@ -1347,7 +1337,7 @@ test("a rejected self choice and a grey memory choice persist independently with
   await open(page,60,[],['baseball','football','idol']);
   await enterRoomNine(page);
   await page.locator('#extraDateNext').click();
-  await page.locator('.room-nine-choice[data-choice="other"]').click();
+  await completeRoomInteraction(page);
   await page.locator('#roomNineContinue').click();
   await page.locator('.room-nine-choice[data-choice="erase"]').click();
   await page.locator('.room-nine-choice[data-choice="self"]').click();
@@ -1377,6 +1367,54 @@ test("deployed game copy contains no playthrough exposition, role mapping or aut
   expect(deployedCopy).not.toMatch(/一周目|二周目|上一轮|二代目|第二个成灿|玩家\s*[ABＡＢ]|下意识|RECOVERED SNAPSHOT|INSTANCE\s*0[12]|旧一周目的九次记录|第十天是成灿离开房间后的私人回忆/);
 });
 
+for(const width of [320,390]) {
+  test(`the shared hug is a touch animation with no recipient choices at ${width}px`,async({page})=>{
+    await page.setViewportSize({width,height:844});await open(page,60,[],['baseball','football','idol']);
+    await enterRoomNine(page);await page.locator('#extraDateNext').click();await page.clock.install();
+    const action=page.locator('#roomNineAction');await expect(action).toHaveAttribute('data-interaction','embrace');
+    await expect(page.locator('.room-nine-choice,.room-nine-recipient-label')).toHaveCount(0);
+    expect(await action.evaluate(node=>node.scrollWidth<=node.clientWidth+1)).toBe(true);
+    await action.click();await expect(action).toHaveAttribute('aria-busy','true');
+    await expect(page.locator('#roomNineContinue')).toHaveCount(0);
+    await page.locator('#dates').screenshot({path:`outputs/maque/room-nine-hug-${width}.png`});
+    await page.clock.runFor(2000);await expect(page.locator('.room-nine-result')).toContainText('拥抱已记录');
+    expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('maque_extra_dates_v1')!).sessions.escape.roomChoices)).toEqual([{id:'shared',day:1}]);
+  });
+}
+
+test('leaving a room animation cannot commit a day or advance another session',async({page})=>{
+  await open(page,60,[],['baseball','football','idol']);await enterRoomNine(page);await page.locator('#extraDateNext').click();
+  await page.clock.install();await page.locator('#roomNineAction').click();await page.evaluate('goHome()');await page.clock.runFor(2500);
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('maque_extra_dates_v1')!).sessions.escape.roomChoices)).toEqual([]);
+  await enterRoomNine(page,'resume');await expect(page.locator('.room-nine-day')).toContainText('01 / 09');
+  await expect(page.locator('#roomNineAction')).toBeEnabled();await expect(page.locator('.room-nine-choice')).toHaveCount(0);
+});
+
+for(const target of ['self','other']) {
+  test(`ear piercing preserves the ${target} recipient on reload and commits only after touch`,async({page})=>{
+    await page.setViewportSize({width:390,height:844});
+    await page.addInitScript(()=>{
+      if(localStorage.getItem('room-ear-seeded'))return;localStorage.setItem('room-ear-seeded','yes');
+      localStorage.setItem('maque_extra_dates_v1',JSON.stringify({version:5,sessions:{escape:{step:1,roomIndex:7,roomChoices:Array.from({length:7},(_,index)=>({id:[0,3].includes(index)?'shared':'other',day:index+1}))}},completed:[],likes:[],comments:{}}));
+    });
+    await open(page,60,[],['baseball','football','idol']);await enterRoomNine(page,'resume');
+    await expect(page.locator('.room-nine-day')).toContainText('08 / 09');
+    await page.locator('[data-choice="erase"]').click();await page.locator(`[data-choice="${target}"]`).click();
+    const action=page.locator('#roomNineAction');await expect(action).toHaveAttribute('data-interaction','piercing');
+    await expect(action).toHaveAttribute('data-target',target==='self'?'Eunseok':'Sungchan');
+    await expect(page.locator('#roomNineContinue')).toHaveCount(0);
+    await page.reload();await page.evaluate("view('home')");await enterRoomNine(page,'resume');
+    await expect(action).toHaveAttribute('data-target',target==='self'?'Eunseok':'Sungchan');
+    expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('maque_extra_dates_v1')!).sessions.escape.roomChoices.length)).toBe(7);
+    await page.clock.install();await action.click();await expect(action).toBeDisabled();
+    await page.locator('#dates').screenshot({path:`outputs/maque/room-nine-piercing-${target}-390.png`});
+    await page.clock.runFor(2000);await expect(page.locator('.room-nine-result')).toContainText('穿刺已记录');
+    const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('maque_extra_dates_v1')!).sessions.escape);
+    expect(saved.roomChoices).toHaveLength(8);expect(saved.roomChoices[7]).toEqual({id:target,day:8});expect(saved.roomTarget).toBeNull();
+    expect(await page.evaluate(()=>localStorage.getItem('maque_affection'))).toBe('60');
+  });
+}
+
 
 test("the encrypted diary requires two confirmations and leads to the gentle repeated-first-meeting ending", async ({ page }) => {
   await open(page, 80, [], ["baseball"]);
@@ -1401,7 +1439,7 @@ test(`an existing completed room save at step ${savedStep} preserves progress an
   },savedStep);
   await open(page,80,[],["baseball","football","idol","escape"]);
   const save=await page.evaluate(()=>JSON.parse(localStorage.getItem("maque_extra_dates_v1")!));
-  expect(save.version).toBe(4);
+  expect(save.version).toBe(5);
   expect(save.sessions.escape.step).toBe(2);
   expect(save.sessions.escape.reward).toBe(15);
   expect(save.sessions.escape.roomChoices).toHaveLength(9);
